@@ -1,0 +1,93 @@
+erDiagram
+    USUARIO {
+        int id PK
+        string tipo
+        string nombre
+        string email UK
+        string contraseña
+        timestamp fecha_creacion
+    }
+    PERSONA {
+        boolean premium
+    }
+    EMPRESA {
+        string direccion
+    }
+    ADMINISTRADOR {
+        int id PK
+        string nombre
+        string email UK
+        string contraseña
+        string cargo
+        timestamp fecha_creacion
+    }
+    PERFIL {
+        int id PK,FK
+        text descripcion
+        string ruta_foto_perfil
+        timestamp fecha_actualizacion
+    }
+    CHAT {
+        int id PK
+        string nombre
+        boolean es_grupal
+        timestamp fecha_creacion
+        timestamp ultimo_mensaje
+    }
+    MENSAJE {
+        int id PK
+        text contenido
+        timestamp fecha_envio
+    }
+    EVENTO {
+        int codigo PK
+        string nombre
+        string ubicacion
+        text descripcion
+        date fecha_inicio
+        date fecha_final
+        timestamp fecha_creacion
+    }
+    FOTO_EVENTO {
+        int id PK
+        string ruta_foto
+        text descripcion
+        int orden
+        timestamp fecha_subida
+    }
+    APTITUD {
+        string nombre PK
+    }
+    GENERO {
+        string nombre PK
+    }
+    REPORTE {
+        int id PK
+        string tipo_contenido
+        int id_contenido
+        text motivo
+        text detalle_adicional
+        timestamp fecha_reporte
+        string estado
+        timestamp fecha_revision
+    }
+
+    %% Relaciones claras
+    USUARIO ||--|| PERFIL : "tiene (1:1)"
+    USUARIO ||--o{ EVENTO : "publica (1:N)"
+    EVENTO ||--o{ FOTO_EVENTO : "tiene fotos (1:N)"
+    EVENTO }o--o{ APTITUD : "requiere aptitudes (N:M)"
+    USUARIO }o--o{ APTITUD : "posee aptitudes (N:M, solo personas)"
+    EVENTO }o--o{ GENERO : "pertenece a géneros (N:M)"
+    USUARIO }o--o{ GENERO : "prefiere géneros (N:M, solo personas)"
+    CHAT ||--o{ MENSAJE : "contiene mensajes (1:N)"
+    USUARIO }o--o{ CHAT : "participa en chats (N:M, solo personas)"
+    USUARIO ||--o{ MENSAJE : "envía mensajes (1:N, solo personas)"
+    USUARIO }o--o{ EVENTO : "asiste a eventos (N:M, solo personas)"
+    USUARIO ||--o{ EVENTO : "comenta eventos (1:N, solo personas)"
+    USUARIO ||--o{ REPORTE : "reporta contenido (1:N, solo personas)"
+    ADMINISTRADOR ||--o{ REPORTE : "revisa reportes (1:N)"
+
+    %% Herencia
+    PERSONA }|..|{ USUARIO : "hereda de"
+    EMPRESA }|..|{ USUARIO : "hereda de"
