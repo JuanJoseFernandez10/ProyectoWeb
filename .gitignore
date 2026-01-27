@@ -1,6 +1,12 @@
 # Compiled class file
 *.class
 
+# Frontend Files
+*node_modules/
+*.env
+*dist/
+*build/
+
 # Log file
 *.log
 
