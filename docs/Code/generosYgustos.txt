@@ -1,0 +1,148 @@
+<div className="mb-8 ">
+                    <label
+                        className="block text-white/90 mb-2 text-center"
+                        htmlFor="gustos"
+                    >
+                        --GUSTOS--
+                    </label>
+
+                    <div className="grid grid-cols-3 w-full gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Reggeaton" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Reggeaton</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Trap" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Trap</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Pop" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Pop</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Indie" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Indie</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Electronica" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Electronica</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Disco" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Disco</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Country" id="" />
+                        <label className="text-white/90 ml-2 mr-4">Country</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Flamenco" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Flamenco</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Salsa" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Salsa</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Country" id="" />
+                        <label className="text-white/90 ml-2 mr-4">Country</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Flamenco" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Flamenco</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Salsa" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Salsa</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div className="mb-8">
+                    <label
+                        className="block text-white/90 mb-4 text-center"
+                        htmlFor="password"
+                    >
+                        --GENEROS--
+                    </label>
+
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Reggeaton" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Reggeaton</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Trap" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Trap</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Pop" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Pop</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Rock" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Rock</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Indie" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Indie</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Electronica" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Electronica</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Disco" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Disco</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Clasica" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Clásica</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <input type="checkbox" name="Country" id="" />
+                        <label className="text-white/90 ml-2 mr-4">Country</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Flamenco" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Flamenco</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Salsa" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Salsa</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Jazz" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Jazz</label>   
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4">
+                        <div>
+                            <input type="checkbox" name="BreakBeat" id="" />
+                            <label className="text-white/90 ml-2 mr-4">BreakBeat</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Metal" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Metal</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Punk" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Punk</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="Hip Hop/Rap" id="" />
+                            <label className="text-white/90 ml-2 mr-4">Hip Hop/Rap</label>
+                        </div>
+                    </div>
+                </div>

@@ -1,32 +1,10 @@
-import Login from '../components/ComponentesSignLog/Login';
-import Register from '../components/ComponentesSignLog/Register';
+import React from 'react';
+import AccesCard from '../components/ComponentesSignLog/AccesCard'; // ajusta la ruta según tu estructura
 
-import { useEffect } from 'react';
-
-export default function SignLog() {
-
-    useEffect(() => {
-        const script = document.createElement('script');
-        
-        script.src = "/src/scripts/AccesController.js";
-        script.async = true;
-        
-        document.body.appendChild(script);
-
-
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
-
+export default function AccesPage() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-amber-100 py-8">
-            <div id='divLogin'>
-                <Login></Login>
-            </div>
-            <div id='idRegister'>
-                <Register></Register>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-amber-100 py-8 px-4 md:px-20 lg:px-40">
+        <AccesCard />
         </div>
-    )
+    );
 }
