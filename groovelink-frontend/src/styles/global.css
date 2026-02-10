@@ -4,6 +4,22 @@ p, a, span, label, h1, h2, h3, h4, h5, h6, div {
     font-family: cursive;
 }
 
+@theme{
+    extend: {
+        colors: {
+            "primary": "#FFBA42",
+            "secondary": "#F5A201",
+            "accent": "#A",
+            "background": "#FFD35B",
+            "text-primary": "#FFFFFF",
+            "text-secondary": "#B3B3B3",
+        },
+        fontFamily: {
+            'cursive': ['"Comic Sans MS"', 'cursive', 'sans-serif'],
+        },
+    },
+}
+
 .inputs-custom{
     @apply w-full py-3 px-4 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-indigo-400/70 focus:bg-white/15 transition-all duration-300;
 }
@@ -14,3 +30,5 @@ p, a, span, label, h1, h2, h3, h4, h5, h6, div {
 .visible{
     display: block;
 } 
+
+
