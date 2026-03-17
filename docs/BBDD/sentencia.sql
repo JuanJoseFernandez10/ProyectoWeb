@@ -1,41 +1,51 @@
--- Tabla para usuarios normales (personas y empresas) para herencia
+-- =========================================
+-- TABLA BASE DE USUARIO
+-- =========================================
 CREATE TABLE usuario (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    email VARCHAR(70) UNIQUE NOT NULL,
-    contraseña VARCHAR(255) NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    rol VARCHAR(20) NOT NULL -- Enum: ROLE_USER, ROLE_EMPRESA, ROLE_ADMIN
 );
 
--- Perfil de usuario
+-- =========================================
+-- PERSONA
+-- =========================================
+CREATE TABLE persona (
+    id INTEGER PRIMARY KEY REFERENCES usuario(id) ON DELETE CASCADE,
+    premium BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+-- =========================================
+-- EMPRESA
+-- =========================================
+CREATE TABLE empresa (
+    id INTEGER PRIMARY KEY REFERENCES usuario(id) ON DELETE CASCADE,
+    direccion VARCHAR(255) NOT NULL
+);
+
+-- =========================================
+-- ADMINISTRADOR
+-- =========================================
+CREATE TABLE administrador (
+    id INTEGER PRIMARY KEY REFERENCES usuario(id) ON DELETE CASCADE,
+    cargo VARCHAR(40)
+);
+
+-- =========================================
+-- PERFIL DE USUARIO
+-- =========================================
 CREATE TABLE perfil (
     id INTEGER PRIMARY KEY REFERENCES usuario(id) ON DELETE CASCADE,
     descripcion TEXT,
-    ruta_foto_perfil VARCHAR(255),
+    foto_perfil BYTEA,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Persona
-CREATE TABLE persona (
-    premium BOOLEAN NOT NULL DEFAULT FALSE
-) INHERITS (usuario);
-
--- Empresa
-CREATE TABLE empresa (
-    direccion VARCHAR(255) NOT NULL
-) INHERITS (usuario);
-
--- Administrador 
-CREATE TABLE administrador (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    email VARCHAR(70) UNIQUE NOT NULL,
-    contraseña VARCHAR(255) NOT NULL,
-    cargo VARCHAR(40),
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Chats
+-- =========================================
+-- CHATS Y MENSAJES
+-- =========================================
 CREATE TABLE chat (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -44,7 +54,6 @@ CREATE TABLE chat (
     ultimo_mensaje TIMESTAMP
 );
 
--- Participantes en chat
 CREATE TABLE usuario_participa_chat (
     id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
     id_chat INTEGER NOT NULL REFERENCES chat(id) ON DELETE CASCADE,
@@ -52,7 +61,6 @@ CREATE TABLE usuario_participa_chat (
     PRIMARY KEY (id_usuario, id_chat)
 );
 
--- Mensajes en chat
 CREATE TABLE mensaje (
     id SERIAL PRIMARY KEY,
     id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
@@ -61,7 +69,9 @@ CREATE TABLE mensaje (
     fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Eventos
+-- =========================================
+-- EVENTOS Y FOTOS
+-- =========================================
 CREATE TABLE eventos (
     codigo SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -73,73 +83,74 @@ CREATE TABLE eventos (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Galería de fotos de eventos
 CREATE TABLE foto_evento (
     id SERIAL PRIMARY KEY,
     codigo_evento INTEGER NOT NULL REFERENCES eventos(codigo) ON DELETE CASCADE,
-    ruta_foto VARCHAR(255) NOT NULL,
+    foto BYTEA,
     descripcion TEXT,
     orden INTEGER DEFAULT 0,
     fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Aptitudes
-CREATE TABLE aptitudes (
-    nombre VARCHAR(50) PRIMARY KEY
+-- =========================================
+-- APTITUDES Y GENEROS
+-- =========================================
+CREATE TABLE aptitud (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Géneros
-CREATE TABLE generos (
-    nombre VARCHAR(50) PRIMARY KEY
+CREATE TABLE genero (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Aptitudes de eventos
-CREATE TABLE eventos_aptitudes (
-    codigo_evento INTEGER REFERENCES eventos(codigo) ON DELETE CASCADE,
-    nombre_aptitud VARCHAR(50) REFERENCES aptitudes(nombre) ON DELETE CASCADE,
-    PRIMARY KEY (codigo_evento, nombre_aptitud)
-);
-
--- Aptitudes de personas
 CREATE TABLE persona_aptitudes (
-    id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
-    nombre_aptitud VARCHAR(50) REFERENCES aptitudes(nombre) ON DELETE CASCADE,
-    PRIMARY KEY (id_usuario, nombre_aptitud)
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
+    id_aptitud INTEGER NOT NULL REFERENCES aptitud(id) ON DELETE CASCADE
 );
 
--- Géneros de eventos
-CREATE TABLE eventos_generos (
-    codigo_evento INTEGER REFERENCES eventos(codigo) ON DELETE CASCADE,
-    nombre_genero VARCHAR(50) REFERENCES generos(nombre) ON DELETE CASCADE,
-    PRIMARY KEY (codigo_evento, nombre_genero)
+CREATE TABLE eventos_aptitudes (
+    id SERIAL PRIMARY KEY,
+    codigo_evento INTEGER NOT NULL REFERENCES eventos(codigo) ON DELETE CASCADE,
+    id_aptitud INTEGER NOT NULL REFERENCES aptitud(id) ON DELETE CASCADE
 );
 
--- Géneros de personas
 CREATE TABLE persona_generos (
-    id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
-    nombre_genero VARCHAR(50) REFERENCES generos(nombre) ON DELETE CASCADE,
-    PRIMARY KEY (id_usuario, nombre_genero)
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
+    id_genero INTEGER NOT NULL REFERENCES genero(id) ON DELETE CASCADE
 );
 
--- Comentarios en eventos
+CREATE TABLE eventos_generos (
+    id SERIAL PRIMARY KEY,
+    codigo_evento INTEGER NOT NULL REFERENCES eventos(codigo) ON DELETE CASCADE,
+    id_genero INTEGER NOT NULL REFERENCES genero(id) ON DELETE CASCADE
+);
+
+-- =========================================
+-- COMENTARIOS Y ASISTENCIA
+-- =========================================
 CREATE TABLE persona_comentario_evento (
-    id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
     codigo_evento INTEGER NOT NULL REFERENCES eventos(codigo) ON DELETE CASCADE,
     texto TEXT NOT NULL,
     megustas INTEGER DEFAULT 0,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id_usuario, codigo_evento)
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Asistencia a eventos
 CREATE TABLE persona_une_evento (
-    id_usuario INTEGER NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
     codigo_evento INTEGER NOT NULL REFERENCES eventos(codigo) ON DELETE CASCADE,
-    fecha_inscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id_usuario, codigo_evento)
+    fecha_inscripcion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sistema de reportes 
+-- =========================================
+-- REPORTES
+-- =========================================
 CREATE TABLE reporte (
     id SERIAL PRIMARY KEY,
     id_reportero INTEGER REFERENCES usuario(id) ON DELETE SET NULL,
@@ -153,7 +164,9 @@ CREATE TABLE reporte (
     fecha_revision TIMESTAMP
 );
 
--- Índices
+-- =========================================
+-- INDICES
+-- =========================================
 CREATE INDEX idx_eventos_nombre ON eventos(nombre);
 CREATE INDEX idx_eventos_ubicacion ON eventos(ubicacion);
 CREATE INDEX idx_eventos_fecha_inicio ON eventos(fecha_inicio);

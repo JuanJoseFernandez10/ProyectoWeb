@@ -88,6 +88,11 @@
 	        <artifactId>junit-jupiter-engine</artifactId>
 	        <scope>test</scope>
 	    </dependency>
+		<dependency>
+			<groupId>com.dwes</groupId>
+			<artifactId>securityAPI</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

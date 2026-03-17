@@ -1,0 +1,5 @@
+Revisar todos los archivos
+Poner bien todos los footers
+Implementar CSV
+
+IMplementar Email(casi listo ponerlo en las vistas)
