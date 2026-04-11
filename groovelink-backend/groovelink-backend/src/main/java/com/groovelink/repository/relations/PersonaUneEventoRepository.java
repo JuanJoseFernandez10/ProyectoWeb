@@ -12,4 +12,5 @@ public interface PersonaUneEventoRepository extends JpaRepository<PersonaUneEven
     List<PersonaUneEvento> findByEvento_Id(Long eventoId);
     boolean existsByUsuario_IdAndEvento_Id(Long usuarioId, Long eventoId);
     void deleteByUsuario_IdAndEvento_Id(Long usuarioId, Long eventoId);
+    
 }

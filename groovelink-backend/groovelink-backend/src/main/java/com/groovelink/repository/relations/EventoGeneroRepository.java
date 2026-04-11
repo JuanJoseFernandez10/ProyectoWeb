@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface EventoGeneroRepository extends JpaRepository<EventoGenero, Long> {
     List<EventoGenero> findByEvento_Id(Long eventoId);
+    boolean existsByEvento_IdAndGenero_Id(Long eventoId, Long generoId);
 }

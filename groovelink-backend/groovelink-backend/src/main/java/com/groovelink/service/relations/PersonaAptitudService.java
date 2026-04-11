@@ -1,7 +1,7 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.PersonaAptitud;
-import com.groovelink.repository.PersonaAptitudRepository;
+import com.groovelink.repository.relations.PersonaAptitudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

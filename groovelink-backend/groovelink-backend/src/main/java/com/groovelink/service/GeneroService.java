@@ -6,6 +6,8 @@ import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.GeneroRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +21,12 @@ public class GeneroService {
         this.generoRepository = generoRepository;
     }
 
+    @Cacheable(value = "generos", unless = "#result == null || #result.isEmpty()")
     public List<Genero> findAll() {
         return generoRepository.findAll();
     }
 
+    @Cacheable(value = "generos", key = "#id")
     public Optional<Genero> findById(Long id) {
         return generoRepository.findById(id);
     }
@@ -32,6 +36,7 @@ public class GeneroService {
     }
 
     @Transactional
+    @CacheEvict(value = "generos", allEntries = true)
     public Genero save(Genero genero) {
         if (generoRepository.findByNombre(genero.getNombre()).isPresent()) {
             throw new DuplicateResourceException("Genero", "nombre");

@@ -1,12 +1,20 @@
 package com.groovelink.service;
 
+import com.groovelink.entitys.Aptitud;
+import com.groovelink.entitys.Genero;
 import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.relations.PersonaAptitud;
 import com.groovelink.entitys.relations.PersonaGenero;
 import com.groovelink.exception.*;
 import com.groovelink.repository.*;
+import com.groovelink.repository.relations.PersonaAptitudRepository;
+import com.groovelink.repository.relations.PersonaGeneroRepository;
+import com.groovelink.repository.relations.PersonaUneEventoRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +43,13 @@ public class PersonaService {
         this.generoRepository = generoRepository;
     }
 
+    @Cacheable(value = "personas", key = "#id")
     public Optional<Persona> findById(Long id) {
         return personaRepository.findById(id);
     }
 
     @Transactional
+    @CacheEvict(value = "personas", allEntries = true)
     public Persona save(Persona persona) {
         return personaRepository.save(persona);
     }
@@ -90,6 +100,7 @@ public class PersonaService {
         personaGeneroRepository.deleteByUsuario_IdAndGenero_Id(personaId, generoId);
     }
 
+    @Cacheable(value = "personasPremium")
     public List<Persona> findAllPremium() {
         return personaRepository.findByPremiumTrue();
     }

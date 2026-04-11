@@ -1,9 +1,7 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.PersonaUneEvento;
-import com.groovelink.exception.BusinessException;
-import com.groovelink.exception.ResourceNotFoundException;
-import com.groovelink.repository.PersonaUneEventoRepository;
+import com.groovelink.repository.relations.PersonaUneEventoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

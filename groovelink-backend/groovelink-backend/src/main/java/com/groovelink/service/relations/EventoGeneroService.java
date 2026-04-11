@@ -1,10 +1,8 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.EventoGenero;
-import com.groovelink.repository.EventoGeneroRepository;
+import com.groovelink.repository.relations.EventoGeneroRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service

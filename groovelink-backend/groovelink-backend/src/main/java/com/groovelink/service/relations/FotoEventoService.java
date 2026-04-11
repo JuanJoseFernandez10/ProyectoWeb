@@ -1,9 +1,9 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.FotoEvento;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.EventoRepository;
-import com.groovelink.repository.FotoEventoRepository;
+import com.groovelink.repository.relations.FotoEventoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

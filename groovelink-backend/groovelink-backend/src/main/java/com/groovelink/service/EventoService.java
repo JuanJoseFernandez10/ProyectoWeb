@@ -5,8 +5,12 @@ import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.relations.PersonaUneEvento;
 import com.groovelink.exception.*;
 import com.groovelink.repository.*;
+import com.groovelink.repository.relations.PersonaUneEventoRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,15 +31,18 @@ public class EventoService {
         this.personaUneEventoRepository = personaUneEventoRepository;
     }
 
+    @Cacheable(value = "eventos", key = "#id")
     public Optional<Evento> findById(Long id) {
         return eventoRepository.findById(id);
     }
 
     @Transactional
+    @CacheEvict(value = "eventos", allEntries = true)
     public Evento save(Evento evento) {
         return eventoRepository.save(evento);
     }
 
+    @Cacheable(value = "eventosFuturos")
     public List<Evento> findEventosFuturos() {
         return eventoRepository.findByFechaInicioAfter(LocalDate.now());
     }

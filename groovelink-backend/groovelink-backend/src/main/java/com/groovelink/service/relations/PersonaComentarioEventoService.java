@@ -1,9 +1,9 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.PersonaComentarioEvento;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.EventoRepository;
-import com.groovelink.repository.PersonaComentarioEventoRepository;
+import com.groovelink.repository.relations.PersonaComentarioEventoRepository;
 import com.groovelink.repository.PersonaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +34,8 @@ public class PersonaComentarioEventoService {
         personaRepository.findById(comentario.getUsuario().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Persona", comentario.getUsuario().getId()));
 
-        eventoRepository.findById(comentario.getEvento().getCodigo())
-                .orElseThrow(() -> new ResourceNotFoundException("Evento", comentario.getEvento().getCodigo()));
+        eventoRepository.findById(comentario.getEvento().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Evento", comentario.getEvento().getId()));
 
         return comentarioRepository.save(comentario);
     }

@@ -1,10 +1,12 @@
 package com.groovelink.entitys;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.groovelink.entitys.relations.EventoAptitud;
 import com.groovelink.entitys.relations.EventoGenero;
 import com.groovelink.entitys.relations.FotoEvento;
+import com.groovelink.entitys.relations.PersonaUneEvento;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,7 +23,7 @@ public class Evento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long codigo;
+    private Long id;
 
     private String nombre;
     private String ubicacion;
@@ -40,6 +42,9 @@ public class Evento {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PersonaUneEvento> personaUneEventos;
+    
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
     private java.util.List<FotoEvento> fotos;
 
@@ -49,12 +54,12 @@ public class Evento {
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
     private java.util.List<EventoGenero> generos;
 
-	public Long getCodigo() {
-		return codigo;
+	public Long getId() {
+		return id;
 	}
 
-	public void setCodigo(Long codigo) {
-		this.codigo = codigo;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getNombre() {
@@ -135,6 +140,14 @@ public class Evento {
 
 	public void setGeneros(java.util.List<EventoGenero> generos) {
 		this.generos = generos;
+	}
+
+	public List<PersonaUneEvento> getPersonaUneEventos() {
+		return personaUneEventos;
+	}
+
+	public void setPersonaUneEventos(List<PersonaUneEvento> personaUneEventos) {
+		this.personaUneEventos = personaUneEventos;
 	}
     
     

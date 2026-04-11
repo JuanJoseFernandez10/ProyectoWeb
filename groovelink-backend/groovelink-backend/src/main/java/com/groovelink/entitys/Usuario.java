@@ -68,3 +68,4 @@ public abstract class Usuario {
 	}
 
 }
+

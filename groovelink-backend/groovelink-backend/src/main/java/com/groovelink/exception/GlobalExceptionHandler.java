@@ -2,6 +2,9 @@ package com.groovelink.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -35,6 +38,39 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidOperationException.class)
     public ResponseEntity<Object> handleInvalidOperation(InvalidOperationException ex) {
         return buildErrorResponse(ex, ex.getStatus());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> handleNoResourceFound(NoResourceFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", "Recurso no encontrado");
+        body.put("errorCode", "NOT_FOUND");
+        body.put("status", HttpStatus.NOT_FOUND.value());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", "Credenciales invalidas");
+        body.put("errorCode", "UNAUTHORIZED");
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", "Datos de entrada invalidos");
+        body.put("errorCode", "BAD_REQUEST");
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

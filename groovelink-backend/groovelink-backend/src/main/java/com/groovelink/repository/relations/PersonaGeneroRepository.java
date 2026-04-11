@@ -10,4 +10,5 @@ import java.util.List;
 public interface PersonaGeneroRepository extends JpaRepository<PersonaGenero, Long> {
     List<PersonaGenero> findByUsuario_Id(Long usuarioId);
     void deleteByUsuario_IdAndGenero_Id(Long usuarioId, Long generoId);
+    boolean existsByUsuario_IdAndGenero_Id(Long usuarioId, Long generoId);
 }

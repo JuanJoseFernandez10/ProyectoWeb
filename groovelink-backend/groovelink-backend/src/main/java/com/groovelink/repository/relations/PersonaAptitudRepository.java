@@ -10,4 +10,5 @@ import java.util.List;
 public interface PersonaAptitudRepository extends JpaRepository<PersonaAptitud, Long> {
     List<PersonaAptitud> findByUsuario_Id(Long usuarioId);
     void deleteByUsuario_IdAndAptitud_Id(Long usuarioId, Long aptitudId);
+    boolean existsByUsuario_IdAndAptitud_Id(Long usuarioId, Long aptitudId);
 }

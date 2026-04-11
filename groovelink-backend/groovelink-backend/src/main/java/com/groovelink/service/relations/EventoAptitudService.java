@@ -1,7 +1,7 @@
-package com.groovelink.service;
+package com.groovelink.service.relations;
 
 import com.groovelink.entitys.relations.EventoAptitud;
-import com.groovelink.repository.EventoAptitudRepository;
+import com.groovelink.repository.relations.EventoAptitudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
