@@ -1,41 +1,87 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CabeceraAcces from './CabeceraAcces';
+import { AuthContext } from '../../context/AuthContext';
 
 function Login({ cambiarModo }) {
+    const navigate = useNavigate();
+    const { login, isLoading, authError, authFieldErrors, authFieldLabels, clearAuthError } = useContext(AuthContext);
+    const [formData, setFormData] = useState({ username: '', password: '' });
+    const hasFieldErrors = Object.keys(authFieldErrors || {}).length > 0;
+
+    const getFieldErrorMessage = (field, fallbackLabel) => {
+        if (!authFieldErrors?.[field]) return null;
+        const label = authFieldLabels?.[field] || fallbackLabel;
+        return `${label}: ${authFieldErrors[field]}`;
+    };
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        clearAuthError();
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            await login(formData);
+            navigate('/home');
+        } catch {
+            // El mensaje de error se gestiona desde AuthContext.
+        }
+    };
+
     return (
-        <div className="p-10 md:p-15 rounded-3xl flex flex-col items-center bg-amber-300/20 backdrop-blur-2xl shadow-2xl shadow-amber-200">
+        <div className="p-10 md:p-15 rounded-3xl flex flex-col items-center">
         <CabeceraAcces modo="login" cambiarModo={cambiarModo} />
 
-        <form className="mt-10 w-full max-w-md bg-amber-600/30 backdrop-blur-xl border border-white/10 rounded-xl p-8 shadow-2xl shadow-black/40 text-white">
+        <form className="card-panel mt-10 w-full max-w-md p-8" onSubmit={handleSubmit} noValidate>
             <div className="mb-6">
-            <label className="block text-white/90 mb-2" htmlFor="username">
+            <label className="block text-ink mb-2" htmlFor="username">
                 Username
             </label>
             <input
-                className="inputs-custom w-full"
+                className={`${authFieldErrors?.username ? 'inputs-custom-error' : 'inputs-custom'} w-full`}
+                name="username"
                 id="username"
                 type="text"
                 placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
             />
+            {authFieldErrors?.username ? (
+            <p className="field-error-message">{getFieldErrorMessage('username', 'Usuario')}</p>
+            ) : null}
             </div>
 
             <div className="mb-8">
-            <label className="block text-white/90 mb-2" htmlFor="password">
+            <label className="block text-ink mb-2" htmlFor="password">
                 Password
             </label>
             <input
-                className="inputs-custom w-full"
+                className={`${authFieldErrors?.password ? 'inputs-custom-error' : 'inputs-custom'} w-full`}
+                name="password"
                 id="password"
                 type="password"
                 placeholder="••••••••••••"
+                value={formData.password}
+                onChange={handleChange}
             />
+            {authFieldErrors?.password ? (
+            <p className="field-error-message">{getFieldErrorMessage('password', 'Contrasena')}</p>
+            ) : null}
             </div>
 
+            {authError && !hasFieldErrors ? (
+            <p className="form-error-alert">{authError}</p>
+            ) : null}
+
             <button
-            className="w-full py-3 bg-linear-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-indigo-500/30"
+            className="btn-primary w-full"
             type="submit"
+            disabled={isLoading}
             >
-            Logeate
+            {isLoading ? 'Entrando...' : 'Logeate'}
             </button>
         </form>
         </div>

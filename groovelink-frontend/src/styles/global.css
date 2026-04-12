@@ -1,34 +1,172 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
-p, a, span, label, h1, h2, h3, h4, h5, h6, div {
-    font-family: cursive;
+body {
+    font-family: "Montserrat", sans-serif;
+    background: linear-gradient(180deg, #fff8ea 0%, #ffefcc 100%);
+    color: #4b2f13;
+    overflow-x: hidden;
 }
 
-@theme{
-    extend: {
-        colors: {
-            "primary": "#FFBA42",
-            "secondary": "#F5A201",
-            "accent": "#A",
-            "background": "#FFD35B",
-            "text-primary": "#FFFFFF",
-            "text-secondary": "#B3B3B3",
-        },
-        fontFamily: {
-            'cursive': ['"Comic Sans MS"', 'cursive', 'sans-serif'],
-        },
-    },
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Archivo Black", "Montserrat", sans-serif;
+    letter-spacing: 0.03em;
+}
+
+@theme {
+    --color-primary: #f3b24f;
+    --color-secondary: #df8b2c;
+    --color-accent: #ffc86a;
+    --color-background: #fff2d8;
+    --color-text-primary: #fffdf7;
+    --color-text-secondary: #8a775a;
+    --color-ink: #4b2f13;
+    --color-ink-soft: #6a4520;
+
+    --font-cursive: "Montserrat", sans-serif;
+}
+
+.page-surface {
+    @apply bg-background text-ink;
+}
+
+.card-shell {
+    @apply rounded-3xl border border-secondary/20 bg-text-primary/50 backdrop-blur-xl shadow-2xl shadow-secondary/20;
+}
+
+.card-panel {
+    @apply rounded-2xl border border-secondary/35 bg-primary/55 backdrop-blur-xl shadow-2xl shadow-ink/20 text-ink;
+}
+
+.btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg border border-secondary px-4 py-3 font-bold text-ink bg-primary transition-all duration-300 hover:bg-secondary hover:text-text-primary shadow-lg shadow-secondary/30;
+}
+
+.btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-secondary/35 px-4 py-3 font-bold text-ink bg-text-primary/40 transition-all duration-300 hover:bg-primary/45 shadow-md shadow-secondary/20;
+}
+
+.tab-switch {
+    @apply flex flex-row rounded-lg border border-secondary/30 p-1 bg-secondary/15 backdrop-blur-sm;
+}
+
+.tab-button {
+    @apply text-xl font-extrabold transition-colors px-3 py-1;
+}
+
+.tab-button-active {
+    @apply text-secondary underline underline-offset-4;
+}
+
+.tab-button-idle {
+    @apply text-ink-soft hover:text-ink;
 }
 
 .inputs-custom{
-    @apply w-full py-3 px-4 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-indigo-400/70 focus:bg-white/15 transition-all duration-300;
+    @apply w-full py-3 px-4 bg-text-primary/70 border border-secondary/35 rounded-lg text-ink placeholder:text-ink-soft/60 focus:outline-none focus:border-secondary focus:bg-text-primary/90 transition-all duration-300;
 }
 
-.hidden{
+.inputs-custom-error {
+    @apply w-full py-3 px-4 bg-text-primary/75 border border-red-400/55 rounded-lg text-ink placeholder:text-ink-soft/60 focus:outline-none focus:border-red-400/70 focus:bg-text-primary/90 transition-all duration-300 shadow-md shadow-red-400/15;
+}
+
+.field-error-message {
+    @apply mt-2 text-sm font-medium text-red-700 bg-red-50/55 border border-red-200/70 rounded-md px-3 py-1.5;
+}
+
+.form-error-alert {
+    @apply mb-4 text-sm font-medium text-red-700 bg-red-50/65 border border-red-200/80 rounded-lg px-3 py-2;
+}
+
+.field-error-message,
+.form-error-alert {
+    position: relative;
+    padding-left: 2.35rem;
+}
+
+.field-error-message::before,
+.form-error-alert::before {
+    content: "!";
+    position: absolute;
+    left: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 1px 4px rgba(220, 38, 38, 0.2);
+}
+
+.is-hidden {
     display: none;
 }
-.visible{
+.is-visible {
     display: block;
 } 
+
+@media (max-width: 500px) {
+    .event-card {
+        border-radius: 0.7rem;
+    }
+
+    .event-card-media {
+        min-height: 6.6rem !important;
+        height: 6.6rem !important;
+    }
+
+    .event-card-category {
+        left: 0.45rem;
+        top: 0.45rem;
+        max-width: calc(100% - 0.9rem);
+        padding: 0.2rem 0.45rem;
+        font-size: 0.52rem;
+        letter-spacing: 0.04em;
+    }
+
+    .event-card-date {
+        left: 0.45rem;
+        bottom: 0.45rem;
+        border-radius: 0.55rem;
+        padding: 0.25rem 0.45rem;
+    }
+
+    .event-card-body {
+        gap: 0.45rem;
+        padding: 0.55rem;
+    }
+
+    .event-card-meta {
+        gap: 0.3rem;
+        font-size: 0.62rem;
+    }
+
+    .event-card-title {
+        font-size: 1.05rem;
+        line-height: 1.1;
+    }
+
+    .event-card-description {
+        font-size: 0.84rem;
+        line-height: 1.25;
+    }
+
+    .event-card-actions {
+        gap: 0.35rem;
+    }
+
+    .event-card-button {
+        padding: 0.36rem 0.6rem !important;
+        font-size: 0.82rem !important;
+    }
+}
 
 

@@ -11,9 +11,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDTO {
+public class RegisterResponseDTO {
     private String message;
     private String username;
     private Rol role;
-    private String token;  // JWT token que el cliente guardará y enviará en cada request
 }
