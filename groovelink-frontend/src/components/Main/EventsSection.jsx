@@ -1,4 +1,4 @@
-import React from 'react'
+aimport React from 'react'
 import EventCard from './EventCard'
 
 function EventsSection({ featuredEvent, events }) {
