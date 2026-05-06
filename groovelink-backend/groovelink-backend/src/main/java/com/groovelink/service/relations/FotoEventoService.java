@@ -30,7 +30,7 @@ public class FotoEventoService {
         eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
-        fotoEvento.setEvento(null); // Se asigna en el controlador o aquí si prefieres
+        fotoEvento.setEvento(null); // se asigna en el controlador o aquí mismo
         return fotoEventoRepository.save(fotoEvento);
     }
 }

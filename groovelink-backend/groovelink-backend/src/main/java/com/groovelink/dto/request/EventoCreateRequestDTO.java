@@ -32,6 +32,6 @@ public class EventoCreateRequestDTO {
     @FutureOrPresent
     private LocalDate fechaFinal;
 
-    private List<Long> aptitudesIds;   // IDs de aptitudes
-    private List<Long> generosIds;     // IDs de géneros
+    private List<Long> aptitudesIds;   // ids de aptitudes
+    private List<Long> generosIds;     // ids de generos
 }

@@ -16,41 +16,42 @@ import java.util.stream.Collectors;
 )
 public interface GrooveLinkMapper {
 
-    // ====================== Registro ======================
+    // Registro
     Persona toPersona(UsuarioRegistroRequestDTO dto);
     Empresa toEmpresa(UsuarioRegistroRequestDTO dto);
     Administrador toAdministrador(UsuarioRegistroRequestDTO dto);
 
     UsuarioResponseDTO toUsuarioResponseDTO(Usuario usuario);
 
-    // ====================== Persona ======================
+    // Persona
     @Mapping(target = "aptitudes", source = "aptitudes", qualifiedByName = "aptitudesToNombres")
     @Mapping(target = "generos",   source = "generos",   qualifiedByName = "generosToNombres")
     @Mapping(target = "perfil",    source = "perfil")
     PersonaResponseDTO toPersonaResponseDTO(Persona persona);
 
-    // ====================== Perfil ======================
+    // Perfil
     PerfilResponseDTO toPerfilResponseDTO(Perfil perfil);
 
-    // ====================== Evento ======================
+    // Evento
     Evento toEvento(EventoCreateRequestDTO dto);
 
     @Mapping(target = "codigo", source = "id")
     @Mapping(target = "publicadoPorUsername", source = "publicado.username")
     @Mapping(target = "aptitudes", source = "aptitudes", qualifiedByName = "eventoAptitudesToNombres")
     @Mapping(target = "generos",   source = "generos",   qualifiedByName = "eventoGenerosToNombres")
-    @Mapping(target = "numeroAsistentes", expression = "java(evento.getPersonaUneEventos() != null ? evento.getPersonaUneEventos().size() : 0)")
+    @Mapping(target = "numeroAsistentes", expression = "java(evento.getNumeroAsistentes() != null ? evento.getNumeroAsistentes() : 0)")
+    @Mapping(target = "numeroMeGustas", expression = "java(evento.getNumeroMeGustas() != null ? evento.getNumeroMeGustas() : 0)")
     EventoResponseDTO toEventoResponseDTO(Evento evento);
 
-    // ====================== Chat ======================
+    // Chat
     @Mapping(target = "participantesUsernames", source = "participantes", qualifiedByName = "usuariosToUsernames")
     ChatResponseDTO toChatResponseDTO(Chat chat);
 
-    // ====================== Mensaje ======================
+    // Mensaje
     @Mapping(target = "enviadoPorUsername", source = "usuario.username")
     MensajeResponseDTO toMensajeResponseDTO(Mensaje mensaje);
 
-    // ====================== Otros simples ======================
+    // Otros simples
     AptitudResponseDTO toAptitudResponseDTO(Aptitud aptitud);
     GeneroResponseDTO toGeneroResponseDTO(Genero genero);
 
@@ -61,7 +62,7 @@ public interface GrooveLinkMapper {
     @Mapping(target = "revisadoPorUsername", source = "revisadoPor.username", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
     ReporteResponseDTO toReporteResponseDTO(Reporte reporte);
 
-    // ====================== Métodos auxiliares ======================
+    // Helpers
     @Named("aptitudesToNombres")
     default List<String> aptitudesToNombres(List<PersonaAptitud> aptitudes) {
         if (aptitudes == null) return List.of();

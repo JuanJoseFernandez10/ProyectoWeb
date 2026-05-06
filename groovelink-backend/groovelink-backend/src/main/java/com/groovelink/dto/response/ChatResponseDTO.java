@@ -16,5 +16,5 @@ public class ChatResponseDTO {
     private LocalDateTime fechaCreacion;
     private LocalDateTime ultimoMensaje;
 
-    private List<String> participantesUsernames;   // solo usernames
+    private List<String> participantesUsernames;   // usernames
 }

@@ -15,5 +15,5 @@ public class LoginResponseDTO {
     private String message;
     private String username;
     private Rol role;
-    private String token;  // JWT token que el cliente guardará y enviará en cada request
+    private String token;  // token JWT para cada request
 }

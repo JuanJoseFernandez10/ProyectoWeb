@@ -22,9 +22,9 @@ public class EventoAptitudService {
 
     @Transactional
     public EventoAptitud agregarAptitudAEvento(Long eventoId, Long aptitudId) {
-        // Aquí deberías cargar Evento y Aptitud, pero por simplicidad lo dejo básico
+        // aquí faltaría cargar Evento y Aptitud, pero por ahora lo dejo simple
         EventoAptitud ea = new EventoAptitud();
-        // ea.setEvento(evento); 
+        // ea.setEvento(evento);
         // ea.setAptitud(aptitud);
         return eventoAptitudRepository.save(ea);
     }

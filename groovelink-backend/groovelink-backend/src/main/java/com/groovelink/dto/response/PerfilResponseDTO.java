@@ -8,5 +8,5 @@ import lombok.Setter;
 public class PerfilResponseDTO {
 
     private String descripcion;
-    private String fotoPerfilUrl;   // puedes poner base64 o URL si guardas las fotos en cloud
+    private String fotoPerfilUrl;   // base64 o URL si usas cloud
 }

@@ -19,8 +19,9 @@ public class EventoResponseDTO {
     private LocalDate fechaFinal;
     private LocalDateTime fechaCreacion;
 
-    private String publicadoPorUsername;   // username del que publicó
-    private List<String> aptitudes;        // solo nombres
-    private List<String> generos;          // solo nombres
+    private String publicadoPorUsername;   
+    private List<String> aptitudes;       
+    private List<String> generos;         
     private Integer numeroAsistentes;
+    private Integer numeroMeGustas;
 }

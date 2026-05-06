@@ -1,5 +1,5 @@
 import React from 'react';
-import AccesCard from '../components/ComponentesSignLog/AccesCard'; // ajusta la ruta según tu estructura
+import AccesCard from '../components/ComponentesSignLog/AccesCard'; // ruta a la card
 
 export default function AccesPage() {
     return (

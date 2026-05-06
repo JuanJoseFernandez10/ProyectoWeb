@@ -14,6 +14,6 @@ public class PersonaResponseDTO {
     private boolean premium;
 
     private PerfilResponseDTO perfil;
-    private List<String> aptitudes;     // solo nombres
-    private List<String> generos;       // solo nombres
+    private List<String> aptitudes;     // nombres
+    private List<String> generos;       // nombres
 }

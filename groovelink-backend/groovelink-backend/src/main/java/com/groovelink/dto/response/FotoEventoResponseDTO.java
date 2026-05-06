@@ -13,5 +13,5 @@ public class FotoEventoResponseDTO {
     private String descripcion;
     private Integer orden;
     private LocalDateTime fechaSubida;
-    // private String fotoBase64;   // o URL si usas cloud storage
+    // private String fotoBase64;   // o URL si usas cloud
 }

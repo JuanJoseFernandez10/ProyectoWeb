@@ -3,6 +3,7 @@ package com.groovelink.entitys;
 import com.groovelink.entitys.relations.PersonaAptitud;
 import com.groovelink.entitys.relations.PersonaComentarioEvento;
 import com.groovelink.entitys.relations.PersonaGenero;
+import com.groovelink.entitys.relations.PersonaMeGustaEvento;
 import com.groovelink.entitys.relations.PersonaUneEvento;
 
 import jakarta.persistence.CascadeType;
@@ -18,7 +19,7 @@ public class Persona extends Usuario {
 
     private boolean premium = false;
 
-    // Relaciones
+    // relaciones
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private java.util.List<PersonaAptitud> aptitudes;
 
@@ -30,6 +31,9 @@ public class Persona extends Usuario {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private java.util.List<PersonaUneEvento> asistencias;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private java.util.List<PersonaMeGustaEvento> meGustasEventos;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Perfil perfil;
@@ -72,6 +76,14 @@ public class Persona extends Usuario {
 
 	public void setAsistencias(java.util.List<PersonaUneEvento> asistencias) {
 		this.asistencias = asistencias;
+	}
+
+	public java.util.List<PersonaMeGustaEvento> getMeGustasEventos() {
+		return meGustasEventos;
+	}
+
+	public void setMeGustasEventos(java.util.List<PersonaMeGustaEvento> meGustasEventos) {
+		this.meGustasEventos = meGustasEventos;
 	}
 
 	public Perfil getPerfil() {

@@ -1,4 +1,4 @@
-// AuthProvider.js
+// AuthProvider - provider de auth
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { loginRequest, registerRequest } from "../api/auth";

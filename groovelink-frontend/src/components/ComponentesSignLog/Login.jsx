@@ -27,7 +27,7 @@ function Login({ cambiarModo }) {
             await login(formData);
             navigate('/home');
         } catch {
-            // El mensaje de error se gestiona desde AuthContext.
+            // el error ya lo maneja AuthContext, así que no hago nada aquí
         }
     };
 

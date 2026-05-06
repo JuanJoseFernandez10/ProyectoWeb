@@ -3,7 +3,7 @@ import Login from './Login';
 import Register from './Register';
 
 function AccesCard() {
-  const [modo, setModo] = useState('login'); // 'login' | 'registro'
+    const [modo, setModo] = useState('login'); // login o registro
 
     return (
         <div className="card-shell flex flex-col md:flex-row justify-between mt-5 overflow-hidden w-full max-w-5xl mx-auto">

@@ -1,6 +1,6 @@
 import React from 'react'
 
-function EventCard({ event, featured = false }) {
+function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiking = false }) {
     return (
         <article
             className={`event-card min-w-0 w-full overflow-hidden rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 backdrop-blur-xl max-[500px]:rounded-xl sm:rounded-3xl sm:shadow-xl ${
@@ -29,14 +29,23 @@ function EventCard({ event, featured = false }) {
                     <div className="event-card-meta flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-ink-soft max-[500px]:text-[10px] sm:gap-2 sm:text-xs">
                         <span className="max-w-full truncate rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.place}</span>
                         <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.attendees} asistentes</span>
+                        <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.likes ?? 0} me gusta</span>
+                        {event.organizer ? (
+                            <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.organizer}</span>
+                        ) : null}
                     </div>
                     <h3 className="event-card-title text-lg font-black tracking-tight text-ink max-[500px]:text-base max-[500px]:leading-tight sm:text-2xl">{event.title}</h3>
                     <p className="event-card-description max-w-2xl text-[15px] leading-relaxed text-ink-soft max-[500px]:text-[13px] max-[500px]:leading-snug sm:text-sm">{event.description}</p>
                 </div>
 
                 <div className="event-card-actions flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-                    <button type="button" className="event-card-button btn-primary w-full px-4 py-2 text-sm max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5">
-                        {event.actionLabel}
+                    <button
+                        type="button"
+                        className="event-card-button btn-primary w-full px-4 py-2 text-sm max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => (event.likedByMe ? onUnlikeEvent?.(event.id) : onLikeEvent?.(event.id))}
+                        disabled={isLiking}
+                    >
+                        {isLiking ? 'Procesando...' : event.likedByMe ? 'Ya me gusta' : 'Me gusta'}
                     </button>
                     <button type="button" className="event-card-button btn-ghost w-full px-4 py-2 text-sm max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5">
                         Ver mas

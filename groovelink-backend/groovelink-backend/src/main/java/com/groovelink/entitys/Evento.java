@@ -6,6 +6,7 @@ import java.util.List;
 import com.groovelink.entitys.relations.EventoAptitud;
 import com.groovelink.entitys.relations.EventoGenero;
 import com.groovelink.entitys.relations.FotoEvento;
+import com.groovelink.entitys.relations.PersonaMeGustaEvento;
 import com.groovelink.entitys.relations.PersonaUneEvento;
 
 import jakarta.persistence.CascadeType;
@@ -17,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Evento {
@@ -42,8 +44,17 @@ public class Evento {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+	@Transient
+	private Integer numeroMeGustas;
+
+	@Transient
+	private Integer numeroAsistentes;
+
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PersonaUneEvento> personaUneEventos;
+
+	@OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PersonaMeGustaEvento> megustas;
     
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
     private java.util.List<FotoEvento> fotos;
@@ -148,6 +159,30 @@ public class Evento {
 
 	public void setPersonaUneEventos(List<PersonaUneEvento> personaUneEventos) {
 		this.personaUneEventos = personaUneEventos;
+	}
+
+	public Integer getNumeroMeGustas() {
+		return numeroMeGustas;
+	}
+
+	public void setNumeroMeGustas(Integer numeroMeGustas) {
+		this.numeroMeGustas = numeroMeGustas;
+	}
+
+	public Integer getNumeroAsistentes() {
+		return numeroAsistentes;
+	}
+
+	public void setNumeroAsistentes(Integer numeroAsistentes) {
+		this.numeroAsistentes = numeroAsistentes;
+	}
+
+	public List<PersonaMeGustaEvento> getMegustas() {
+		return megustas;
+	}
+
+	public void setMegustas(List<PersonaMeGustaEvento> megustas) {
+		this.megustas = megustas;
 	}
     
     
