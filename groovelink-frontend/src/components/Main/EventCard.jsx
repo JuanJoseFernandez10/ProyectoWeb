@@ -1,6 +1,8 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiking = false }) {
+
     return (
         <article
             className={`event-card min-w-0 w-full overflow-hidden rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 backdrop-blur-xl max-[500px]:rounded-xl sm:rounded-3xl sm:shadow-xl ${
@@ -47,9 +49,12 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                     >
                         {isLiking ? 'Procesando...' : event.likedByMe ? 'Ya me gusta' : 'Me gusta'}
                     </button>
-                    <button type="button" className="event-card-button btn-ghost w-full px-4 py-2 text-sm max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5">
+                    <Link
+                        to={`/event/${event.id}`}
+                        className="event-card-button btn-ghost w-full px-4 py-2 text-sm text-center max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5"
+                    >
                         Ver mas
-                    </button>
+                    </Link>
                 </div>
             </div>
         </article>

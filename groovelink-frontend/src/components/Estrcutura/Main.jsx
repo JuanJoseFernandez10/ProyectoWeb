@@ -124,7 +124,7 @@ function Main() {
         setError('')
 
         try {
-            await likeEvent(eventId, token)
+            await likeEvent(eventId)
             setLikedEventIds((current) => {
                 const next = new Set(current)
                 next.add(eventId)
@@ -152,7 +152,7 @@ function Main() {
         setError('')
 
         try {
-            await unlikeEvent(eventId, token)
+            await unlikeEvent(eventId)
             setLikedEventIds((current) => {
                 const next = new Set(current)
                 next.delete(eventId)

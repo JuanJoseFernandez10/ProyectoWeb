@@ -39,7 +39,7 @@ Esta aplicación utiliza **PostgreSQL** como motor de base de datos. El diseño 
 - **Herencia de tablas** (1:1) para diferenciar `persona`, `empresa` y `administrador` → permite agregar campos específicos sin romper la tabla `usuario`.
 - Uso de **SERIAL** para IDs autoincrementales en la mayoría de tablas.
 - **ON DELETE CASCADE** en casi todas las relaciones → si se borra un usuario o evento, se eliminan sus datos dependientes (fotos, mensajes, inscripciones, etc.).
-- **BYTEA** para almacenar fotos directamente en la base (alternativa: usar URLs a S3/minio en producción).
+- **Rutas en disco** para almacenar las fotos fuera de la base de datos y servirlas por URL.
 - Campos de auditoría (`fecha_creacion`, `fecha_actualizacion`, etc.) en casi todas las entidades relevantes.
 - Índices creados en columnas que se usan frecuentemente en filtros y ordenamiento (`nombre`, `ubicacion`, `fecha_inicio`, `ultimo_mensaje`, etc.).
 

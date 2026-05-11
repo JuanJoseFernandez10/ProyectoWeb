@@ -14,6 +14,7 @@ public class EventoResponseDTO {
     private Long codigo;
     private String nombre;
     private String ubicacion;
+    private String imagen;
     private String descripcion;
     private LocalDate fechaInicio;
     private LocalDate fechaFinal;
@@ -24,4 +25,9 @@ public class EventoResponseDTO {
     private List<String> generos;         
     private Integer numeroAsistentes;
     private Integer numeroMeGustas;
+
+    private String rutaPortada;
+    private String rutaFotos;
+    private FotoEventoResponseDTO portada;
+    private List<FotoEventoResponseDTO> fotos;
 }

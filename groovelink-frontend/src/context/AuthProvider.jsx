@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { loginRequest, registerRequest } from "../api/auth";
-
-const AUTH_STORAGE_KEY = "groovelink_auth";
+import { clearAuthSession, readAuthSession, saveAuthSession } from "../api/authSession";
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -14,25 +13,33 @@ export function AuthProvider({ children }) {
     const [authFieldLabels, setAuthFieldLabels] = useState({});
 
     useEffect(() => {
-        const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-        if (!raw) return;
+        const session = readAuthSession();
+        setUser(session.user);
+        setToken(session.token);
+    }, []);
 
-        try {
-            const parsed = JSON.parse(raw);
-            setUser(parsed.user ?? null);
-            setToken(parsed.token ?? null);
-        } catch {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
-        }
+    useEffect(() => {
+        const handleStorageChange = (event) => {
+            if (event.key !== 'groovelink_auth') {
+                return;
+            }
+
+            const session = readAuthSession();
+            setUser(session.user);
+            setToken(session.token);
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
     const persistSession = (sessionUser, sessionToken) => {
         setUser(sessionUser);
         setToken(sessionToken);
-        localStorage.setItem(
-            AUTH_STORAGE_KEY,
-            JSON.stringify({ user: sessionUser, token: sessionToken }),
-        );
+        saveAuthSession(sessionUser, sessionToken);
     };
 
     const getUserFromAuthResponse = (response, fallbackUser = {}) => {
@@ -109,7 +116,7 @@ export function AuthProvider({ children }) {
         setAuthError(null);
         setAuthFieldErrors({});
         setAuthFieldLabels({});
-        localStorage.removeItem(AUTH_STORAGE_KEY);
+        clearAuthSession();
     };
 
     const clearAuthError = () => {

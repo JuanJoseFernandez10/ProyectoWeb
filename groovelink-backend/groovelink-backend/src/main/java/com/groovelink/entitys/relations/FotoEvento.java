@@ -1,7 +1,5 @@
 package com.groovelink.entitys.relations;
 
-import java.time.LocalDateTime;
-
 import com.groovelink.entitys.Evento;
 
 import jakarta.persistence.Column;
@@ -10,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -24,14 +21,16 @@ public class FotoEvento {
     @JoinColumn(name = "codigo_evento")
     private Evento evento;
 
-    @Lob
-    private byte[] foto; 
+	@Column(name = "ruta_archivo")
+	private String rutaArchivo;
 
-    private String descripcion;
-    private Integer orden = 0;
-
-    @Column(name = "fecha_subida")
-    private LocalDateTime fechaSubida = LocalDateTime.now();
+    // Si es portada (cover photo del evento)
+    @Column(name = "es_portada")
+    private Boolean esPortada = false;
+    
+    // Nombre del archivo: "portada", "purolatino1", "purolatino2", etc.
+    @Column(name = "nombre_foto")
+    private String nombreFoto;
 
 	public Long getId() {
 		return id;
@@ -49,35 +48,27 @@ public class FotoEvento {
 		this.evento = evento;
 	}
 
-	public byte[] getFoto() {
-		return foto;
+	public String getRutaArchivo() {
+		return rutaArchivo;
 	}
 
-	public void setFoto(byte[] foto) {
-		this.foto = foto;
+	public void setRutaArchivo(String rutaArchivo) {
+		this.rutaArchivo = rutaArchivo;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
+	public Boolean getEsPortada() {
+		return esPortada;
 	}
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
+	public void setEsPortada(Boolean esPortada) {
+		this.esPortada = esPortada;
 	}
 
-	public Integer getOrden() {
-		return orden;
+	public String getNombreFoto() {
+		return nombreFoto;
 	}
 
-	public void setOrden(Integer orden) {
-		this.orden = orden;
-	}
-
-	public LocalDateTime getFechaSubida() {
-		return fechaSubida;
-	}
-
-	public void setFechaSubida(LocalDateTime fechaSubida) {
-		this.fechaSubida = fechaSubida;
+	public void setNombreFoto(String nombreFoto) {
+		this.nombreFoto = nombreFoto;
 	}
 }
