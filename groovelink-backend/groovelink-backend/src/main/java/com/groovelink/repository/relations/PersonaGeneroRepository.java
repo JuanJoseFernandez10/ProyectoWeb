@@ -11,4 +11,5 @@ public interface PersonaGeneroRepository extends JpaRepository<PersonaGenero, Lo
     List<PersonaGenero> findByUsuario_Id(Long usuarioId);
     void deleteByUsuario_IdAndGenero_Id(Long usuarioId, Long generoId);
     boolean existsByUsuario_IdAndGenero_Id(Long usuarioId, Long generoId);
+    void deleteByUsuario_Id(Long usuarioId);
 }

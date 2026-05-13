@@ -25,7 +25,7 @@ function Register({ cambiarModo }) {
         event.preventDefault();
         try {
             await register(formData);
-            navigate('/home');
+            navigate('/personalize');
         } catch {
             // el error ya lo maneja AuthContext, así que no hago nada aquí
         }

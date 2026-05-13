@@ -9,11 +9,18 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [authError, setAuthError] = useState(null);
+    const [authNotice, setAuthNotice] = useState(null);
     const [authFieldErrors, setAuthFieldErrors] = useState({});
     const [authFieldLabels, setAuthFieldLabels] = useState({});
 
     useEffect(() => {
         const session = readAuthSession();
+        if (!session.token) {
+            clearAuthSession();
+            setUser(null);
+            setToken(null);
+            return;
+        }
         setUser(session.user);
         setToken(session.token);
     }, []);
@@ -25,6 +32,11 @@ export function AuthProvider({ children }) {
             }
 
             const session = readAuthSession();
+            if (!session.token) {
+                setUser(null);
+                setToken(null);
+                return;
+            }
             setUser(session.user);
             setToken(session.token);
         };
@@ -33,6 +45,18 @@ export function AuthProvider({ children }) {
 
         return () => {
             window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleTokenExpired = () => {
+            logout();
+        };
+
+        window.addEventListener('auth:token-expired', handleTokenExpired);
+
+        return () => {
+            window.removeEventListener('auth:token-expired', handleTokenExpired);
         };
     }, []);
 
@@ -57,6 +81,7 @@ export function AuthProvider({ children }) {
     const login = async ({ username, password }) => {
         setIsLoading(true);
         setAuthError(null);
+        setAuthNotice(null);
         setAuthFieldErrors({});
         setAuthFieldLabels({});
 
@@ -85,13 +110,22 @@ export function AuthProvider({ children }) {
     const register = async ({ username, email, password, role }) => {
         setIsLoading(true);
         setAuthError(null);
+        setAuthNotice(null);
         setAuthFieldErrors({});
         setAuthFieldLabels({});
 
         try {
             const response = await registerRequest({ username, email, password, role });
-            const mappedUser = getUserFromAuthResponse(response, { username, email, role });
-            persistSession(mappedUser, response.token ?? null);
+            // El endpoint de registro ahora devuelve token para auto-login
+            if (response?.token) {
+                const mappedUser = getUserFromAuthResponse(response, { username, email, role });
+                persistSession(mappedUser, response.token);
+            } else {
+                clearAuthSession();
+                setUser(null);
+                setToken(null);
+                setAuthNotice('Cuenta creada correctamente. Ahora inicia sesión.');
+            }
             return response;
         } catch (error) {
             const message = error?.message || "No se pudo completar el registro";
@@ -114,6 +148,7 @@ export function AuthProvider({ children }) {
         setUser(null);
         setToken(null);
         setAuthError(null);
+        setAuthNotice(null);
         setAuthFieldErrors({});
         setAuthFieldLabels({});
         clearAuthSession();
@@ -125,18 +160,24 @@ export function AuthProvider({ children }) {
         setAuthFieldLabels({});
     };
 
+    const clearAuthNotice = () => {
+        setAuthNotice(null);
+    };
+
     const value = {
         user,
         token,
-        isAuthenticated: Boolean(user),
+        isAuthenticated: Boolean(token),
         isLoading,
         authError,
+        authNotice,
         authFieldErrors,
         authFieldLabels,
         login,
         register,
         logout,
         clearAuthError,
+        clearAuthNotice,
         setUser,
     };
 

@@ -11,4 +11,5 @@ public interface PersonaAptitudRepository extends JpaRepository<PersonaAptitud, 
     List<PersonaAptitud> findByUsuario_Id(Long usuarioId);
     void deleteByUsuario_IdAndAptitud_Id(Long usuarioId, Long aptitudId);
     boolean existsByUsuario_IdAndAptitud_Id(Long usuarioId, Long aptitudId);
+    void deleteByUsuario_Id(Long usuarioId);
 }

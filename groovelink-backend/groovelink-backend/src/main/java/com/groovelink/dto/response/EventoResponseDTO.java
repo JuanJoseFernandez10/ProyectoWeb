@@ -25,6 +25,7 @@ public class EventoResponseDTO {
     private List<String> generos;         
     private Integer numeroAsistentes;
     private Integer numeroMeGustas;
+    private Boolean likedByMe;
 
     private String rutaPortada;
     private String rutaFotos;

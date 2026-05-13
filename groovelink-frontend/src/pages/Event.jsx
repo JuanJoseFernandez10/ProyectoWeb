@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import EventPhotosPanel from '../components/Main/EventPhotosPanel'
 import { API_URL } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
 import { getEventById, getRelatedEvents, likeEvent, unlikeEvent } from '../api/events'
@@ -131,20 +130,6 @@ function Event() {
         }
     }, [id])
 
-    const refreshEvent = async () => {
-        setLoading(true)
-        setError('')
-
-        try {
-            const eventData = await getEventById(id)
-            setEvent(mapEvent(eventData))
-        } catch (requestError) {
-            setError(requestError.message || 'No se pudo recargar el evento')
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleToggleLike = async () => {
         if (!token) {
             navigate('/login')
@@ -226,15 +211,6 @@ function Event() {
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-secondary/15 bg-text-primary/20 p-5 sm:p-6">
-                                        <EventPhotosPanel
-                                            eventId={id}
-                                            portada={event.portada}
-                                            fotos={event.fotos}
-                                            onUploaded={refreshEvent}
-                                        />
-                                    </div>
-
                                     <div className="space-y-6 p-5 sm:p-6">
                                         <div className="grid gap-3 sm:grid-cols-3">
                                             <div className="rounded-2xl border border-secondary/20 bg-primary/20 p-4">
@@ -298,15 +274,29 @@ function Event() {
                                 <div className="mt-4 flex flex-col gap-3">
                                     <button
                                         type="button"
-                                        className="btn-primary w-full px-4 py-2.5 text-sm"
                                         onClick={handleToggleLike}
                                         disabled={liking}
+                                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-lg transition-all duration-200 ${
+                                            event?.likedByMe
+                                                ? 'bg-red-50 border-2 border-red-300 text-red-600 hover:bg-red-100'
+                                                : 'btn-primary'
+                                        }`}
+                                        title={event?.likedByMe ? 'Quitar me gusta' : 'Me gusta'}
                                     >
-                                        {liking
-                                            ? 'Procesando...'
-                                            : event?.likedByMe
-                                                ? 'Quitar me gusta'
-                                                : 'Me interesa'}
+                                        {liking ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+                                                Procesando...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl">{event?.likedByMe ? '❤️' : '🤍'}</span>
+                                                <span>{event?.likedByMe ? 'Quitar me gusta' : 'Me gusta'}</span>
+                                                {event?.likes > 0 && (
+                                                    <span className="ml-1 text-sm opacity-75">({event.likes})</span>
+                                                )}
+                                            </>
+                                        )}
                                     </button>
                                     <button type="button" className="btn-ghost w-full px-4 py-2.5 text-sm">
                                         Compartir evento

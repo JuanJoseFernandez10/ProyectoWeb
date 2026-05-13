@@ -36,22 +36,13 @@ export function getHomeEvents({ page = 0, size = 5 } = {}) {
         size: String(size),
     })
 
-    return requestJson(`/home?${params.toString()}`)
+    return requestJson(`/home?${params.toString()}`, {
+        auth: true,
+    })
 }
 
 export async function getEventById(eventId) {
-    try {
-        return await requestJson(`/eventos/${eventId}`)
-    } catch {
-        const homePage = await getHomeEvents({ page: 0, size: 100 })
-        const event = (homePage?.eventos ?? []).find((item) => String(item?.codigo ?? item?.id) === String(eventId))
-
-        if (event) {
-            return event
-        }
-
-        throw new Error('No se pudo cargar el detalle del evento')
-    }
+    return await requestJson(`/eventos/${eventId}`)
 }
 
 export async function getRelatedEvents({ eventId, size = 5 } = {}) {
@@ -72,6 +63,12 @@ export function likeEvent(eventId) {
 export function unlikeEvent(eventId) {
     return requestJson(`/eventos/${eventId}/me-gusta`, {
         method: 'DELETE',
+        auth: true,
+    })
+}
+
+export function getEventForEdit(eventId) {
+    return requestJson(`/eventos/${eventId}/edicion`, {
         auth: true,
     })
 }

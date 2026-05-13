@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 function Login({ cambiarModo }) {
     const navigate = useNavigate();
-    const { login, isLoading, authError, authFieldErrors, authFieldLabels, clearAuthError } = useContext(AuthContext);
+    const { login, isLoading, authError, authNotice, authFieldErrors, authFieldLabels, clearAuthError, clearAuthNotice } = useContext(AuthContext);
     const [formData, setFormData] = useState({ username: '', password: '' });
     const hasFieldErrors = Object.keys(authFieldErrors || {}).length > 0;
 
@@ -18,6 +18,7 @@ function Login({ cambiarModo }) {
     const handleChange = (event) => {
         const { name, value } = event.target;
         clearAuthError();
+        clearAuthNotice();
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -36,6 +37,10 @@ function Login({ cambiarModo }) {
         <CabeceraAcces modo="login" cambiarModo={cambiarModo} />
 
         <form className="card-panel mt-10 w-full max-w-md p-8" onSubmit={handleSubmit} noValidate>
+            {authNotice ? (
+            <p className="form-success-alert" role="status" aria-live="polite">{authNotice}</p>
+            ) : null}
+
             <div className="mb-6">
             <label className="block text-ink mb-2" htmlFor="username">
                 Username

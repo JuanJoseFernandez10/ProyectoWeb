@@ -44,3 +44,9 @@ export function clearAuthSession() {
 export function getAuthToken() {
     return readAuthSession().token
 }
+
+export function dispatchTokenExpired() {
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:token-expired'))
+    }
+}

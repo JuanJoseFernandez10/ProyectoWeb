@@ -1,11 +1,44 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { API_URL } from '../../api/config'
+import { getAuthToken } from '../../api/authSession'
 
 function UserProfileMenu({ user, onLogout, onGoHome }) {
+    const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState(false)
+    const [profileImageUrl, setProfileImageUrl] = useState(null)
     const menuRef = useRef(null)
 
+    // Fetch profile photo from backend if user has token
+    useEffect(() => {
+        const token = getAuthToken()
+        if (!token) return
+
+        // Check if user already has fotoPerfilUrl from props
+        if (user?.fotoPerfilUrl) {
+            setProfileImageUrl(user.fotoPerfilUrl)
+            return
+        }
+
+        // Fetch profile to get the photo URL
+        fetch(`${API_URL}/usuarios/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data?.fotoPerfilUrl) {
+                    setProfileImageUrl(data.fotoPerfilUrl)
+                }
+            })
+            .catch(() => {
+                // Silently fail, just show initials
+            })
+    }, [user])
+
     const profileImage =
-        user?.profileImageUrl || user?.avatarUrl || user?.photoUrl || user?.imageUrl || null
+        profileImageUrl || user?.profileImageUrl || user?.avatarUrl || user?.photoUrl || user?.imageUrl || null
 
     const displayName = user?.username || user?.name || user?.email || 'usuario'
 
@@ -35,6 +68,12 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
         return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
     }, [displayName])
 
+    const canCreateEvent = useMemo(() => {
+        if (!rawRole) return false
+        const role = String(rawRole)
+        return role === 'ROLE_EMPRESA' || role === 'ROLE_ADMIN'
+    }, [rawRole])
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -60,6 +99,21 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
         onGoHome()
     }
 
+    const handleGoProfile = () => {
+        setMenuOpen(false)
+        navigate('/profile')
+    }
+
+    const handleCreateEvent = () => {
+        setMenuOpen(false)
+        navigate('/event/new')
+    }
+
+    const handleMyEvents = () => {
+        setMenuOpen(false)
+        navigate('/my-events')
+    }
+
     const handleLogout = () => {
         setMenuOpen(false)
         onLogout()
@@ -76,7 +130,7 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
             >
                 {profileImage ? (
                     <img
-                        src={profileImage}
+                        src={profileImage.startsWith('http') ? profileImage : `${API_URL}${profileImage}`}
                         alt={`Foto de ${displayName}`}
                         className="h-9 w-9 rounded-full object-cover border border-text-primary/50"
                     />
@@ -105,24 +159,40 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
                         </button>
                         <button
                             type="button"
-                            className="btn-ghost w-full justify-start py-2! px-3! bg-background/40! border-transparent! shadow-none! text-ink-soft! cursor-not-allowed"
-                            disabled
+                            className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-ink! hover:bg-background! hover:border-secondary/25!"
+                            onClick={handleGoProfile}
                         >
-                            Mi perfil (proximamente)
+                            Mi perfil
+                        </button>
+                        {canCreateEvent && (
+                            <button
+                                type="button"
+                                className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-ink! hover:bg-background! hover:border-secondary/25!"
+                                onClick={handleCreateEvent}
+                            >
+                                Crear evento
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-ink! hover:bg-background! hover:border-secondary/25!"
+                            onClick={handleMyEvents}
+                        >
+                            Mis eventos
                         </button>
                         <button
                             type="button"
                             className="btn-ghost w-full justify-start py-2! px-3! bg-background/40! border-transparent! shadow-none! text-ink-soft! cursor-not-allowed"
                             disabled
                         >
-                            Ajustes (proximamente)
+                            Ajustes (próximamente)
                         </button>
                         <button
                             type="button"
                             className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-red-700! hover:bg-red-50! hover:border-red-200!"
                             onClick={handleLogout}
                         >
-                            Cerrar sesion
+                            Cerrar sesión
                         </button>
                     </div>
                 </div>

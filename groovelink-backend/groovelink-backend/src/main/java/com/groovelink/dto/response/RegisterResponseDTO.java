@@ -15,4 +15,5 @@ public class RegisterResponseDTO {
     private String message;
     private String username;
     private Rol role;
+    private String token;
 }

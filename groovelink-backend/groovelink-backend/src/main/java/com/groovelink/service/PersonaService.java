@@ -100,6 +100,54 @@ public class PersonaService {
         personaGeneroRepository.deleteByUsuario_IdAndGenero_Id(personaId, generoId);
     }
 
+    @Transactional
+    @CacheEvict(value = "personas", allEntries = true)
+    public void reemplazarAptitudes(Long usuarioId, List<Long> aptitudesIds) {
+        // Delete all existing aptitudes for this user
+        personaAptitudRepository.deleteByUsuario_Id(usuarioId);
+        
+        if (aptitudesIds == null || aptitudesIds.isEmpty()) {
+            return;
+        }
+        
+        Persona persona = personaRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Persona", usuarioId));
+        
+        for (Long aptitudId : aptitudesIds) {
+            Aptitud aptitud = aptitudRepository.findById(aptitudId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Aptitud", aptitudId));
+            
+            PersonaAptitud relacion = new PersonaAptitud();
+            relacion.setUsuario(persona);
+            relacion.setAptitud(aptitud);
+            personaAptitudRepository.save(relacion);
+        }
+    }
+
+    @Transactional
+    @CacheEvict(value = "personas", allEntries = true)
+    public void reemplazarGeneros(Long usuarioId, List<Long> generosIds) {
+        // Delete all existing generos for this user
+        personaGeneroRepository.deleteByUsuario_Id(usuarioId);
+        
+        if (generosIds == null || generosIds.isEmpty()) {
+            return;
+        }
+        
+        Persona persona = personaRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Persona", usuarioId));
+        
+        for (Long generoId : generosIds) {
+            Genero genero = generoRepository.findById(generoId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Genero", generoId));
+            
+            PersonaGenero relacion = new PersonaGenero();
+            relacion.setUsuario(persona);
+            relacion.setGenero(genero);
+            personaGeneroRepository.save(relacion);
+        }
+    }
+
     @Cacheable(value = "personasPremium")
     public List<Persona> findAllPremium() {
         return personaRepository.findByPremiumTrue();

@@ -36,6 +36,11 @@ public class FotoEventoService {
         return fotoEventoRepository.findByEvento_IdOrderByIdAsc(eventoId);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<FotoEvento> findById(Long fotoId) {
+        return fotoEventoRepository.findById(fotoId);
+    }
+
     // Obtener la portada (cover photo) del evento
     @Transactional(readOnly = true)
     public Optional<FotoEvento> findPortadaByEvento(Long eventoId) {

@@ -55,6 +55,20 @@ function Main() {
         }
     }, [currentPage, refreshTick])
 
+    useEffect(() => {
+        if (homeData.eventos.length > 0) {
+            setLikedEventIds((current) => {
+                const next = new Set(current)
+                homeData.eventos.forEach(event => {
+                    if (event.likedByMe) {
+                        next.add(event.codigo)
+                    }
+                })
+                return next
+            })
+        }
+    }, [homeData])
+
     const formatEventDate = (value) => {
         if (!value) {
             return 'Próximamente'
@@ -130,7 +144,6 @@ function Main() {
                 next.add(eventId)
                 return next
             })
-            setRefreshTick((value) => value + 1)
         } catch (requestError) {
             setError(requestError.message || 'No se pudo guardar el me gusta')
         } finally {
@@ -158,7 +171,6 @@ function Main() {
                 next.delete(eventId)
                 return next
             })
-            setRefreshTick((value) => value + 1)
         } catch (requestError) {
             setError(requestError.message || 'No se pudo quitar el me gusta')
         } finally {
@@ -219,6 +231,7 @@ function Main() {
                         onNextPage={() => setCurrentPage((value) => value + 1)}
                         onPreviousPage={() => setCurrentPage((value) => Math.max(value - 1, 0))}
                         onLikeEvent={handleLikeEvent}
+                        onUnlikeEvent={handleUnlikeEvent}
                         likingEventId={likingEventId}
                     />
 

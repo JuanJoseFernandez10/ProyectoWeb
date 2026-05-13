@@ -96,4 +96,22 @@ public interface GrooveLinkMapper {
         if (usuarios == null) return List.of();
         return usuarios.stream().map(Usuario::getUsername).collect(Collectors.toList());
     }
+
+    @Named("construirFotoUrl")
+    default String construirFotoUrl(com.groovelink.entitys.relations.FotoEvento foto) {
+        if (Boolean.TRUE.equals(foto.getEsPortada())) {
+            return "/fotos-evento/" + foto.getEvento().getId() + "/portada/archivo";
+        }
+        return "/fotos-evento/" + foto.getEvento().getId() + "/" + foto.getNombreFoto() + "/archivo";
+    }
+
+    default FotoEventoResponseDTO toFotoEventoResponseDTO(FotoEvento foto) {
+        if (foto == null) return null;
+        FotoEventoResponseDTO dto = new FotoEventoResponseDTO();
+        dto.setId(foto.getId());
+        dto.setEsPortada(foto.getEsPortada());
+        dto.setNombreFoto(foto.getNombreFoto());
+        dto.setFotoUrl(construirFotoUrl(foto));
+        return dto;
+    }
 }

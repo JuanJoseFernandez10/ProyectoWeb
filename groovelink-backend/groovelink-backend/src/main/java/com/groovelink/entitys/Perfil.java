@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 
@@ -23,8 +22,10 @@ public class Perfil {
 
     private String descripcion;
 
-    @Lob
-    private byte[] fotoPerfil; 
+    private String ubicacion;
+
+    @Column(name = "ruta_foto_perfil")
+    private String rutaFotoPerfil; 
 
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion = LocalDateTime.now();
@@ -53,12 +54,20 @@ public class Perfil {
 		this.descripcion = descripcion;
 	}
 
-	public byte[] getFotoPerfil() {
-		return fotoPerfil;
+	public String getUbicacion() {
+		return ubicacion;
 	}
 
-	public void setFotoPerfil(byte[] fotoPerfil) {
-		this.fotoPerfil = fotoPerfil;
+	public void setUbicacion(String ubicacion) {
+		this.ubicacion = ubicacion;
+	}
+
+	public String getRutaFotoPerfil() {
+		return rutaFotoPerfil;
+	}
+
+	public void setRutaFotoPerfil(String rutaFotoPerfil) {
+		this.rutaFotoPerfil = rutaFotoPerfil;
 	}
 
 	public LocalDateTime getFechaActualizacion() {

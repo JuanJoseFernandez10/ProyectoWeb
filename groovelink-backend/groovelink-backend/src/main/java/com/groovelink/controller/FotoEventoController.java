@@ -2,8 +2,15 @@ package com.groovelink.controller;
 
 import com.groovelink.dto.response.FotoEventoResponseDTO;
 import com.groovelink.dto.response.FotoEventoUploadResponseDTO;
+import com.groovelink.entitys.Evento;
+import com.groovelink.entitys.Usuario;
 import com.groovelink.entitys.relations.FotoEvento;
+import com.groovelink.exception.BusinessException;
+import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.service.relations.FotoEventoService;
+import com.groovelink.mapper.GrooveLinkMapper;
+import com.groovelink.service.EventoService;
+import com.groovelink.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,16 +32,28 @@ import java.util.stream.Collectors;
 public class FotoEventoController {
 
     private final FotoEventoService fotoEventoService;
+    private final EventoService eventoService;
+    private final UsuarioService usuarioService;
+    private final GrooveLinkMapper mapper;
 
-    public FotoEventoController(FotoEventoService fotoEventoService) {
+    public FotoEventoController(FotoEventoService fotoEventoService,
+                                EventoService eventoService,
+                                UsuarioService usuarioService,
+                                GrooveLinkMapper mapper) {
         this.fotoEventoService = fotoEventoService;
+        this.eventoService = eventoService;
+        this.usuarioService = usuarioService;
+        this.mapper = mapper;
     }
 
     // Subir la portada del evento
     @PostMapping(value = "/{eventoId}/portada", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FotoEventoUploadResponseDTO> subirPortada(
             @PathVariable Long eventoId,
+            Authentication authentication,
             @RequestParam("foto") MultipartFile foto) {
+
+        validarPropietarioEvento(eventoId, authentication);
 
         FotoEvento fotoGuardada = fotoEventoService.agregarFoto(eventoId, foto, true, "portada");
 
@@ -46,9 +66,11 @@ public class FotoEventoController {
     @PostMapping(value = "/{eventoId}/otras", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<FotoEventoUploadResponseDTO>> subirFotosNormales(
             @PathVariable Long eventoId,
+            Authentication authentication,
             @RequestParam("fotos") List<MultipartFile> fotos) {
 
-        String carpetaNombre = fotoEventoService.generarNombreCarpeta(eventoId);
+        validarPropietarioEvento(eventoId, authentication);
+
         long inicio = fotoEventoService.countFotosNoPortada(eventoId) + 1;
 
         List<FotoEventoUploadResponseDTO> respuestas = java.util.stream.IntStream.range(0, fotos.size())
@@ -114,9 +136,30 @@ public class FotoEventoController {
 
     // Eliminar una foto específica
     @DeleteMapping("/{fotoId}")
-    public ResponseEntity<Void> eliminarFoto(@PathVariable Long fotoId) {
+    public ResponseEntity<Void> eliminarFoto(@PathVariable Long fotoId, Authentication authentication) {
+        FotoEvento fotoEvento = fotoEventoService.findById(fotoId)
+                .orElseThrow(() -> new ResourceNotFoundException("FotoEvento", fotoId));
+
+        validarPropietarioEvento(fotoEvento.getEvento().getId(), authentication);
+
         fotoEventoService.eliminarFoto(fotoId);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validarPropietarioEvento(Long eventoId, Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            throw new BusinessException("No autenticado");
+        }
+
+        Usuario usuario = usuarioService.findByUsername(authentication.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
+
+        Evento evento = eventoService.findById(eventoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
+
+        if (evento.getPublicado() == null || !evento.getPublicado().getId().equals(usuario.getId())) {
+            throw new BusinessException("Solo el creador del evento puede gestionar sus fotos");
+        }
     }
 
     private FotoEventoUploadResponseDTO construirRespuestaUpload(Long eventoId, FotoEvento fotoGuardada, String mensaje) {
@@ -143,11 +186,7 @@ public class FotoEventoController {
     }
 
     private String construirFotoUrl(FotoEvento foto) {
-        if (Boolean.TRUE.equals(foto.getEsPortada())) {
-            return "/fotos-evento/" + foto.getEvento().getId() + "/portada/archivo";
-        }
-
-        return "/fotos-evento/" + foto.getEvento().getId() + "/" + foto.getNombreFoto() + "/archivo";
+        return mapper.construirFotoUrl(foto);
     }
 
     private ResponseEntity<ByteArrayResource> servirArchivo(FotoEvento foto) {

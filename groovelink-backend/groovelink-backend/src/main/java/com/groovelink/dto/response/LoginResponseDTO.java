@@ -14,6 +14,7 @@ import lombok.Setter;
 public class LoginResponseDTO {
     private String message;
     private String username;
+    private String email;
     private Rol role;
-    private String token;  // token JWT para cada request
+    private String token;
 }

@@ -14,6 +14,7 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager(
                 "eventos",
+                "eventosList",
                 "eventosFuturos",
                 "personas",
                 "personasPremium",

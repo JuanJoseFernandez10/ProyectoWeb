@@ -54,11 +54,11 @@ public abstract class Usuario {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public LocalDateTime getFecha_creacion() {
+	public LocalDateTime getFechaCreacion() {
 		return fechaCreacion;
 	}
-	public void setFecha_creacion(LocalDateTime fecha_creacion) {
-		this.fechaCreacion = fecha_creacion;
+	public void setFechaCreacion(LocalDateTime fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
 	}
 	public Rol getRol() {
 		return rol;
@@ -68,4 +68,3 @@ public abstract class Usuario {
 	}
 
 }
-

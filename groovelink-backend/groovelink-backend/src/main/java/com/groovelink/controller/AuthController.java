@@ -55,9 +55,15 @@ public class AuthController {
             .map(Object::toString)
             .map(Rol::valueOf)
             .orElse(Rol.ROLE_USER);
+
+        String email = usuarioService.findByUsername(authentication.getName())
+                .map(Usuario::getEmail)
+                .orElse(null);
+
         return new LoginResponseDTO(
                 "Login correcto",
                 authentication.getName(),
+                email,
                 authority,
                 token
         );
@@ -80,10 +86,17 @@ public class AuthController {
 
         Usuario saved = usuarioService.save(usuario);
 
+        Authentication authentication = authenticationManager.authenticate(
+                UsernamePasswordAuthenticationToken.unauthenticated(
+                        request.getUsername(), request.getPassword())
+        );
+        String token = jwtProvider.generateToken(authentication);
+
         return new RegisterResponseDTO(
                 "Registro correcto",
                 saved.getUsername(),
-                saved.getRol()
+                saved.getRol(),
+                token
         );
     }
 
@@ -92,6 +105,7 @@ public class AuthController {
     public LoginResponseDTO loginHelp() {
         return new LoginResponseDTO(
                 "Usa POST /auth/login con { username, password }",
+                null,
                 null,
                 null,
                 null
@@ -106,4 +120,3 @@ public class AuthController {
         };
     }
 }
-

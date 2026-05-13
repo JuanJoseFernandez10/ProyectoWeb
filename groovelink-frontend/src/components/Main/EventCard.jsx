@@ -31,7 +31,6 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                     <div className="event-card-meta flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-ink-soft max-[500px]:text-[10px] sm:gap-2 sm:text-xs">
                         <span className="max-w-full truncate rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.place}</span>
                         <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.attendees} asistentes</span>
-                        <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.likes ?? 0} me gusta</span>
                         {event.organizer ? (
                             <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.organizer}</span>
                         ) : null}
@@ -43,11 +42,17 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                 <div className="event-card-actions flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                     <button
                         type="button"
-                        className="event-card-button btn-primary w-full px-4 py-2 text-sm max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] sm:w-auto sm:px-5 sm:py-2.5 disabled:cursor-not-allowed disabled:opacity-60"
                         onClick={() => (event.likedByMe ? onUnlikeEvent?.(event.id) : onLikeEvent?.(event.id))}
                         disabled={isLiking}
+                        className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:scale-110"
+                        title={event.likedByMe ? 'Quitar me gusta' : 'Me gusta'}
                     >
-                        {isLiking ? 'Procesando...' : event.likedByMe ? 'Ya me gusta' : 'Me gusta'}
+                        <span className="text-xl leading-none">
+                            {event.likedByMe ? '❤️' : '🤍'}
+                        </span>
+                        <span className="text-ink-soft">
+                            {event.likes ?? 0}
+                        </span>
                     </button>
                     <Link
                         to={`/event/${event.id}`}

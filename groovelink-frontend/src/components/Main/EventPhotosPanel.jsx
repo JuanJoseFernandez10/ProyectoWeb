@@ -1,10 +1,8 @@
-import React, { useContext, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { API_URL } from '../../api/config'
-import { AuthContext } from '../../context/AuthContext'
 import { uploadEventCover, uploadEventPhotos } from '../../api/eventPhotos'
 
-function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded }) {
-    const { isAuthenticated } = useContext(AuthContext)
+function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded, canManage = false }) {
     const [coverFile, setCoverFile] = useState(null)
     const [otherFiles, setOtherFiles] = useState([])
     const [coverLoading, setCoverLoading] = useState(false)
@@ -91,9 +89,11 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded }) {
                         Aquí sale la portada y el resto de fotos del evento.
                     </p>
                 </div>
-                <div className="rounded-full border border-secondary/20 bg-primary/20 px-3 py-1 text-xs font-semibold text-ink-soft">
-                    Carpeta automática: nombreEvento_id
-                </div>
+                {canManage ? (
+                    <div className="rounded-full border border-secondary/20 bg-primary/20 px-3 py-1 text-xs font-semibold text-ink-soft">
+                        Carpeta automática: nombreEvento_id
+                    </div>
+                ) : null}
             </div>
 
             {portada?.fotoUrl ? (
@@ -145,7 +145,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded }) {
                 <p className="mt-5 text-sm text-ink-soft">No hay más fotos todavía.</p>
             )}
 
-            {isAuthenticated ? (
+            {canManage ? (
                 <div className="mt-6 grid gap-4 lg:grid-cols-2">
                     <form onSubmit={handleCoverSubmit} className="rounded-3xl border border-secondary/20 bg-primary/15 p-4 sm:p-5">
                         <h3 className="text-lg font-black text-ink">Subir portada</h3>
@@ -186,11 +186,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded }) {
                         </button>
                     </form>
                 </div>
-            ) : (
-                <div className="mt-6 rounded-3xl border border-secondary/20 bg-text-primary/35 px-4 py-4 text-sm text-ink-soft">
-                    Inicia sesión para subir portada o más fotos.
-                </div>
-            )}
+            ) : null}
 
             {message ? <p className="mt-4 text-sm font-semibold text-emerald-700">{message}</p> : null}
             {error ? <p className="mt-2 text-sm font-semibold text-red-700">{error}</p> : null}

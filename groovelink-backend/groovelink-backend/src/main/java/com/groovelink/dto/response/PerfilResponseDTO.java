@@ -7,6 +7,11 @@ import lombok.Setter;
 @Setter
 public class PerfilResponseDTO {
 
+    private Long id;
+    private String username;
+    private String email;
     private String descripcion;
-    private String fotoPerfilUrl;   // base64 o URL si usas cloud
+    private String ubicacion;
+    private String fotoPerfilUrl;
+    private boolean premium;
 }
