@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
@@ -14,4 +15,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c FROM Chat c WHERE :usuarioId MEMBER OF c.participantes AND c.esGrupal = false")
     List<Chat> findChatsIndividualesDeUsuario(@Param("usuarioId") Long usuarioId);
+
+    Optional<Chat> findByEventoId(Long eventoId);
+
+    @Query("SELECT c FROM Chat c WHERE :usuarioId MEMBER OF c.participantes AND c.eventoId IS NOT NULL")
+    List<Chat> findChatsGrupoEventoDeUsuario(@Param("usuarioId") Long usuarioId);
 }

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
-import { getEventById, getRelatedEvents, likeEvent, unlikeEvent } from '../api/events'
+import { getEventById, getRelatedEvents, likeEvent, unlikeEvent, joinEvent, leaveEvent, getMyJoinedEvents } from '../api/events'
 
 function formatDate(value) {
     if (!value) {
@@ -77,6 +77,9 @@ function Event() {
     const [relatedError, setRelatedError] = useState('')
     const [actionError, setActionError] = useState('')
     const [liking, setLiking] = useState(false)
+    const [joined, setJoined] = useState(false)
+    const [joining, setJoining] = useState(false)
+    const [joinCheckDone, setJoinCheckDone] = useState(false)
 
     useEffect(() => {
         let active = true
@@ -129,6 +132,68 @@ function Event() {
             active = false
         }
     }, [id])
+
+    useEffect(() => {
+        if (!token) {
+            return
+        }
+
+        let active = true
+
+        async function checkJoined() {
+            try {
+                const unidos = await getMyJoinedEvents()
+                const unidosArr = Array.isArray(unidos) ? unidos : unidos?.eventos ?? []
+                const isJoined = unidosArr.some(
+                    (e) => String(e.codigo ?? e.id) === String(id),
+                )
+                if (active) {
+                    setJoined(isJoined)
+                }
+            } catch {
+                // ignore
+            } finally {
+                if (active) {
+                    setJoinCheckDone(true)
+                }
+            }
+        }
+
+        checkJoined()
+
+        return () => {
+            active = false
+        }
+    }, [token, id])
+
+    const handleToggleJoin = async () => {
+        if (!token) {
+            navigate('/login')
+            return
+        }
+
+        if (!event || joining) {
+            return
+        }
+
+        setJoining(true)
+        setActionError('')
+
+        try {
+            const eventId = event.id
+            if (joined) {
+                await leaveEvent(eventId)
+                setJoined(false)
+            } else {
+                await joinEvent(eventId)
+                setJoined(true)
+            }
+        } catch (requestError) {
+            setActionError(requestError.message || 'No se pudo actualizar la inscripción')
+        } finally {
+            setJoining(false)
+        }
+    }
 
     const handleToggleLike = async () => {
         if (!token) {
@@ -267,10 +332,10 @@ function Event() {
 
                         <aside className="space-y-6">
                             <section className="card-shell p-5">
-                                <h2 className="text-xl font-black text-ink">Reserva / interés</h2>
-                                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                                    Esto luego irá conectado al backend para apuntarse, guardar me gusta y cargar el detalle real.
-                                </p>
+                                    <h2 className="text-xl font-black text-ink">Participación</h2>
+                                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                                        Únete al evento para acceder al chat grupal con todos los asistentes.
+                                    </p>
                                 <div className="mt-4 flex flex-col gap-3">
                                     <button
                                         type="button"
@@ -298,8 +363,27 @@ function Event() {
                                             </>
                                         )}
                                     </button>
-                                    <button type="button" className="btn-ghost w-full px-4 py-2.5 text-sm">
-                                        Compartir evento
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleJoin}
+                                        disabled={joining || !token}
+                                        className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold text-lg transition-all duration-200 ${
+                                            joined
+                                                ? 'bg-amber-50 border-2 border-amber-300 text-amber-700 hover:bg-amber-100'
+                                                : 'btn-primary'
+                                        }`}
+                                    >
+                                        {joining ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-5 h-5 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+                                                Procesando...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl">{joined ? '🚪' : '✋'}</span>
+                                                <span>{joined ? 'Salir del evento' : 'Unirse al evento'}</span>
+                                            </>
+                                        )}
                                     </button>
                                     {actionError ? (
                                         <p className="text-sm font-medium text-red-700">{actionError}</p>

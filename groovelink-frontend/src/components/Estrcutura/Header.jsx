@@ -13,6 +13,7 @@ function Header() {
         { label: 'Inicio', path: '/home' },
         { label: 'Eventos', path: '/events' },
         { label: 'Grupos', path: '/groups' },
+        { label: 'Chats', path: '/chats' },
     ]
 
     const handleLogout = () => {

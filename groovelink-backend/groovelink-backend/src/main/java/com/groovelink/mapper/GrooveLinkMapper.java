@@ -45,6 +45,7 @@ public interface GrooveLinkMapper {
 
     // Chat
     @Mapping(target = "participantesUsernames", source = "participantes", qualifiedByName = "usuariosToUsernames")
+    @Mapping(target = "eventoId", source = "eventoId")
     ChatResponseDTO toChatResponseDTO(Chat chat);
 
     // Mensaje

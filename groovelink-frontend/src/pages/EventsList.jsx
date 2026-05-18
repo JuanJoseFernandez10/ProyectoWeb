@@ -1,21 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import EventsSection from '../Main/EventsSection'
-import GroupsPanel from '../Main/GroupsPanel'
-import ChatsPanel from '../Main/ChatsPanel'
-import { getHomeEvents, likeEvent, unlikeEvent, getMyJoinedEvents } from '../../api/events'
-import { AuthContext } from '../../context/AuthContext'
-import { API_URL } from '../../api/config'
-import { useChat } from '../../hooks/useChat'
+import { AuthContext } from '../context/AuthContext'
+import { API_URL } from '../api/config'
+import { getHomeEvents, likeEvent, unlikeEvent } from '../api/events'
+import EventsSection from '../components/Main/EventsSection'
 
-function Main() {
+function EventsList() {
     const navigate = useNavigate()
     const { token } = useContext(AuthContext)
     const [homeData, setHomeData] = useState({
         eventos: [],
         total: 0,
         page: 0,
-        size: 5,
+        size: 6,
         totalPages: 0,
         hasNext: false,
         hasPrevious: false,
@@ -23,20 +20,8 @@ function Main() {
     const [currentPage, setCurrentPage] = useState(0)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
-    const [joinedEvents, setJoinedEvents] = useState([])
     const [likedEventIds, setLikedEventIds] = useState(() => new Set())
     const [likingEventId, setLikingEventId] = useState(null)
-
-    const {
-        chats,
-        activeChat,
-        messages,
-        openChat,
-        closeChat,
-        sendMessage,
-        getActiveChatName,
-        getActiveChatImage,
-    } = useChat()
 
     useEffect(() => {
         let active = true
@@ -46,30 +31,13 @@ function Main() {
             setError('')
 
             try {
-                const [data, joined] = await Promise.allSettled([
-                    getHomeEvents({ page: currentPage, size: 5 }),
-                    token ? getMyJoinedEvents() : Promise.resolve([]),
-                ])
-
-                if (!active) {
-                    return
-                }
-
-                if (data.status === 'fulfilled') {
-                    setHomeData(data.value)
-                } else {
-                    setError(data.reason?.message || 'No se pudieron cargar los eventos')
-                }
-
-                if (joined.status === 'fulfilled') {
-                    const unidos = Array.isArray(joined.value) ? joined.value : joined.value?.eventos ?? []
-                    setJoinedEvents(unidos)
-                } else {
-                    setJoinedEvents([])
+                const data = await getHomeEvents({ page: currentPage, size: 6 })
+                if (active) {
+                    setHomeData(data)
                 }
             } catch (requestError) {
                 if (active) {
-                    setError(requestError.message || 'No se pudieron cargar los datos')
+                    setError(requestError.message || 'No se pudieron cargar los eventos')
                 }
             } finally {
                 if (active) {
@@ -83,7 +51,7 @@ function Main() {
         return () => {
             active = false
         }
-    }, [currentPage, token])
+    }, [currentPage])
 
     useEffect(() => {
         if (homeData.eventos.length > 0) {
@@ -100,15 +68,9 @@ function Main() {
     }, [homeData])
 
     const formatEventDate = (value) => {
-        if (!value) {
-            return 'Próximamente'
-        }
-
+        if (!value) return 'Próximamente'
         const date = new Date(value)
-        if (Number.isNaN(date.getTime())) {
-            return 'Próximamente'
-        }
-
+        if (Number.isNaN(date.getTime())) return 'Próximamente'
         return new Intl.DateTimeFormat('es-ES', {
             weekday: 'short',
             day: '2-digit',
@@ -117,15 +79,9 @@ function Main() {
     }
 
     const formatEventTime = (value) => {
-        if (!value) {
-            return 'Sin hora'
-        }
-
+        if (!value) return 'Sin hora'
         const date = new Date(value)
-        if (Number.isNaN(date.getTime())) {
-            return 'Sin hora'
-        }
-
+        if (Number.isNaN(date.getTime())) return 'Sin hora'
         return new Intl.DateTimeFormat('es-ES', {
             hour: '2-digit',
             minute: '2-digit',
@@ -159,14 +115,11 @@ function Main() {
             navigate('/login')
             return
         }
-
         if (likedEventIds.has(eventId) || likingEventId === eventId) {
             return
         }
-
         setLikingEventId(eventId)
         setError('')
-
         try {
             await likeEvent(eventId)
             setLikedEventIds((current) => {
@@ -194,14 +147,11 @@ function Main() {
             navigate('/login')
             return
         }
-
         if (!likedEventIds.has(eventId) || likingEventId === eventId) {
             return
         }
-
         setLikingEventId(eventId)
         setError('')
-
         try {
             await unlikeEvent(eventId)
             setLikedEventIds((current) => {
@@ -225,45 +175,29 @@ function Main() {
     }
 
     return (
-        <main className="page-surface min-h-screen py-5 max-[500px]:py-3 sm:py-7 md:py-10">
-            <div className="mx-auto w-full max-w-7xl px-3 max-[500px]:px-2 sm:px-4">
-                <div className="grid gap-4 max-[500px]:gap-3 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-                    <EventsSection
-                        featuredEvent={featuredEvent}
-                        events={gridEvents}
-                        totalEvents={homeData.total}
-                        pagination={{
-                            page: homeData.page,
-                            totalPages: homeData.totalPages,
-                            hasNext: homeData.hasNext,
-                            hasPrevious: homeData.hasPrevious,
-                        }}
-                        loading={loading}
-                        error={error}
-                        onNextPage={() => setCurrentPage((value) => value + 1)}
-                        onPreviousPage={() => setCurrentPage((value) => Math.max(value - 1, 0))}
-                        onLikeEvent={handleLikeEvent}
-                        onUnlikeEvent={handleUnlikeEvent}
-                        likingEventId={likingEventId}
-                    />
-
-                    <aside className="grid gap-4 max-[500px]:gap-3 md:gap-6 lg:grid-rows-2">
-                        <GroupsPanel events={joinedEvents} />
-                        <ChatsPanel
-                            chats={chats}
-                            activeChatId={activeChat}
-                            activeChatName={getActiveChatName()}
-                            activeChatImage={getActiveChatImage()}
-                            messages={messages}
-                            onOpenChat={openChat}
-                            onCloseChat={closeChat}
-                            onSendMessage={sendMessage}
-                        />
-                    </aside>
-                </div>
+        <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
+            <div className="mx-auto w-full max-w-5xl px-3 sm:px-4">
+                <EventsSection
+                    featuredEvent={featuredEvent}
+                    events={gridEvents}
+                    totalEvents={homeData.total}
+                    pagination={{
+                        page: homeData.page,
+                        totalPages: homeData.totalPages,
+                        hasNext: homeData.hasNext,
+                        hasPrevious: homeData.hasPrevious,
+                    }}
+                    loading={loading}
+                    error={error}
+                    onNextPage={() => setCurrentPage((value) => value + 1)}
+                    onPreviousPage={() => setCurrentPage((value) => Math.max(value - 1, 0))}
+                    onLikeEvent={handleLikeEvent}
+                    onUnlikeEvent={handleUnlikeEvent}
+                    likingEventId={likingEventId}
+                />
             </div>
         </main>
     )
 }
 
-export default Main
+export default EventsList

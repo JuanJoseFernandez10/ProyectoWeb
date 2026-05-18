@@ -7,8 +7,10 @@ import java.util.Optional;
 
 import com.groovelink.entitys.Administrador;
 import com.groovelink.entitys.Aptitud;
+import com.groovelink.entitys.Chat;
 import com.groovelink.entitys.Evento;
 import com.groovelink.entitys.Genero;
+import com.groovelink.entitys.Mensaje;
 import com.groovelink.entitys.Perfil;
 import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.Usuario;
@@ -21,8 +23,10 @@ import com.groovelink.entitys.relations.PersonaUneEvento;
 import com.groovelink.enums.Rol;
 import com.groovelink.repository.AdministradorRepository;
 import com.groovelink.repository.AptitudRepository;
+import com.groovelink.repository.ChatRepository;
 import com.groovelink.repository.EventoRepository;
 import com.groovelink.repository.GeneroRepository;
+import com.groovelink.repository.MensajeRepository;
 import com.groovelink.repository.PerfilRepository;
 import com.groovelink.repository.PersonaRepository;
 import com.groovelink.repository.UsuarioRepository;
@@ -59,6 +63,8 @@ public class DemoDataLoader implements CommandLineRunner {
     private final PersonaComentarioEventoRepository personaComentarioEventoRepository;
     private final PersonaMeGustaEventoRepository personaMeGustaEventoRepository;
     private final PersonaUneEventoRepository personaUneEventoRepository;
+    private final ChatRepository chatRepository;
+    private final MensajeRepository mensajeRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DemoDataLoader(
@@ -75,6 +81,8 @@ public class DemoDataLoader implements CommandLineRunner {
             PersonaComentarioEventoRepository personaComentarioEventoRepository,
             PersonaMeGustaEventoRepository personaMeGustaEventoRepository,
             PersonaUneEventoRepository personaUneEventoRepository,
+            ChatRepository chatRepository,
+            MensajeRepository mensajeRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.administradorRepository = administradorRepository;
@@ -89,6 +97,8 @@ public class DemoDataLoader implements CommandLineRunner {
         this.personaComentarioEventoRepository = personaComentarioEventoRepository;
         this.personaMeGustaEventoRepository = personaMeGustaEventoRepository;
         this.personaUneEventoRepository = personaUneEventoRepository;
+        this.chatRepository = chatRepository;
+        this.mensajeRepository = mensajeRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -167,6 +177,9 @@ public class DemoDataLoader implements CommandLineRunner {
         ensureComentario(carlos, electroRooftop, "La mejor fiesta electrónica del año", 5);
         ensureComentario(juan, rockFriends, "Rock en vivo como debe ser", 4);
 
+        ensureChats();
+        ensureMensajes();
+
         long usuarios = usuarioRepository.count();
         long eventos = eventoRepository.count();
         long asistencias = personaUneEventoRepository.count();
@@ -174,9 +187,11 @@ public class DemoDataLoader implements CommandLineRunner {
         long aptitudesCount = aptitudRepository.count();
         long generosCount = generoRepository.count();
         long perfilesCount = perfilRepository.count();
+        long chats = chatRepository.count();
+        long mensajes = mensajeRepository.count();
 
-        log.info("Demo seed summary: usuarios={}, eventos={}, asistencias={}, megustas={}, aptitudes={}, generos={}, perfiles={}",
-            usuarios, eventos, asistencias, megustas, aptitudesCount, generosCount, perfilesCount);
+        log.info("Demo seed summary: usuarios={}, eventos={}, asistencias={}, megustas={}, aptitudes={}, generos={}, perfiles={}, chats={}, mensajes={}",
+            usuarios, eventos, asistencias, megustas, aptitudesCount, generosCount, perfilesCount, chats, mensajes);
     }
 
     private Administrador ensureAdministrador(String username, String email, String rawPassword, String cargo) {
@@ -312,5 +327,78 @@ public class DemoDataLoader implements CommandLineRunner {
             relation.setFecha(LocalDateTime.now());
             personaComentarioEventoRepository.save(relation);
         }
+    }
+
+    private void ensureChats() {
+        if (chatRepository.count() > 0) return;
+
+        Persona juan = findPersona("juan");
+        Persona maria = findPersona("maria");
+        Persona carlos = findPersona("carlos");
+        if (juan == null || maria == null || carlos == null) return;
+
+        Chat grupoMusica = new Chat();
+        grupoMusica.setNombre("Grupo Música");
+        grupoMusica.setEsGrupal(true);
+        grupoMusica.setParticipantes(List.of(juan, maria, carlos));
+        chatRepository.save(grupoMusica);
+
+        Chat chatJuanMaria = new Chat();
+        chatJuanMaria.setNombre("Juan y María");
+        chatJuanMaria.setEsGrupal(false);
+        chatJuanMaria.setParticipantes(List.of(juan, maria));
+        chatRepository.save(chatJuanMaria);
+
+        Chat chatJuanCarlos = new Chat();
+        chatJuanCarlos.setNombre("Juan y Carlos");
+        chatJuanCarlos.setEsGrupal(false);
+        chatJuanCarlos.setParticipantes(List.of(juan, carlos));
+        chatRepository.save(chatJuanCarlos);
+    }
+
+    private void ensureMensajes() {
+        if (mensajeRepository.count() > 0) return;
+
+        Persona juan = findPersona("juan");
+        Persona maria = findPersona("maria");
+        Persona carlos = findPersona("carlos");
+        if (juan == null || maria == null || carlos == null) return;
+
+        List<Chat> chats = chatRepository.findAll();
+        for (Chat chat : chats) {
+            if ("Grupo Música".equals(chat.getNombre())) {
+                saveMensaje(chat, juan, "¡Bienvenidos al grupo! 🎵");
+                saveMensaje(chat, maria, "Hola a todos!");
+                saveMensaje(chat, carlos, "Qué buena idea crear este grupo");
+                chat.setUltimoMensaje(LocalDateTime.now());
+                chatRepository.save(chat);
+            } else if ("Juan y María".equals(chat.getNombre())) {
+                saveMensaje(chat, juan, "Hola María! ¿Vas al concierto del sábado?");
+                saveMensaje(chat, maria, "Sí! Tengo muchas ganas");
+                chat.setUltimoMensaje(LocalDateTime.now());
+                chatRepository.save(chat);
+            } else if ("Juan y Carlos".equals(chat.getNombre())) {
+                saveMensaje(chat, juan, "Carlos! ¿Te apuntas al evento del finde?");
+                saveMensaje(chat, carlos, "Claro! Cuenta conmigo");
+                chat.setUltimoMensaje(LocalDateTime.now());
+                chatRepository.save(chat);
+            }
+        }
+    }
+
+    private void saveMensaje(Chat chat, Persona usuario, String contenido) {
+        Mensaje mensaje = new Mensaje();
+        mensaje.setChat(chat);
+        mensaje.setUsuario(usuario);
+        mensaje.setContenido(contenido);
+        mensaje.setFechaEnvio(LocalDateTime.now());
+        mensajeRepository.save(mensaje);
+    }
+
+    private Persona findPersona(String username) {
+        return usuarioRepository.findByUsername(username)
+                .filter(u -> u instanceof Persona)
+                .map(u -> (Persona) u)
+                .orElse(null);
     }
 }

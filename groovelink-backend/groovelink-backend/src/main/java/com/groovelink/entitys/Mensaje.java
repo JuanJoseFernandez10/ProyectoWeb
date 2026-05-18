@@ -7,10 +7,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(indexes = {
+    @Index(name = "idx_mensaje_chat_fecha", columnList = "id_chat, fecha_envio")
+})
 public class Mensaje {
 
     @Id
@@ -25,6 +30,7 @@ public class Mensaje {
     @JoinColumn(name = "id_chat")
     private Chat chat;
 
+    @Column(length = 2000)
     private String contenido;
 
     @Column(name = "fecha_envio")

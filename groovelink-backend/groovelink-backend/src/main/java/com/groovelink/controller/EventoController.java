@@ -9,6 +9,7 @@ import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.mapper.GrooveLinkMapper;
 import com.groovelink.repository.relations.PersonaMeGustaEventoRepository;
+import com.groovelink.repository.relations.PersonaUneEventoRepository;
 import com.groovelink.service.EventoService;
 import com.groovelink.service.relations.FotoEventoService;
 import com.groovelink.service.UsuarioService;
@@ -30,17 +31,20 @@ public class EventoController {
     private final UsuarioService usuarioService;
     private final GrooveLinkMapper mapper;
     private final PersonaMeGustaEventoRepository personaMeGustaEventoRepository;
+    private final PersonaUneEventoRepository personaUneEventoRepository;
 
     public EventoController(EventoService eventoService, 
                           FotoEventoService fotoEventoService, 
                           UsuarioService usuarioService,
                           GrooveLinkMapper mapper,
-                          PersonaMeGustaEventoRepository personaMeGustaEventoRepository) {
+                          PersonaMeGustaEventoRepository personaMeGustaEventoRepository,
+                          PersonaUneEventoRepository personaUneEventoRepository) {
         this.eventoService = eventoService;
         this.fotoEventoService = fotoEventoService;
         this.usuarioService = usuarioService;
         this.mapper = mapper;
         this.personaMeGustaEventoRepository = personaMeGustaEventoRepository;
+        this.personaUneEventoRepository = personaUneEventoRepository;
     }
 
     @Transactional(readOnly = true)
@@ -197,6 +201,39 @@ public class EventoController {
     @DeleteMapping("/{eventoId}/me-gusta")
     public void quitarMeGusta(@PathVariable Long eventoId, Authentication authentication) {
         eventoService.quitarMeGusta(obtenerPersonaId(authentication), eventoId);
+    }
+
+    @PostMapping("/{eventoId}/unirse")
+    public void unirseEvento(@PathVariable Long eventoId, Authentication authentication) {
+        eventoService.inscribirEnEvento(obtenerPersonaId(authentication), eventoId);
+    }
+
+    @DeleteMapping("/{eventoId}/unirse")
+    public void salirEvento(@PathVariable Long eventoId, Authentication authentication) {
+        eventoService.cancelarAsistencia(obtenerPersonaId(authentication), eventoId);
+    }
+
+    @GetMapping("/unidos")
+    @Transactional(readOnly = true)
+    public List<EventoResponseDTO> eventosUnidos(Authentication authentication) {
+        Long usuarioId = obtenerPersonaId(authentication);
+        return personaUneEventoRepository.findByUsuario_Id(usuarioId).stream()
+            .map(pue -> {
+                Evento evento = pue.getEvento();
+                eventoService.cargarNumeroMeGustas(evento);
+                return convertirEvento(evento, false);
+            })
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    private boolean esPersona(Authentication authentication) {
+        try {
+            Usuario usuario = usuarioService.findByUsername(authentication.getName())
+                .orElseThrow(() -> new BusinessException("Usuario autenticado no encontrado"));
+            return usuario instanceof Persona;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Long obtenerPersonaId(Authentication authentication) {

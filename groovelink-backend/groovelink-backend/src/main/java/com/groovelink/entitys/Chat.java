@@ -12,6 +12,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 
 @Entity
 public class Chat {
@@ -23,6 +24,9 @@ public class Chat {
     private String nombre;
 
     private boolean esGrupal;
+
+    @Column(name = "evento_id", unique = true)
+    private Long eventoId;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
@@ -39,6 +43,7 @@ public class Chat {
     private java.util.List<Usuario> participantes;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    @OrderBy("fechaEnvio ASC")
     private java.util.List<Mensaje> mensajes;
 
 	public Long getId() {
@@ -47,6 +52,14 @@ public class Chat {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getEventoId() {
+		return eventoId;
+	}
+
+	public void setEventoId(Long eventoId) {
+		this.eventoId = eventoId;
 	}
 
 	public String getNombre() {

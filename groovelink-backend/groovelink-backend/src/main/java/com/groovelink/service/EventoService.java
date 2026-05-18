@@ -20,6 +20,9 @@ import com.groovelink.repository.UsuarioRepository;
 import com.groovelink.repository.relations.PersonaMeGustaEventoRepository;
 import com.groovelink.repository.relations.PersonaUneEventoRepository;
 import com.groovelink.service.relations.FotoEventoService;
+import com.groovelink.entitys.relations.FotoEvento;
+import com.groovelink.entitys.Chat;
+import com.groovelink.repository.ChatRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,7 @@ public class EventoService {
     private final GeneroRepository generoRepository;
     private final GrooveLinkMapper mapper;
     private final FotoEventoService fotoEventoService;
+    private final ChatRepository chatRepository;
 
     public EventoService(EventoRepository eventoRepository,
                          PersonaRepository personaRepository,
@@ -54,7 +58,8 @@ public class EventoService {
                          AptitudRepository aptitudRepository,
                          GeneroRepository generoRepository,
                          GrooveLinkMapper mapper,
-                         FotoEventoService fotoEventoService) {
+                         FotoEventoService fotoEventoService,
+                         ChatRepository chatRepository) {
         this.eventoRepository = eventoRepository;
         this.personaRepository = personaRepository;
         this.usuarioRepository = usuarioRepository;
@@ -64,6 +69,7 @@ public class EventoService {
         this.generoRepository = generoRepository;
         this.mapper = mapper;
         this.fotoEventoService = fotoEventoService;
+        this.chatRepository = chatRepository;
     }
 
     @Cacheable(value = "eventosList", key = "'all'")
@@ -81,7 +87,11 @@ public class EventoService {
     public Page<EventoResponseDTO> findAllOrdenadosPorMeGustasDto(Pageable pageable) {
         Page<Evento> page = eventoRepository.findAllOrderByMeGustasDesc(pageable);
         page.forEach(this::cargarNumeroMeGustas);
-        return page.map(mapper::toEventoResponseDTO);
+        return page.map(evento -> {
+            EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
+            completarPortada(dto, evento);
+            return dto;
+        });
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +100,7 @@ public class EventoService {
         page.forEach(this::cargarNumeroMeGustas);
         return page.map(evento -> {
             EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
+            completarPortada(dto, evento);
             if (usuarioId != null) {
                 dto.setLikedByMe(
                     personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
@@ -97,6 +108,18 @@ public class EventoService {
             }
             return dto;
         });
+    }
+
+    private void completarPortada(EventoResponseDTO dto, Evento evento) {
+        if (evento.getFotos() != null) {
+            evento.getFotos().stream()
+                .filter(f -> Boolean.TRUE.equals(f.getEsPortada()))
+                .findFirst()
+                .ifPresent(portada -> {
+                    dto.setImagen(mapper.construirFotoUrl(portada));
+                    dto.setPortada(mapper.toFotoEventoResponseDTO(portada));
+                });
+        }
     }
 
     @Cacheable(value = "eventos", key = "#id")
@@ -172,6 +195,27 @@ public class EventoService {
         asistencia.setEvento(evento);
 
         personaUneEventoRepository.save(asistencia);
+
+        Chat eventChat = chatRepository.findByEventoId(eventoId)
+                .orElseGet(() -> {
+                    Chat newChat = new Chat();
+                    newChat.setNombre(evento.getNombre());
+                    newChat.setEsGrupal(true);
+                    newChat.setEventoId(eventoId);
+                    newChat.setParticipantes(new java.util.ArrayList<>());
+                    return chatRepository.save(newChat);
+                });
+
+        if (eventChat.getParticipantes() == null) {
+            eventChat.setParticipantes(new java.util.ArrayList<>());
+        }
+
+        boolean yaEnChat = eventChat.getParticipantes().stream()
+                .anyMatch(p -> p.getId().equals(personaId));
+        if (!yaEnChat) {
+            eventChat.getParticipantes().add(persona);
+            chatRepository.save(eventChat);
+        }
     }
 
     @Transactional
@@ -180,6 +224,13 @@ public class EventoService {
             throw new BusinessException("No estás inscrito en este evento");
         }
         personaUneEventoRepository.deleteByUsuario_IdAndEvento_Id(personaId, eventoId);
+
+        chatRepository.findByEventoId(eventoId).ifPresent(chat -> {
+            if (chat.getParticipantes() != null) {
+                chat.getParticipantes().removeIf(p -> p.getId().equals(personaId));
+                chatRepository.save(chat);
+            }
+        });
     }
 
     @Transactional
@@ -223,7 +274,7 @@ public class EventoService {
                 .collect(Collectors.toList());
     }
 
-    private void cargarNumeroMeGustas(Evento evento) {
+    public void cargarNumeroMeGustas(Evento evento) {
         evento.setNumeroMeGustas(personaMeGustaEventoRepository.countByEvento_Id(evento.getId()));
         try {
             long asistentes = personaUneEventoRepository.countByEvento_Id(evento.getId());

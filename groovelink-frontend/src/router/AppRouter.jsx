@@ -3,10 +3,13 @@ import Index from "../pages/index"
 import AccesPage from "../pages/AccesPage"
 import Home from "../pages/Home"
 import Event from "../pages/Event"
+import EventsList from "../pages/EventsList"
 import MiPerfil from "../pages/MiPerfil"
 import EventEdicion from "../pages/EventEdicion"
 import MisEventos from "../pages/MisEventos"
 import Personalizacion from "../pages/Personalizacion"
+import Chats from "../pages/Chats"
+import Groups from "../pages/Groups"
 import Header from "../components/Estrcutura/Header"
 import Footer from "../components/Estrcutura/Footer"
 
@@ -39,12 +42,14 @@ function Layout() {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<AccesPage />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/events" element={<Home />} />
+                <Route path="/events" element={<EventsList />} />
                 <Route path="/event/:id" element={<Event />} />
                 <Route path="/event/new" element={<EventEdicion />} />
                 <Route path="/event/:id/edit" element={<EventEdicion />} />
                 <Route path="/profile" element={<MiPerfil />} />
                 <Route path="/my-events" element={<MisEventos />} />
+                <Route path="/chats" element={<Chats />} />
+                <Route path="/groups" element={<Groups />} />
                 <Route path="/personalize" element={<Personalizacion />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

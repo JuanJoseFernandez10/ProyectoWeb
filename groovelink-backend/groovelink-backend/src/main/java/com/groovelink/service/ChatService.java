@@ -27,9 +27,9 @@ public class ChatService {
     }
 
     @Transactional
-    public Chat crearChatGrupal(String nombre, List<Long> participantesIds) {
+    public Chat crearChat(String nombre, List<Long> participantesIds, boolean esGrupal) {
         if (participantesIds.size() < 2) {
-            throw new InvalidOperationException("Un chat grupal debe tener al menos 2 participantes");
+            throw new InvalidOperationException("Un chat debe tener al menos 2 participantes");
         }
 
         List<Usuario> participantes = participantesIds.stream()
@@ -39,7 +39,7 @@ public class ChatService {
 
         Chat chat = new Chat();
         chat.setNombre(nombre);
-        chat.setEsGrupal(true);
+        chat.setEsGrupal(esGrupal);
         chat.setParticipantes(participantes);
 
         return chatRepository.save(chat);

@@ -42,7 +42,9 @@ export function getHomeEvents({ page = 0, size = 5 } = {}) {
 }
 
 export async function getEventById(eventId) {
-    return await requestJson(`/eventos/${eventId}`)
+    return await requestJson(`/eventos/${eventId}`, {
+        auth: true,
+    })
 }
 
 export async function getRelatedEvents({ eventId, size = 5 } = {}) {
@@ -69,6 +71,26 @@ export function unlikeEvent(eventId) {
 
 export function getEventForEdit(eventId) {
     return requestJson(`/eventos/${eventId}/edicion`, {
+        auth: true,
+    })
+}
+
+export function joinEvent(eventId) {
+    return requestJson(`/eventos/${eventId}/unirse`, {
+        method: 'POST',
+        auth: true,
+    })
+}
+
+export function leaveEvent(eventId) {
+    return requestJson(`/eventos/${eventId}/unirse`, {
+        method: 'DELETE',
+        auth: true,
+    })
+}
+
+export function getMyJoinedEvents() {
+    return requestJson('/eventos/unidos', {
         auth: true,
     })
 }

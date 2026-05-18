@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/eventos/*/edicion").authenticated()
                     .requestMatchers(HttpMethod.GET, "/", "/error", "/favicon.ico", "/home/**", "/eventos/**", "/fotos-evento/**", "/usuarios/perfiles/**", "/aptitudes", "/generos").permitAll()
                     .requestMatchers(HttpMethod.POST, "/eventos/**", "/fotos-evento/**", "/usuarios/me/**").authenticated()
