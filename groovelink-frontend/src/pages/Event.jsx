@@ -62,6 +62,7 @@ function mapEvent(event) {
         fotos: Array.isArray(event.fotos) ? event.fotos : [],
         rutaPortada: event.rutaPortada,
         rutaFotos: event.rutaFotos,
+        participantes: Array.isArray(event.participantes) ? event.participantes : [],
     }
 }
 
@@ -80,6 +81,8 @@ function Event() {
     const [joined, setJoined] = useState(false)
     const [joining, setJoining] = useState(false)
     const [joinCheckDone, setJoinCheckDone] = useState(false)
+    const [participantPage, setParticipantPage] = useState(0)
+    const PARTICIPANTS_PER_PAGE = 5
 
     useEffect(() => {
         let active = true
@@ -332,10 +335,10 @@ function Event() {
 
                         <aside className="space-y-6">
                             <section className="card-shell p-5">
-                                    <h2 className="text-xl font-black text-ink">Participación</h2>
-                                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                                        Únete al evento para acceder al chat grupal con todos los asistentes.
-                                    </p>
+                                <h2 className="text-xl font-black text-ink">Participación</h2>
+                                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                                    Únete al evento para acceder al chat grupal con todos los asistentes.
+                                </p>
                                 <div className="mt-4 flex flex-col gap-3">
                                     <button
                                         type="button"
@@ -388,6 +391,61 @@ function Event() {
                                     {actionError ? (
                                         <p className="text-sm font-medium text-red-700">{actionError}</p>
                                     ) : null}
+                                </div>
+                            </section>
+
+                            <section className="card-shell p-5">
+                                <h2 className="text-xl font-black text-ink">Asistentes ({event?.participantes?.length || 0})</h2>
+                                <div className="mt-4 space-y-3">
+                                    {event?.participantes?.length > 0 ? (
+                                        <>
+                                            {event.participantes
+                                                .slice(participantPage * PARTICIPANTS_PER_PAGE, (participantPage + 1) * PARTICIPANTS_PER_PAGE)
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        onClick={() => navigate(`/user/${p.id}`)}
+                                                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/5 cursor-pointer transition-colors"
+                                                    >
+                                                        {p.fotoPerfilUrl ? (
+                                                            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
+                                                                <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} className="h-full w-full object-cover" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">
+                                                                {(p.username || '?').slice(0, 1).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-semibold text-ink">@{p.username}</span>
+                                                    </div>
+                                                ))}
+                                            {event.participantes.length > PARTICIPANTS_PER_PAGE && (
+                                                <div className="flex items-center justify-center gap-2 pt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setParticipantPage((p) => Math.max(0, p - 1))}
+                                                        disabled={participantPage === 0}
+                                                        className="btn-ghost px-3 py-1 text-xs disabled:opacity-30"
+                                                    >
+                                                        Anterior
+                                                    </button>
+                                                    <span className="text-xs text-ink-soft">
+                                                        {participantPage + 1} / {Math.ceil(event.participantes.length / PARTICIPANTS_PER_PAGE)}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setParticipantPage((p) => p + 1)}
+                                                        disabled={(participantPage + 1) * PARTICIPANTS_PER_PAGE >= event.participantes.length}
+                                                        className="btn-ghost px-3 py-1 text-xs disabled:opacity-30"
+                                                    >
+                                                        Siguiente
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <p className="text-sm text-ink-soft">No hay asistentes aún. ¡Sé el primero!</p>
+                                    )}
                                 </div>
                             </section>
 

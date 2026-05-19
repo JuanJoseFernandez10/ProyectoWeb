@@ -10,6 +10,9 @@ import MisEventos from "../pages/MisEventos"
 import Personalizacion from "../pages/Personalizacion"
 import Chats from "../pages/Chats"
 import Groups from "../pages/Groups"
+import CreateGroup from "../pages/CreateGroup"
+import PerfilUsuario from "../pages/PerfilUsuario"
+import Amigos from "../pages/Amigos"
 import Header from "../components/Estrcutura/Header"
 import Footer from "../components/Estrcutura/Footer"
 
@@ -50,7 +53,10 @@ function Layout() {
                 <Route path="/my-events" element={<MisEventos />} />
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/groups" element={<Groups />} />
+                <Route path="/groups/create" element={<CreateGroup />} />
                 <Route path="/personalize" element={<Personalizacion />} />
+                <Route path="/user/:id" element={<PerfilUsuario />} />
+                <Route path="/friends" element={<Amigos />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             {!hideLayout && <Footer />}

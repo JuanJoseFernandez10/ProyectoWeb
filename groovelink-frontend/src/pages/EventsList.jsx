@@ -1,13 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 import { API_URL } from '../api/config'
-import { getHomeEvents, likeEvent, unlikeEvent } from '../api/events'
+import { getHomeEvents, searchEvents, likeEvent, unlikeEvent } from '../api/events'
 import EventsSection from '../components/Main/EventsSection'
 
 function EventsList() {
     const navigate = useNavigate()
     const { token } = useContext(AuthContext)
+    const [searchParams] = useSearchParams()
+    const searchQuery = searchParams.get('q') || ''
+
     const [homeData, setHomeData] = useState({
         eventos: [],
         total: 0,
@@ -24,6 +27,10 @@ function EventsList() {
     const [likingEventId, setLikingEventId] = useState(null)
 
     useEffect(() => {
+        setCurrentPage(0)
+    }, [searchQuery])
+
+    useEffect(() => {
         let active = true
 
         async function load() {
@@ -31,7 +38,9 @@ function EventsList() {
             setError('')
 
             try {
-                const data = await getHomeEvents({ page: currentPage, size: 6 })
+                const data = searchQuery
+                    ? await searchEvents({ q: searchQuery, page: currentPage, size: 6 })
+                    : await getHomeEvents({ page: currentPage, size: 6 })
                 if (active) {
                     setHomeData(data)
                 }
@@ -51,7 +60,7 @@ function EventsList() {
         return () => {
             active = false
         }
-    }, [currentPage])
+    }, [currentPage, searchQuery])
 
     useEffect(() => {
         if (homeData.eventos.length > 0) {
@@ -174,13 +183,27 @@ function EventsList() {
         }
     }
 
+    const isSearch = !!searchQuery
+
     return (
         <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
             <div className="mx-auto w-full max-w-5xl px-3 sm:px-4">
+                {isSearch && (
+                    <div className="mb-4">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/events')}
+                            className="btn-ghost px-4 py-2 text-sm"
+                        >
+                            ← Ver todos los eventos
+                        </button>
+                    </div>
+                )}
                 <EventsSection
-                    featuredEvent={featuredEvent}
-                    events={gridEvents}
+                    featuredEvent={isSearch ? null : featuredEvent}
+                    events={events}
                     totalEvents={homeData.total}
+                    title={isSearch ? `Resultados para "${searchQuery}"` : undefined}
                     pagination={{
                         page: homeData.page,
                         totalPages: homeData.totalPages,

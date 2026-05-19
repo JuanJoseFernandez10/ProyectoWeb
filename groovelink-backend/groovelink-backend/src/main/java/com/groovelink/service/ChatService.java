@@ -27,7 +27,7 @@ public class ChatService {
     }
 
     @Transactional
-    public Chat crearChat(String nombre, List<Long> participantesIds, boolean esGrupal) {
+    public Chat crearChat(String nombre, String descripcion, List<Long> participantesIds, boolean esGrupal) {
         if (participantesIds.size() < 2) {
             throw new InvalidOperationException("Un chat debe tener al menos 2 participantes");
         }
@@ -39,10 +39,31 @@ public class ChatService {
 
         Chat chat = new Chat();
         chat.setNombre(nombre);
+        chat.setDescripcion(descripcion);
         chat.setEsGrupal(esGrupal);
         chat.setParticipantes(participantes);
 
         return chatRepository.save(chat);
+    }
+
+    @Transactional
+    public Chat crearChat(String nombre, List<Long> participantesIds, boolean esGrupal) {
+        return crearChat(nombre, null, participantesIds, esGrupal);
+    }
+
+    @Transactional
+    public Chat findOrCreatePrivateChat(Long usuarioId1, Long usuarioId2) {
+        List<Chat> chatsUsuario1 = chatRepository.findByParticipantes_Id(usuarioId1);
+        for (Chat chat : chatsUsuario1) {
+            if (!chat.isEsGrupal() && chat.getEventoId() == null) {
+                boolean containsOther = chat.getParticipantes().stream()
+                        .anyMatch(p -> p.getId().equals(usuarioId2));
+                if (containsOther && chat.getParticipantes().size() == 2) {
+                    return chat;
+                }
+            }
+        }
+        return crearChat("Chat privado", List.of(usuarioId1, usuarioId2), false);
     }
 
     @Transactional

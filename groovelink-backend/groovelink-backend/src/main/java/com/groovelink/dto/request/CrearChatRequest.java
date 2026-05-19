@@ -16,6 +16,9 @@ public class CrearChatRequest {
     @Size(max = 255)
     private String nombre;
 
+    @Size(max = 1000)
+    private String descripcion;
+
     private boolean esGrupal;
 
     @NotEmpty

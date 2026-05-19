@@ -130,6 +130,22 @@ public class EventoService {
     }
 
     @Transactional(readOnly = true)
+    public Page<EventoResponseDTO> buscarEventosDto(String q, Pageable pageable, Long usuarioId) {
+        Page<Evento> page = eventoRepository.buscarPorNombre(q, pageable);
+        page.forEach(this::cargarNumeroMeGustas);
+        return page.map(evento -> {
+            EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
+            completarPortada(dto, evento);
+            if (usuarioId != null) {
+                dto.setLikedByMe(
+                    personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
+                );
+            }
+            return dto;
+        });
+    }
+
+    @Transactional(readOnly = true)
     public List<Evento> findEventosPublicadosPorUsuario(Long usuarioId) {
         List<Evento> eventos = eventoRepository.findEventosPublicadosPorUsuario(usuarioId);
         eventos.forEach(this::cargarNumeroMeGustas);

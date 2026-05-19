@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChat } from '../hooks/useChat'
 import ChatConversation from '../components/Main/ChatConversation'
 import { API_URL } from '../api/config'
@@ -36,6 +37,7 @@ function getCurrentUsername() {
 }
 
 function Chats() {
+    const navigate = useNavigate()
     const {
         chats,
         activeChat,
@@ -46,11 +48,33 @@ function Chats() {
         getActiveChatName,
         getActiveChatImage,
         getActiveChatParticipants,
+        getActiveChatParticipantIds,
         wsConnected,
         loading,
     } = useChat()
 
     const currentUsername = getCurrentUsername()
+    const [searchParams] = useSearchParams()
+
+    useEffect(() => {
+        const chatIdParam = searchParams.get('chatId')
+        if (chatIdParam && !activeChat) {
+            openChat(Number(chatIdParam))
+        }
+    }, [searchParams, activeChat, openChat])
+
+    const getOtherUserId = () => {
+        if (!activeChat) return null
+        const ids = getActiveChatParticipantIds()
+        if (!ids) return null
+        const entry = Object.entries(ids).find(([username]) => username !== currentUsername)
+        return entry ? entry[1] : null
+    }
+
+    const handleProfileClick = () => {
+        const otherId = getOtherUserId()
+        if (otherId) navigate(`/user/${otherId}`)
+    }
 
     return (
         <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
@@ -109,6 +133,19 @@ function Chats() {
                                                 {isGroup ? 'Grupal' : 'Privado'}
                                             </p>
                                         </div>
+                                        {!isGroup && chat.participantesIds && (
+                                            <span
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    const otherId = Object.entries(chat.participantesIds).find(([u]) => u !== currentUsername)
+                                                    if (otherId) navigate(`/user/${otherId[1]}`)
+                                                }}
+                                                className="shrink-0 rounded-full p-1.5 text-xs text-ink-soft hover:bg-secondary/15 hover:text-secondary"
+                                                title="Ver perfil"
+                                            >
+                                                👤
+                                            </span>
+                                        )}
                                     </button>
                                 )
                             })}
@@ -140,6 +177,7 @@ function Chats() {
                                 onSend={(content) => sendMessage(activeChat, content)}
                                 onClose={closeChat}
                                 showBackButton
+                                onProfileClick={handleProfileClick}
                             />
                         ) : (
                             <div className="flex h-full items-center justify-center">

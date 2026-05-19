@@ -12,7 +12,7 @@ function getCurrentUsername() {
     return null
 }
 
-function ChatConversation({ chatName, chatImage, messages, onSend, onClose, showBackButton }) {
+function ChatConversation({ chatName, chatImage, messages, onSend, onClose, showBackButton, onProfileClick, extraHeaderButton }) {
     const [input, setInput] = useState('')
     const bottomRef = useRef(null)
     const currentUsername = getCurrentUsername()
@@ -40,11 +40,22 @@ function ChatConversation({ chatName, chatImage, messages, onSend, onClose, show
                     </button>
                 )}
                 {chatImage && (
-                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full cursor-pointer" onClick={onProfileClick}>
                         <img src={chatImage} alt={chatName} className="h-full w-full object-cover" />
                     </div>
                 )}
-                <h4 className="flex-1 truncate text-base font-bold text-ink">{chatName}</h4>
+                <h4
+                  className="flex-1 truncate text-base font-bold text-ink cursor-pointer hover:text-secondary"
+                  onClick={onProfileClick}
+                  title="Ver perfil"
+                >
+                  {chatName}
+                </h4>
+                {extraHeaderButton && (
+                    <div className="mr-1">
+                        {extraHeaderButton}
+                    </div>
+                )}
                 <button
                     onClick={onClose}
                     className="flex h-8 w-8 items-center justify-center rounded-full text-ink-soft hover:bg-secondary/15 hover:text-ink"

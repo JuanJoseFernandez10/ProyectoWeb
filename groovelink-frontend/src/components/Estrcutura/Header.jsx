@@ -14,6 +14,7 @@ function Header() {
         { label: 'Eventos', path: '/events' },
         { label: 'Grupos', path: '/groups' },
         { label: 'Chats', path: '/chats' },
+        { label: 'Amigos', path: '/friends' },
     ]
 
     const handleLogout = () => {

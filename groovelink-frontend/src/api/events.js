@@ -94,3 +94,15 @@ export function getMyJoinedEvents() {
         auth: true,
     })
 }
+
+export function searchEvents({ q, page = 0, size = 6 }) {
+    const params = new URLSearchParams({
+        q: String(q),
+        page: String(page),
+        size: String(size),
+    })
+
+    return requestJson(`/eventos/buscar?${params.toString()}`, {
+        auth: true,
+    })
+}

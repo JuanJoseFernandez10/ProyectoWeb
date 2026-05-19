@@ -3,6 +3,7 @@ package com.groovelink.controller;
 import com.groovelink.dto.request.CrearChatRequest;
 import com.groovelink.dto.response.ChatResponseDTO;
 import com.groovelink.dto.response.MensajeResponseDTO;
+import com.groovelink.dto.response.UsuarioBasicoDTO;
 import com.groovelink.entitys.Chat;
 import com.groovelink.entitys.Mensaje;
 import com.groovelink.entitys.Usuario;
@@ -20,10 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -60,25 +59,7 @@ public class ChatRestController {
         List<ChatResponseDTO> dtos = new ArrayList<>();
 
         for (Chat chat : chats) {
-            ChatResponseDTO dto = mapper.toChatResponseDTO(chat);
-
-            if (chat.getEventoId() != null) {
-                fotoEventoService.findPortadaByEvento(chat.getEventoId())
-                        .ifPresent(portada ->
-                                dto.setImagen("/fotos-evento/" + chat.getEventoId() + "/portada/archivo")
-                        );
-            }
-
-            Map<String, String> fotos = new HashMap<>();
-            if (chat.getParticipantes() != null) {
-                for (Usuario p : chat.getParticipantes()) {
-                    String fotoUrl = "/usuarios/perfiles/" + p.getId() + "/foto";
-                    fotos.put(p.getUsername(), fotoUrl);
-                }
-            }
-            dto.setParticipantesFotos(fotos);
-
-            dtos.add(dto);
+            dtos.add(enriquecerChatDTO(chat));
         }
 
         return ResponseEntity.ok(dtos);
@@ -94,20 +75,86 @@ public class ChatRestController {
         return ResponseEntity.ok(dtos);
     }
 
+    @PostMapping("/privado/{usuarioId}")
+    public ResponseEntity<ChatResponseDTO> createOrGetPrivateChat(@PathVariable Long usuarioId,
+                                                                   Authentication auth) {
+        Usuario current = usuarioRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        Chat chat = chatService.findOrCreatePrivateChat(current.getId(), usuarioId);
+        return ResponseEntity.ok(enriquecerChatDTO(chat));
+    }
+
+    @GetMapping("/{chatId}/participantes")
+    public ResponseEntity<List<UsuarioBasicoDTO>> getParticipantes(@PathVariable Long chatId,
+                                                                     Authentication auth) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat", chatId));
+
+        Usuario current = usuarioRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        boolean esParticipante = chat.getParticipantes().stream()
+                .anyMatch(p -> p.getId().equals(current.getId()));
+        if (!esParticipante) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<UsuarioBasicoDTO> dtos = chat.getParticipantes().stream()
+                .map(this::toUsuarioBasicoDTO)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
     @PostMapping
     public ResponseEntity<ChatResponseDTO> createChat(@RequestBody @Valid CrearChatRequest request,
                                                        Authentication auth) {
         Usuario usuario = usuarioRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        List<Long> ids = request.getParticipantesIds();
+        List<Long> ids = new ArrayList<>(request.getParticipantesIds());
         if (!ids.contains(usuario.getId())) {
             ids.add(usuario.getId());
         }
 
-        Chat chat = chatService.crearChat(request.getNombre(), ids, request.isEsGrupal());
-        ChatResponseDTO dto = mapper.toChatResponseDTO(chat);
+        Chat chat = chatService.crearChat(request.getNombre(), request.getDescripcion(), ids, request.isEsGrupal());
+        ChatResponseDTO dto = enriquecerChatDTO(chat);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    private UsuarioBasicoDTO toUsuarioBasicoDTO(Usuario u) {
+        UsuarioBasicoDTO dto = new UsuarioBasicoDTO();
+        dto.setId(u.getId());
+        dto.setUsername(u.getUsername());
+        dto.setEmail(u.getEmail());
+        dto.setRol(u.getRol().name());
+        dto.setFotoPerfilUrl("/usuarios/perfiles/" + u.getId() + "/foto");
+        return dto;
+    }
+
+    private ChatResponseDTO enriquecerChatDTO(Chat chat) {
+        ChatResponseDTO dto = mapper.toChatResponseDTO(chat);
+
+        if (chat.getEventoId() != null) {
+            fotoEventoService.findPortadaByEvento(chat.getEventoId())
+                    .ifPresent(portada ->
+                            dto.setImagen("/fotos-evento/" + chat.getEventoId() + "/portada/archivo")
+                    );
+        }
+
+        Map<String, String> fotos = new HashMap<>();
+        Map<String, Long> ids = new HashMap<>();
+        if (chat.getParticipantes() != null) {
+            for (Usuario p : chat.getParticipantes()) {
+                fotos.put(p.getUsername(), "/usuarios/perfiles/" + p.getId() + "/foto");
+                ids.put(p.getUsername(), p.getId());
+            }
+        }
+        dto.setParticipantesFotos(fotos);
+        dto.setParticipantesIds(ids);
+
+        return dto;
     }
 }

@@ -5,6 +5,7 @@ import { getMyJoinedEvents, leaveEvent } from '../api/events'
 import { fetchMyChats } from '../api/chat'
 import { useChat } from '../hooks/useChat'
 import ChatConversation from '../components/Main/ChatConversation'
+import GroupDetail from '../components/Main/GroupDetail'
 import { API_URL } from '../api/config'
 
 function Groups() {
@@ -13,6 +14,7 @@ function Groups() {
     const [joinedEvents, setJoinedEvents] = useState([])
     const [loading, setLoading] = useState(true)
     const [myChats, setMyChats] = useState([])
+    const [showGroupInfo, setShowGroupInfo] = useState(false)
 
     const {
         activeChat,
@@ -22,6 +24,7 @@ function Groups() {
         sendMessage,
         getActiveChatName,
         getActiveChatImage,
+        getActiveChat,
     } = useChat()
 
     useEffect(() => {
@@ -79,17 +82,43 @@ function Groups() {
     }
 
     if (activeChat) {
+        const activeChatData = getActiveChat()
+        const chatImage = getActiveChatImage() ? `${API_URL}${getActiveChatImage()}` : null
         return (
             <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
                 <div className="mx-auto w-full max-w-7xl h-[calc(100vh-12rem)] px-3 sm:px-4">
-                    <ChatConversation
-                        chatName={getActiveChatName()}
-                        chatImage={getActiveChatImage() ? `${API_URL}${getActiveChatImage()}` : null}
-                        messages={messages[activeChat] || []}
-                        onSend={(content) => sendMessage(activeChat, content)}
-                        onClose={closeChat}
-                        showBackButton
-                    />
+                    <div className={`flex gap-4 h-full ${showGroupInfo ? '' : ''}`}>
+                        <div className={`flex flex-col ${showGroupInfo ? 'w-1/2' : 'w-full'}`}>
+                            <ChatConversation
+                                chatName={getActiveChatName()}
+                                chatImage={chatImage}
+                                messages={messages[activeChat] || []}
+                                onSend={(content) => sendMessage(activeChat, content)}
+                                onClose={closeChat}
+                                showBackButton
+                                extraHeaderButton={
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowGroupInfo((v) => !v)}
+                                        className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-secondary/10 text-ink-soft"
+                                        aria-label="Info del grupo"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                }
+                            />
+                        </div>
+                        {showGroupInfo && activeChatData && (
+                            <div className="w-1/2 overflow-y-auto">
+                                <GroupDetail
+                                    chat={activeChatData}
+                                    onClose={() => setShowGroupInfo(false)}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </main>
         )
@@ -107,9 +136,18 @@ function Groups() {
                             Eventos a los que te has unido
                         </h2>
                     </div>
-                    <span className="rounded-full border border-secondary/25 bg-primary/30 px-3 py-1 text-xs font-bold text-ink-soft">
-                        {joinedEvents.length} grupos
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/groups/create')}
+                            className="btn-primary px-4 py-2 text-sm whitespace-nowrap"
+                        >
+                            + Crear grupo
+                        </button>
+                        <span className="rounded-full border border-secondary/25 bg-primary/30 px-3 py-1 text-xs font-bold text-ink-soft">
+                            {joinedEvents.length} {joinedEvents.length === 1 ? 'grupo' : 'grupos'}
+                        </span>
+                    </div>
                 </div>
 
                 {loading ? (

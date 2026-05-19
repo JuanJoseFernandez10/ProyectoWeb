@@ -25,6 +25,7 @@ public class EventoResponseDTO {
     private List<String> generos;         
     private Integer numeroAsistentes;
     private Integer numeroMeGustas;
+    private List<UsuarioBasicoDTO> participantes;
     private Boolean likedByMe;
 
     private String rutaPortada;

@@ -18,15 +18,21 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
     List<Evento> findByFechaInicioBetween(LocalDate start, LocalDate end);
     Optional<Evento> findByNombre(String nombre);
 
-    @Query("SELECT e FROM Evento e LEFT JOIN e.megustas m GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC")
+    @Query("SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC")
         List<Evento> findAllOrderByMeGustasDesc();
 
         @Query(
-            value = "SELECT e FROM Evento e LEFT JOIN e.megustas m GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
-            countQuery = "SELECT COUNT(e) FROM Evento e"
+            value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+            countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE"
         )
         Page<Evento> findAllOrderByMeGustasDesc(Pageable pageable);
 
     @Query("SELECT e FROM Evento e WHERE e.publicado.id = :usuarioId")
     List<Evento> findEventosPublicadosPorUsuario(@Param("usuarioId") Long usuarioId);
+
+    @Query(
+        value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE AND LOWER(e.nombre) LIKE LOWER(CONCAT('%', :q, '%')) GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND LOWER(e.nombre) LIKE LOWER(CONCAT('%', :q, '%'))"
+    )
+    Page<Evento> buscarPorNombre(@Param("q") String q, Pageable pageable);
 }

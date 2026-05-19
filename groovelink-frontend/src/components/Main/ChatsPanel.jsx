@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ChatConversation from './ChatConversation'
 import { API_URL } from '../../api/config'
 
@@ -46,6 +46,7 @@ function ChatsPanel({
     onSendMessage,
 }) {
     const currentUsername = getCurrentUsername()
+    const navigate = useNavigate()
 
     if (activeChatId) {
         return (
@@ -115,6 +116,19 @@ function ChatsPanel({
                                     {chat.esGrupal ? 'Chat grupal' : 'Chat privado'}
                                 </p>
                             </div>
+                            {!chat.esGrupal && chat.participantesIds && (
+                                <span
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        const otherId = Object.entries(chat.participantesIds).find(([u]) => u !== currentUsername)
+                                        if (otherId) navigate(`/user/${otherId[1]}`)
+                                    }}
+                                    className="shrink-0 rounded-full p-1.5 text-xs text-ink-soft hover:bg-secondary/15 hover:text-secondary"
+                                    title="Ver perfil"
+                                >
+                                    👤
+                                </span>
+                            )}
                             <span
                                 className={`h-3 w-3 rounded-full ${
                                     chat.esGrupal

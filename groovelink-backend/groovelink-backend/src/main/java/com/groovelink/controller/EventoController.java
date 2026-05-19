@@ -3,18 +3,28 @@ package com.groovelink.controller;
 import com.groovelink.dto.request.EventoCreateRequestDTO;
 import com.groovelink.dto.request.EventoUpdateRequestDTO;
 import com.groovelink.dto.response.EventoResponseDTO;
+import com.groovelink.dto.response.EventosResponseDTO;
 import com.groovelink.dto.response.FotoEventoResponseDTO;
-import com.groovelink.entitys.*;
+import com.groovelink.dto.response.UsuarioBasicoDTO;
+import com.groovelink.entitys.Evento;
+import com.groovelink.entitys.Persona;
+import com.groovelink.entitys.Empresa;
+import com.groovelink.entitys.Usuario;
+import com.groovelink.entitys.relations.PersonaUneEvento;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.mapper.GrooveLinkMapper;
 import com.groovelink.repository.relations.PersonaMeGustaEventoRepository;
 import com.groovelink.repository.relations.PersonaUneEventoRepository;
+import com.groovelink.dto.response.UsuarioBasicoDTO;
 import com.groovelink.service.EventoService;
+import com.groovelink.service.PerfilService;
 import com.groovelink.service.relations.FotoEventoService;
 import com.groovelink.service.UsuarioService;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +39,7 @@ public class EventoController {
     private final EventoService eventoService;
     private final FotoEventoService fotoEventoService;
     private final UsuarioService usuarioService;
+    private final PerfilService perfilService;
     private final GrooveLinkMapper mapper;
     private final PersonaMeGustaEventoRepository personaMeGustaEventoRepository;
     private final PersonaUneEventoRepository personaUneEventoRepository;
@@ -36,12 +47,14 @@ public class EventoController {
     public EventoController(EventoService eventoService, 
                           FotoEventoService fotoEventoService, 
                           UsuarioService usuarioService,
+                          PerfilService perfilService,
                           GrooveLinkMapper mapper,
                           PersonaMeGustaEventoRepository personaMeGustaEventoRepository,
                           PersonaUneEventoRepository personaUneEventoRepository) {
         this.eventoService = eventoService;
         this.fotoEventoService = fotoEventoService;
         this.usuarioService = usuarioService;
+        this.perfilService = perfilService;
         this.mapper = mapper;
         this.personaMeGustaEventoRepository = personaMeGustaEventoRepository;
         this.personaUneEventoRepository = personaUneEventoRepository;
@@ -213,6 +226,43 @@ public class EventoController {
         eventoService.cancelarAsistencia(obtenerPersonaId(authentication), eventoId);
     }
 
+    @GetMapping("/buscar")
+    @Transactional(readOnly = true)
+    public EventosResponseDTO buscarEventos(@RequestParam String q,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "6") int size,
+                                            Authentication authentication) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 12);
+
+        Long usuarioId = null;
+        if (authentication != null && authentication.isAuthenticated()
+            && !"anonymousUser".equals(authentication.getName())) {
+            try {
+                usuarioId = usuarioService.findByUsername(authentication.getName())
+                    .map(Usuario::getId)
+                    .orElse(null);
+            } catch (Exception e) {
+                usuarioId = null;
+            }
+        }
+
+        Page<EventoResponseDTO> eventosPage = eventoService.buscarEventosDto(
+            q, PageRequest.of(safePage, safeSize), usuarioId
+        );
+
+        EventosResponseDTO response = new EventosResponseDTO();
+        response.setEventos(eventosPage.stream().toList());
+        response.setTotal((int) eventosPage.getTotalElements());
+        response.setMensaje("Resultados de busqueda");
+        response.setPage(eventosPage.getNumber());
+        response.setSize(eventosPage.getSize());
+        response.setTotalPages(eventosPage.getTotalPages());
+        response.setHasNext(eventosPage.hasNext());
+        response.setHasPrevious(eventosPage.hasPrevious());
+        return response;
+    }
+
     @GetMapping("/unidos")
     @Transactional(readOnly = true)
     public List<EventoResponseDTO> eventosUnidos(Authentication authentication) {
@@ -296,7 +346,23 @@ public class EventoController {
         .map(this::convertirFoto)
         .collect(Collectors.toList()));
 
+    List<PersonaUneEvento> inscripciones = personaUneEventoRepository.findByEvento_Id(eventoId);
+    response.setParticipantes(inscripciones.stream()
+        .map(inscripcion -> toUsuarioBasicoDTO(inscripcion.getUsuario()))
+        .collect(Collectors.toList()));
+
     return response;
+    }
+
+    private UsuarioBasicoDTO toUsuarioBasicoDTO(Usuario u) {
+        UsuarioBasicoDTO dto = new UsuarioBasicoDTO(u.getId(), u.getUsername(), u.getEmail(), u.getRol().name());
+        try {
+            var perfilDTO = perfilService.obtenerPerfil(u.getId());
+            dto.setFotoPerfilUrl(perfilDTO.getFotoPerfilUrl());
+        } catch (Exception e) {
+            dto.setFotoPerfilUrl(null);
+        }
+        return dto;
     }
 
     private FotoEventoResponseDTO convertirFoto(com.groovelink.entitys.relations.FotoEvento foto) {

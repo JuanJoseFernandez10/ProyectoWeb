@@ -23,6 +23,9 @@ public class Chat {
 
     private String nombre;
 
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
     private boolean esGrupal;
 
     @Column(name = "evento_id", unique = true)
@@ -68,6 +71,14 @@ public class Chat {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 
 	public boolean isEsGrupal() {

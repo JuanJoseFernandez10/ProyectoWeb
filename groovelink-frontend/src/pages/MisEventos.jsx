@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { API_URL } from '../api/config'
 import { getAuthToken } from '../api/authSession'
 import { AuthContext } from '../context/AuthContext'
+import { getMyJoinedEvents } from '../api/events'
+import EventCarousel from '../components/EventCarousel'
 
 function formatDate(value) {
     if (!value) return 'Próximamente'
@@ -15,6 +17,7 @@ function MisEventos() {
     const navigate = useNavigate()
     const { user } = useContext(AuthContext)
     const [eventos, setEventos] = useState([])
+    const [eventosUnidos, setEventosUnidos] = useState([])
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -27,6 +30,51 @@ function MisEventos() {
 
     const canAccessFullFeatures = isEmpresa || isAdmin || isPremium
     const canCreateEvent = canAccessFullFeatures
+
+    const renderEventCard = (evento, showEdit = false) => {
+        const eventId = evento.codigo ?? evento.id
+        return (
+            <article key={eventId} className="overflow-hidden rounded-3xl border border-secondary/20 bg-background/80 shadow-sm">
+                <div className="h-40 bg-gradient-to-br from-primary/35 via-secondary/25 to-background/80 flex items-end p-4">
+                    <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-soft">{formatDate(evento.fechaInicio)}</p>
+                        <h2 className="mt-1 text-2xl font-black text-ink">{evento.nombre}</h2>
+                    </div>
+                </div>
+                <div className="p-4">
+                    <p className="text-sm text-ink-soft">{evento.ubicacion}</p>
+                    <p className="mt-2 text-sm text-ink-soft">{evento.descripcion || 'Sin descripción'}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            className="btn-primary px-4 py-2 text-sm"
+                            onClick={() => navigate(`/event/${eventId}`)}
+                        >
+                            Ver
+                        </button>
+                        {showEdit && (
+                            <button
+                                type="button"
+                                className="btn-ghost px-4 py-2 text-sm"
+                                onClick={() => navigate(`/event/${eventId}/edit`)}
+                            >
+                                Editar
+                            </button>
+                        )}
+                        {!showEdit && (
+                            <button
+                                type="button"
+                                className="btn-ghost px-4 py-2 text-sm"
+                                onClick={() => navigate(`/groups`)}
+                            >
+                                Chat grupal
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </article>
+        )
+    }
 
     const getApiErrorMessage = async (response, fallbackMessage) => {
         if (response.status === 401) {
@@ -74,7 +122,11 @@ function MisEventos() {
                     },
                 })
 
-                const [profileData, eventsResponse] = await Promise.all([profilePromise, eventsPromise])
+                const [profileData, eventsResponse, joinedData] = await Promise.all([
+                    profilePromise,
+                    eventsPromise,
+                    getMyJoinedEvents().catch(() => []),
+                ])
 
                 if (!eventsResponse.ok) {
                     const message = await getApiErrorMessage(eventsResponse, 'No se pudieron cargar tus eventos')
@@ -88,6 +140,7 @@ function MisEventos() {
                 if (active) {
                     setProfile(profileData)
                     setEventos(Array.isArray(eventsData) ? eventsData : [])
+                    setEventosUnidos(Array.isArray(joinedData) ? joinedData : [])
                 }
             } catch (requestError) {
                 if (active) {
@@ -157,56 +210,50 @@ function MisEventos() {
                                         <p className="mt-2 text-sm text-ink-soft">Crea el primero y aparecerá aquí con opciones de editar y eliminar.</p>
                                     </div>
                                 ) : (
-                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                        {eventos.map((evento) => (
-                                            <article key={evento.codigo} className="overflow-hidden rounded-3xl border border-secondary/20 bg-background/80 shadow-sm">
-                                                <div className="h-40 bg-gradient-to-br from-primary/35 via-secondary/25 to-background/80 flex items-end p-4">
-                                                    <div>
-                                                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-soft">{formatDate(evento.fechaInicio)}</p>
-                                                        <h2 className="mt-1 text-2xl font-black text-ink">{evento.nombre}</h2>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4">
-                                                    <p className="text-sm text-ink-soft">{evento.ubicacion}</p>
-                                                    <p className="mt-2 text-sm text-ink-soft">{evento.descripcion || 'Sin descripción'}</p>
-                                                    <div className="mt-4 flex flex-wrap gap-2">
-                                                        <button
-                                                            type="button"
-                                                            className="btn-primary px-4 py-2 text-sm"
-                                                            onClick={() => navigate(`/event/${evento.codigo}`)}
-                                                        >
-                                                            Ver
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn-ghost px-4 py-2 text-sm"
-                                                            onClick={() => navigate(`/event/${evento.codigo}/edit`)}
-                                                        >
-                                                            Editar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
+                                    <EventCarousel
+                                        eventos={eventos}
+                                        itemsPerPage={3}
+                                        renderCard={(evento) => renderEventCard(evento, true)}
+                                    />
                                 )}
                             </div>
 
                             {/* Sección: A los que te has unido */}
                             <div className="mt-10">
-                                <h2 className="mb-4 text-xl font-bold text-ink">A los que te has unido</h2>
-                                <div className="rounded-3xl border border-dashed border-secondary/30 bg-background/60 p-8 text-center">
-                                    <p className="text-lg font-bold text-ink">Todavía no te has unido a ningún evento</p>
-                                    <p className="mt-2 text-sm text-ink-soft">Cuando te unas a un evento, aparecerá aquí.</p>
-                                </div>
+                                <h2 className="mb-4 text-xl font-bold text-ink">A los que te has unido ({eventosUnidos.length})</h2>
+                                {eventosUnidos.length === 0 ? (
+                                    <div className="rounded-3xl border border-dashed border-secondary/30 bg-background/60 p-8 text-center">
+                                        <p className="text-lg font-bold text-ink">Todavía no te has unido a ningún evento</p>
+                                        <p className="mt-2 text-sm text-ink-soft">Explora eventos en el inicio y únete a ellos.</p>
+                                    </div>
+                                ) : (
+                                    <EventCarousel
+                                        eventos={eventosUnidos}
+                                        itemsPerPage={3}
+                                        renderCard={(evento) => renderEventCard(evento, false)}
+                                    />
+                                )}
                             </div>
                         </>
                     ) : (
-                        /* Usuario no premium: solo ve mensaje de eventos unidos */
-                        <div className="mt-6 rounded-3xl border border-dashed border-secondary/30 bg-background/60 p-8 text-center">
-                            <p className="text-lg font-bold text-ink">Todavía no te has unido a ningún evento</p>
-                            <p className="mt-2 text-sm text-ink-soft">Cuando te unas a un evento, aparecerá aquí.</p>
-                        </div>
+                        /* No premium: igualmente muestra los unidos */
+                        <>
+                            <div className="mt-6">
+                                <h2 className="mb-4 text-xl font-bold text-ink">A los que te has unido ({eventosUnidos.length})</h2>
+                                {eventosUnidos.length === 0 ? (
+                                    <div className="rounded-3xl border border-dashed border-secondary/30 bg-background/60 p-8 text-center">
+                                        <p className="text-lg font-bold text-ink">Todavía no te has unido a ningún evento</p>
+                                        <p className="mt-2 text-sm text-ink-soft">Explora eventos en el inicio y únete a ellos.</p>
+                                    </div>
+                                ) : (
+                                    <EventCarousel
+                                        eventos={eventosUnidos}
+                                        itemsPerPage={3}
+                                        renderCard={(evento) => renderEventCard(evento, false)}
+                                    />
+                                )}
+                            </div>
+                        </>
                     )}
                 </section>
             </div>

@@ -37,3 +37,14 @@ export function fetchMyChats() {
 export function fetchChatMessages(chatId) {
     return requestJson(`/api/chats/${chatId}/messages`)
 }
+
+export function fetchChatParticipantes(chatId) {
+    return requestJson(`/api/chats/${chatId}/participantes`)
+}
+
+export function createGroupChat({ nombre, descripcion, participantesIds }) {
+    return requestJson('/api/chats', {
+        method: 'POST',
+        body: { nombre, descripcion: descripcion || '', esGrupal: true, participantesIds },
+    })
+}

@@ -13,6 +13,7 @@ public class ChatResponseDTO {
 
     private Long id;
     private String nombre;
+    private String descripcion;
     private boolean esGrupal;
     private LocalDateTime fechaCreacion;
     private LocalDateTime ultimoMensaje;
@@ -22,4 +23,5 @@ public class ChatResponseDTO {
 
     private List<String> participantesUsernames;
     private Map<String, String> participantesFotos;   // username -> fotoPerfil URL
+    private Map<String, Long> participantesIds;       // username -> userId
 }

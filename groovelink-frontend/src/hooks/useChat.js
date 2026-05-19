@@ -168,6 +168,20 @@ export function useChat() {
         return chat?.participantesUsernames || []
     }, [activeChat, chats])
 
+    const getActiveChatParticipantIds = useCallback(() => {
+        if (!activeChat) {
+            return {}
+        }
+
+        const chat = chats.find((c) => c.id === activeChat)
+        return chat?.participantesIds || {}
+    }, [activeChat, chats])
+
+    const getActiveChat = useCallback(() => {
+        if (!activeChat) return null
+        return chats.find((c) => c.id === activeChat) || null
+    }, [activeChat, chats])
+
     const getActiveChatImage = useCallback(() => {
         if (!activeChat) {
             return null
@@ -212,8 +226,10 @@ export function useChat() {
         closeChat,
         sendMessage,
         sendPrivateMessage,
+        getActiveChat,
         getActiveChatName,
         getActiveChatParticipants,
+        getActiveChatParticipantIds,
         getActiveChatImage,
     }
 }
