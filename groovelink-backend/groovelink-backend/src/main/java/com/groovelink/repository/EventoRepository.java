@@ -35,4 +35,12 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
         countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND LOWER(e.nombre) LIKE LOWER(CONCAT('%', :q, '%'))"
     )
     Page<Evento> buscarPorNombre(@Param("q") String q, Pageable pageable);
+
+    @Query(
+        value = "SELECT DISTINCT e FROM Evento e LEFT JOIN e.megustas m LEFT JOIN e.generos eg LEFT JOIN e.aptitudes ea WHERE e.fechaFinal >= CURRENT_DATE AND (eg.genero.id IN :generoIds OR ea.aptitud.id IN :aptitudIds) GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(DISTINCT e) FROM Evento e LEFT JOIN e.generos eg LEFT JOIN e.aptitudes ea WHERE e.fechaFinal >= CURRENT_DATE AND (eg.genero.id IN :generoIds OR ea.aptitud.id IN :aptitudIds)"
+    )
+    Page<Evento> findRecomendados(@Param("generoIds") List<Long> generoIds,
+                                   @Param("aptitudIds") List<Long> aptitudIds,
+                                   Pageable pageable);
 }

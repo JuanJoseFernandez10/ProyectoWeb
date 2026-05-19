@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
 import { getEventById, getRelatedEvents, likeEvent, unlikeEvent, joinEvent, leaveEvent, getMyJoinedEvents } from '../api/events'
+import EventComments from '../components/Main/EventComments'
 
 function formatDate(value) {
     if (!value) {
@@ -301,6 +302,8 @@ function Event() {
                                                 {event.description || 'Todavía no hay descripción para este evento.'}
                                             </p>
                                         </div>
+
+                                        <EventComments eventoId={id} />
 
                                         <div className="grid gap-4 md:grid-cols-2">
                                             <div className="rounded-2xl border border-secondary/20 bg-text-primary/40 p-4">

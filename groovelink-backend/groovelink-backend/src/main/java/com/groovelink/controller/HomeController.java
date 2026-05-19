@@ -36,6 +36,7 @@ public class HomeController {
     public EventosResponseDTO loadHome(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "false") boolean recomendados,
             Authentication authentication
     ) {
         int safePage = Math.max(page, 0);
@@ -53,10 +54,18 @@ public class HomeController {
             }
         }
 
-        Page<EventoResponseDTO> eventosPage = eventoService.findAllOrdenadosPorMeGustasDto(
-            PageRequest.of(safePage, safeSize),
-            usuarioId
-        );
+        Page<EventoResponseDTO> eventosPage;
+        if (recomendados && usuarioId != null) {
+            eventosPage = eventoService.findRecomendadosDto(
+                PageRequest.of(safePage, safeSize),
+                usuarioId
+            );
+        } else {
+            eventosPage = eventoService.findAllOrdenadosPorMeGustasDto(
+                PageRequest.of(safePage, safeSize),
+                usuarioId
+            );
+        }
 
         List<EventoResponseDTO> eventos = eventosPage.stream().toList();
 

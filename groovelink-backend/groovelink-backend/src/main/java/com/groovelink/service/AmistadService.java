@@ -2,6 +2,7 @@ package com.groovelink.service;
 
 import com.groovelink.entitys.SolicitudAmistad;
 import com.groovelink.entitys.Usuario;
+import com.groovelink.enums.TipoNotificacion;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.SolicitudAmistadRepository;
@@ -18,11 +19,14 @@ public class AmistadService {
 
     private final SolicitudAmistadRepository solicitudAmistadRepository;
     private final UsuarioRepository usuarioRepository;
+    private final NotificacionService notificacionService;
 
     public AmistadService(SolicitudAmistadRepository solicitudAmistadRepository,
-                          UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          NotificacionService notificacionService) {
         this.solicitudAmistadRepository = solicitudAmistadRepository;
         this.usuarioRepository = usuarioRepository;
+        this.notificacionService = notificacionService;
     }
 
     @Transactional
@@ -59,7 +63,15 @@ public class AmistadService {
         solicitud.setSolicitante(solicitante);
         solicitud.setSolicitado(solicitado);
         solicitud.setEstado("PENDIENTE");
-        return solicitudAmistadRepository.save(solicitud);
+        SolicitudAmistad saved = solicitudAmistadRepository.save(solicitud);
+
+        notificacionService.crearNotificacion(
+            solicitadoId, TipoNotificacion.SOLICITUD_AMISTAD,
+            solicitante.getUsername() + " te ha enviado una solicitud de amistad",
+            solicitanteId
+        );
+
+        return saved;
     }
 
     @Transactional
@@ -76,7 +88,17 @@ public class AmistadService {
         }
 
         solicitud.setEstado(aceptar ? "ACEPTADA" : "RECHAZADA");
-        return solicitudAmistadRepository.save(solicitud);
+        SolicitudAmistad saved = solicitudAmistadRepository.save(solicitud);
+
+        if (aceptar) {
+            notificacionService.crearNotificacion(
+                solicitud.getSolicitante().getId(), TipoNotificacion.SOLICITUD_ACEPTADA,
+                solicitud.getSolicitado().getUsername() + " ha aceptado tu solicitud de amistad",
+                solicitud.getSolicitado().getId()
+            );
+        }
+
+        return saved;
     }
 
     @Transactional

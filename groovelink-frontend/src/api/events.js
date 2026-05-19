@@ -30,10 +30,11 @@ async function requestJson(path, options = {}) {
     return data
 }
 
-export function getHomeEvents({ page = 0, size = 5 } = {}) {
+export function getHomeEvents({ page = 0, size = 5, recomendados = false } = {}) {
     const params = new URLSearchParams({
         page: String(page),
         size: String(size),
+        recomendados: String(recomendados),
     })
 
     return requestJson(`/home?${params.toString()}`, {

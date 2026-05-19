@@ -47,7 +47,7 @@ function Main() {
 
             try {
                 const [data, joined] = await Promise.allSettled([
-                    getHomeEvents({ page: currentPage, size: 5 }),
+                    getHomeEvents({ page: currentPage, size: 5, recomendados: !!token }),
                     token ? getMyJoinedEvents() : Promise.resolve([]),
                 ])
 

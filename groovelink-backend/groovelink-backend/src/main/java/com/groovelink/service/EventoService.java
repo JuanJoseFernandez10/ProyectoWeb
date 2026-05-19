@@ -110,6 +110,36 @@ public class EventoService {
         });
     }
 
+    @Transactional(readOnly = true)
+    public Page<EventoResponseDTO> findRecomendadosDto(Pageable pageable, Long usuarioId) {
+        Persona persona = personaRepository.findById(usuarioId).orElse(null);
+
+        if (persona == null || persona.getAptitudes() == null || persona.getGeneros() == null ||
+            (persona.getAptitudes().isEmpty() && persona.getGeneros().isEmpty())) {
+            return findAllOrdenadosPorMeGustasDto(pageable, usuarioId);
+        }
+
+        List<Long> generoIds = persona.getGeneros().stream()
+                .map(pg -> pg.getGenero().getId())
+                .toList();
+        List<Long> aptitudIds = persona.getAptitudes().stream()
+                .map(pa -> pa.getAptitud().getId())
+                .toList();
+
+        Page<Evento> page = eventoRepository.findRecomendados(generoIds, aptitudIds, pageable);
+        page.forEach(this::cargarNumeroMeGustas);
+        return page.map(evento -> {
+            EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
+            completarPortada(dto, evento);
+            if (usuarioId != null) {
+                dto.setLikedByMe(
+                    personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
+                );
+            }
+            return dto;
+        });
+    }
+
     private void completarPortada(EventoResponseDTO dto, Evento evento) {
         if (evento.getFotos() != null) {
             evento.getFotos().stream()
