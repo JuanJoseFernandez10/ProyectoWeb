@@ -10,7 +10,7 @@ import { useChat } from '../../hooks/useChat'
 
 function Main() {
     const navigate = useNavigate()
-    const { token } = useContext(AuthContext)
+    const { user, token } = useContext(AuthContext)
     const [homeData, setHomeData] = useState({
         eventos: [],
         total: 0,
@@ -247,8 +247,9 @@ function Main() {
                         likingEventId={likingEventId}
                     />
 
-                    <aside className="grid gap-4 max-[500px]:gap-3 md:gap-6 lg:grid-rows-2">
+                    <aside className="grid gap-4 max-[500px]:gap-3 md:gap-6 lg:grid-rows-[auto_auto_1fr]">
                         <GroupsPanel events={joinedEvents} />
+                        <PremiumBanner />
                         <ChatsPanel
                             chats={chats}
                             activeChatId={activeChat}
@@ -263,6 +264,40 @@ function Main() {
                 </div>
             </div>
         </main>
+    )
+}
+
+function PremiumBanner() {
+    const { user } = useContext(AuthContext)
+    const navigate = useNavigate()
+
+    if (!user) return null
+
+    const rawRole = user?.role || ''
+    const normalizedRole = String(rawRole).replace(/^ROLE_/, '')
+    const isPremium = user?.premium || false
+    const isEmpresa = normalizedRole === 'EMPRESA'
+    const isAdmin = normalizedRole === 'ADMIN'
+
+    if (isPremium || isEmpresa || isAdmin) return null
+
+    return (
+        <div className="rounded-2xl border border-amber-300/30 bg-gradient-to-br from-amber-50 to-amber-100/20 p-4 text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 mb-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-ink" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+            </div>
+            <h4 className="text-sm font-extrabold text-ink mb-1">Crea tus eventos</h4>
+            <p className="text-xs text-ink-soft mb-3">Activa Premium gratis y organiza tus propios eventos.</p>
+            <button
+                type="button"
+                onClick={() => navigate('/premium')}
+                className="bg-gradient-to-r from-amber-400 to-amber-500 text-ink font-extrabold text-xs px-4 py-2 rounded-lg shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all"
+            >
+                Hazte Premium
+            </button>
+        </div>
     )
 }
 

@@ -26,7 +26,8 @@ function NotificationsPanel({ onClose }) {
             contarNoLeidas(),
         ])
             .then(([notifs, countData]) => {
-                setNotificaciones(notifs || [])
+                const all = notifs?.content || notifs || []
+                setNotificaciones(all.filter((n) => !n.leida))
                 setNoLeidas(countData?.count ?? 0)
             })
             .catch(() => {})
@@ -57,6 +58,15 @@ function NotificationsPanel({ onClose }) {
         }
     }
 
+    const handleDismiss = async (e, id) => {
+        e.stopPropagation()
+        try {
+            await marcarComoLeida(id)
+            setNoLeidas((prev) => Math.max(0, prev - 1))
+            setNotificaciones((prev) => prev.filter((n) => n.id !== id))
+        } catch {}
+    }
+
     const handleMarkAllRead = async () => {
         try {
             await marcarTodasComoLeidas()
@@ -82,7 +92,7 @@ function NotificationsPanel({ onClose }) {
     return (
         <div
             ref={panelRef}
-            className="absolute right-0 top-full z-50 mt-2 w-80 sm:w-96 rounded-2xl border border-secondary/20 bg-text-primary shadow-xl shadow-ink/10"
+            className="absolute right-0 sm:right-0 top-full z-50 mt-2 w-72 sm:w-80 md:w-96 rounded-2xl border border-secondary/20 bg-text-primary shadow-xl shadow-ink/10"
         >
             <div className="flex items-center justify-between border-b border-secondary/20 px-4 py-3">
                 <h3 className="text-sm font-bold text-ink">
@@ -139,9 +149,20 @@ function NotificationsPanel({ onClose }) {
                                 </p>
                                 <p className="mt-0.5 text-xs text-ink-soft/70">{formatDate(notif.fechaCreacion)}</p>
                             </div>
-                            {!notif.leida && (
-                                <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-secondary" />
-                            )}
+                            <div className="flex shrink-0 items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={(e) => handleDismiss(e, notif.id)}
+                                    className="flex h-5 w-5 items-center justify-center rounded-full text-ink-soft/50 hover:bg-secondary/10 hover:text-ink-soft"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                {!notif.leida && (
+                                    <div className="h-2 w-2 shrink-0 rounded-full bg-secondary" />
+                                )}
+                            </div>
                         </div>
                     ))
                 )}

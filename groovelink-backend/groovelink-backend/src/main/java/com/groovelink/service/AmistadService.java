@@ -7,6 +7,8 @@ import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.SolicitudAmistadRepository;
 import com.groovelink.repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,6 +147,18 @@ public class AmistadService {
             }
         }
         return amigos;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Usuario> obtenerAmigosPaginados(Long usuarioId, Pageable pageable) {
+        Page<SolicitudAmistad> amistades = solicitudAmistadRepository.findAmistadesByUsuarioId(usuarioId, pageable);
+        return amistades.map(s -> {
+            if (s.getSolicitante().getId().equals(usuarioId)) {
+                return s.getSolicitado();
+            } else {
+                return s.getSolicitante();
+            }
+        });
     }
 
     @Transactional(readOnly = true)

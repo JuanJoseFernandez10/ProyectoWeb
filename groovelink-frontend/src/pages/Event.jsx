@@ -238,7 +238,7 @@ function Event() {
 
     return (
         <>
-            <main className="page-surface min-h-screen px-4 py-8 md:px-6 md:py-10">
+            <main className="page-surface min-h-screen overflow-x-hidden px-4 py-8 md:px-6 md:py-10">
                 <div className="mx-auto w-full max-w-7xl">
                     <div className="mb-6 flex items-center justify-between gap-3">
                         <Link to="/home" className="btn-ghost px-4 py-2 text-sm">
@@ -411,11 +411,11 @@ function Event() {
                                                         className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/5 cursor-pointer transition-colors"
                                                     >
                                                         {p.fotoPerfilUrl ? (
-                                                            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                                                <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} className="h-full w-full object-cover" />
+                                                            <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 overflow-hidden rounded-full">
+                                                                <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
                                                             </div>
                                                         ) : (
-                                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">
+                                                            <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">
                                                                 {(p.username || '?').slice(0, 1).toUpperCase()}
                                                             </div>
                                                         )}

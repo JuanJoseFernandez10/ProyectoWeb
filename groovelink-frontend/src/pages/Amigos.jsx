@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { obtenerAmigos, obtenerSolicitudesRecibidas, responderSolicitud, buscarUsuarios } from '../api/friends'
 import { API_URL } from '../api/config'
@@ -13,6 +13,7 @@ export default function Amigos() {
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
   const [friendFilter, setFriendFilter] = useState('')
+  const searchTimerRef = useRef(null)
 
   const amigosFiltrados = useMemo(() => {
     if (!friendFilter.trim()) return amigos
@@ -44,7 +45,6 @@ export default function Amigos() {
         obtenerAmigos().then(setAmigos).catch(() => {})
       }
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -67,7 +67,7 @@ export default function Amigos() {
           <div className="flex gap-2 mb-6">
             <button
               onClick={() => { setTab('amigos'); setSearchQuery(''); setSearchResults([]) }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                 tab === 'amigos'
                   ? 'bg-secondary text-text-primary'
                   : 'bg-secondary/10 text-ink hover:bg-secondary/20'
@@ -77,7 +77,7 @@ export default function Amigos() {
             </button>
             <button
               onClick={() => { setTab('solicitudes'); setFriendFilter('') }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                 tab === 'solicitudes'
                   ? 'bg-secondary text-text-primary'
                   : 'bg-secondary/10 text-ink hover:bg-secondary/20'
@@ -91,22 +91,25 @@ export default function Amigos() {
             <input
               type="text"
               value={searchQuery}
-              onChange={async (e) => {
+              onChange={(e) => {
                 const q = e.target.value
                 setSearchQuery(q)
+                if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
                 if (q.trim().length < 2) {
                   setSearchResults([])
                   return
                 }
-                setSearching(true)
-                try {
-                  const results = await buscarUsuarios(q.trim())
-                  setSearchResults(results || [])
-                } catch {
-                  setSearchResults([])
-                } finally {
-                  setSearching(false)
-                }
+                searchTimerRef.current = setTimeout(async () => {
+                  setSearching(true)
+                  try {
+                    const results = await buscarUsuarios(q.trim())
+                    setSearchResults(results || [])
+                  } catch {
+                    setSearchResults([])
+                  } finally {
+                    setSearching(false)
+                  }
+                }, 300)
               }}
               placeholder="Buscar usuarios..."
               className="w-full rounded-xl border border-secondary/25 bg-text-primary px-4 py-3 text-sm text-ink outline-none placeholder:text-ink-soft/60 focus:border-secondary"
@@ -125,7 +128,7 @@ export default function Amigos() {
                   >
                     {u.fotoPerfilUrl ? (
                       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <img src={buildApiUrl(u.fotoPerfilUrl)} alt={u.username} className="h-full w-full object-cover" />
+                        <img src={buildApiUrl(u.fotoPerfilUrl)} alt={u.username} loading="lazy" className="h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-sm font-black text-secondary">
@@ -166,7 +169,7 @@ export default function Amigos() {
                 >
                   {amigo.fotoPerfilUrl ? (
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                      <img src={buildApiUrl(amigo.fotoPerfilUrl)} alt={amigo.username} className="h-full w-full object-cover" />
+                      <img src={buildApiUrl(amigo.fotoPerfilUrl)} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-base font-black text-secondary">
@@ -197,7 +200,7 @@ export default function Amigos() {
                 >
                   {sol.solicitante.fotoPerfilUrl ? (
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                      <img src={buildApiUrl(sol.solicitante.fotoPerfilUrl)} alt={sol.solicitante.username} className="h-full w-full object-cover" />
+                      <img src={buildApiUrl(sol.solicitante.fotoPerfilUrl)} alt={sol.solicitante.username} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-base font-black text-secondary">

@@ -13,6 +13,7 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                 <img
                     src={event.image}
                     alt={event.title}
+                    loading="lazy"
                     className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-ink/70 via-ink/15 to-transparent" />
@@ -66,4 +67,4 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
     )
 }
 
-export default EventCard
+export default React.memo(EventCard)

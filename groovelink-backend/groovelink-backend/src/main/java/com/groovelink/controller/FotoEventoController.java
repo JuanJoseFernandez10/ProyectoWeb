@@ -7,6 +7,7 @@ import com.groovelink.entitys.Usuario;
 import com.groovelink.entitys.relations.FotoEvento;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
+import com.groovelink.exception.InvalidOperationException;
 import com.groovelink.service.relations.FotoEventoService;
 import com.groovelink.mapper.GrooveLinkMapper;
 import com.groovelink.service.EventoService;
@@ -54,6 +55,7 @@ public class FotoEventoController {
             @RequestParam("foto") MultipartFile foto) {
 
         validarPropietarioEvento(eventoId, authentication);
+        validarFoto(foto);
 
         FotoEvento fotoGuardada = fotoEventoService.agregarFoto(eventoId, foto, true, "portada");
 
@@ -70,6 +72,9 @@ public class FotoEventoController {
             @RequestParam("fotos") List<MultipartFile> fotos) {
 
         validarPropietarioEvento(eventoId, authentication);
+        for (MultipartFile f : fotos) {
+            validarFoto(f);
+        }
 
         long inicio = fotoEventoService.countFotosNoPortada(eventoId) + 1;
 
@@ -172,6 +177,19 @@ public class FotoEventoController {
                 carpetaNombre,
                 mensaje
         );
+    }
+
+    private void validarFoto(MultipartFile foto) {
+        if (foto.isEmpty()) {
+            throw new BusinessException("El archivo no puede estar vacío");
+        }
+        String contentType = foto.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new BusinessException("Solo se permiten imágenes (JPEG, PNG, GIF, WebP)");
+        }
+        if (foto.getSize() > 5 * 1024 * 1024) {
+            throw new BusinessException("La imagen no puede superar los 5MB");
+        }
     }
 
     // Converter auxiliar: FotoEvento -> FotoEventoResponseDTO

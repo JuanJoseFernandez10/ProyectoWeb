@@ -64,7 +64,6 @@ export default function MiPerfil() {
       setDescripcion(data.descripcion || '');
     } catch (error) {
       mostrarMensaje('error', error.message || 'No se pudo cargar el perfil');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -112,7 +111,6 @@ export default function MiPerfil() {
       mostrarMensaje('éxito', 'Descripción actualizada correctamente');
     } catch (error) {
       mostrarMensaje('error', error.message || 'No se pudo actualizar la descripcion');
-      console.error(error);
     } finally {
       setEnviando(false);
     }
@@ -158,7 +156,6 @@ export default function MiPerfil() {
       mostrarMensaje('éxito', 'Foto de perfil actualizada correctamente');
     } catch (error) {
       mostrarMensaje('error', error.message || 'No se pudo subir la foto de perfil');
-      console.error(error);
     } finally {
       setEnviando(false);
     }
@@ -208,19 +205,21 @@ export default function MiPerfil() {
             </div>
           )}
 
-          {/* Foto de perfil */}
-          <div className="mb-8">
-            <div className="flex flex-col items-center mb-6">
+          {/* Foto de perfil + info side by side on md+ */}
+          <div className="flex flex-col md:flex-row md:gap-8 mb-8">
+            <div className="md:w-1/3 flex flex-col items-center mb-6 md:mb-0">
               {previewFoto ? (
                 <img
                   src={previewFoto}
                   alt="Vista previa"
+                  loading="lazy"
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"
                 />
               ) : perfil.fotoPerfilUrl ? (
                 <img
                   src={buildApiUrl(perfil.fotoPerfilUrl)}
                   alt="Foto de perfil"
+                  loading="lazy"
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"
                 />
               ) : (
@@ -229,46 +228,50 @@ export default function MiPerfil() {
                 </div>
               )}
               {perfil.premium && (
-                <span className="mt-2 inline-block bg-accent text-ink px-3 py-1 rounded-full text-sm font-bold">
-                  ⭐ Premium
+                <span className="mt-2 inline-flex items-center gap-1 bg-gradient-to-r from-amber-400 to-amber-500 text-ink px-4 py-1.5 rounded-full text-sm font-extrabold shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  Premium
                 </span>
               )}
+
+              <form onSubmit={handleSubirFoto} className="space-y-4 mt-4 w-full">
+                <div>
+                  <label className="block text-ink-soft text-sm font-medium mb-2">
+                    Cambiar foto de perfil
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFotoChange}
+                    className="block w-full text-ink-soft file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-ink hover:file:bg-secondary file:transition"
+                  />
+                </div>
+                {fotoSeleccionada && (
+                  <button
+                    type="submit"
+                    disabled={enviando}
+                    className="btn-primary w-full disabled:opacity-50"
+                  >
+                    {enviando ? 'Subiendo...' : 'Guardar Foto'}
+                  </button>
+                )}
+              </form>
             </div>
 
-            <form onSubmit={handleSubirFoto} className="space-y-4">
-              <div>
-                <label className="block text-ink-soft text-sm font-medium mb-2">
-                  Cambiar foto de perfil
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFotoChange}
-                  className="block w-full text-ink-soft file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-ink hover:file:bg-secondary file:transition"
-                />
-              </div>
-              {fotoSeleccionada && (
-                <button
-                  type="submit"
-                  disabled={enviando}
-                  className="btn-primary w-full disabled:opacity-50"
-                >
-                  {enviando ? 'Subiendo...' : 'Guardar Foto'}
-                </button>
-              )}
-            </form>
-          </div>
-
-          {/* Información de usuario */}
-          <div className="rounded-lg border border-secondary/20 bg-background/80 p-4 mb-8">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-ink-soft text-sm">Email</label>
-                <p className="text-ink font-semibold">{perfil.email}</p>
-              </div>
-              <div>
-                <label className="block text-ink-soft text-sm">Usuario</label>
-                <p className="text-ink font-semibold">@{perfil.username}</p>
+            <div className="md:w-2/3">
+              <div className="rounded-lg border border-secondary/20 bg-background/80 p-4 mb-8">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-ink-soft text-sm">Email</label>
+                    <p className="text-ink font-semibold">{perfil.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-ink-soft text-sm">Usuario</label>
+                    <p className="text-ink font-semibold">@{perfil.username}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

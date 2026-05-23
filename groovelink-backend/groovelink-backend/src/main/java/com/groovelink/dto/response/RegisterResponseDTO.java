@@ -16,4 +16,5 @@ public class RegisterResponseDTO {
     private String username;
     private Rol role;
     private String token;
+    private boolean premium;
 }

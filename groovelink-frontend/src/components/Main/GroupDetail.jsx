@@ -44,7 +44,7 @@ function GroupDetail({ chat, onClose }) {
             <div className="flex flex-col items-center text-center mb-6">
                 {chatImage ? (
                     <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-secondary/20">
-                        <img src={chatImage} alt={chatName} className="h-full w-full object-cover" />
+                        <img src={chatImage} alt={chatName} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                 ) : (
                     <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 text-3xl font-black text-ink">
@@ -80,7 +80,7 @@ function GroupDetail({ chat, onClose }) {
                             >
                                 {p.fotoPerfilUrl ? (
                                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                        <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} className="h-full w-full object-cover" />
+                                        <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
                                     </div>
                                 ) : (
                                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

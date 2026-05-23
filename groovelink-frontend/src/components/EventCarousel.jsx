@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 function EventCarousel({ eventos, renderCard, itemsPerPage = 3 }) {
   const [page, setPage] = useState(0)
@@ -50,4 +50,4 @@ function EventCarousel({ eventos, renderCard, itemsPerPage = 3 }) {
   )
 }
 
-export default EventCarousel
+export default memo(EventCarousel)

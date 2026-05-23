@@ -87,8 +87,8 @@ function Groups() {
         return (
             <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
                 <div className="mx-auto w-full max-w-7xl h-[calc(100vh-12rem)] px-3 sm:px-4">
-                    <div className={`flex gap-4 h-full ${showGroupInfo ? '' : ''}`}>
-                        <div className={`flex flex-col ${showGroupInfo ? 'w-1/2' : 'w-full'}`}>
+                    <div className="flex flex-col md:flex-row gap-4 h-full">
+                        <div className={`flex flex-col ${showGroupInfo ? 'hidden md:flex' : 'flex'} md:flex-1 ${showGroupInfo ? 'md:w-1/2' : 'md:w-full'}`}>
                             <ChatConversation
                                 chatName={getActiveChatName()}
                                 chatImage={chatImage}
@@ -111,7 +111,7 @@ function Groups() {
                             />
                         </div>
                         {showGroupInfo && activeChatData && (
-                            <div className="w-1/2 overflow-y-auto">
+                            <div className="w-full md:w-1/2 overflow-y-auto">
                                 <GroupDetail
                                     chat={activeChatData}
                                     onClose={() => setShowGroupInfo(false)}
@@ -173,6 +173,7 @@ function Groups() {
                                                 <img
                                                     src={`${API_URL}${event.imagen}`}
                                                     alt={event.nombre}
+                                                    loading="lazy"
                                                     className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                                                 />
                                             </div>

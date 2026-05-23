@@ -5,6 +5,8 @@ import com.groovelink.entitys.Usuario;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.service.NotificacionService;
 import com.groovelink.service.UsuarioService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,12 @@ public class NotificacionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NotificacionResponseDTO>> obtenerNotificaciones(Authentication auth) {
+    public ResponseEntity<Page<NotificacionResponseDTO>> obtenerNotificaciones(Authentication auth,
+                                                                               @RequestParam(defaultValue = "0") int page,
+                                                                               @RequestParam(defaultValue = "10") int size) {
         Usuario usuario = usuarioService.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
-        return ResponseEntity.ok(notificacionService.obtenerNotificaciones(usuario.getId()));
+        return ResponseEntity.ok(notificacionService.obtenerNotificacionesPaginadas(usuario.getId(), PageRequest.of(page, size)));
     }
 
     @GetMapping("/no-leidas")

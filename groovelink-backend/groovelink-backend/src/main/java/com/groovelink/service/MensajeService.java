@@ -2,6 +2,8 @@ package com.groovelink.service;
 
 import com.groovelink.entitys.Mensaje;
 import com.groovelink.repository.MensajeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,5 +24,9 @@ public class MensajeService {
 
     public List<Mensaje> findByChat(Long chatId) {
         return mensajeRepository.findByChat_IdOrderByFechaEnvioAsc(chatId);
+    }
+
+    public Page<Mensaje> findByChatPaginado(Long chatId, Pageable pageable) {
+        return mensajeRepository.findByChat_IdOrderByFechaEnvioAsc(chatId, pageable);
     }
 }

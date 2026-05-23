@@ -102,6 +102,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded, canManage 
                         <img
                             src={`${API_URL}${portada.fotoUrl}`}
                             alt={portada.nombreFoto || 'Portada del evento'}
+                            loading="lazy"
                             className="h-full w-full object-cover"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/20 to-transparent" />
@@ -126,6 +127,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded, canManage 
                                     <img
                                         src={`${API_URL}${foto.fotoUrl}`}
                                         alt={foto.nombreFoto || 'Foto del evento'}
+                                        loading="lazy"
                                         className="h-full w-full object-cover"
                                     />
                                 ) : null}

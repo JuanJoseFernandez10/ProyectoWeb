@@ -21,6 +21,7 @@ public interface GrooveLinkMapper {
     Empresa toEmpresa(UsuarioRegistroRequestDTO dto);
     Administrador toAdministrador(UsuarioRegistroRequestDTO dto);
 
+    @Mapping(target = "premium", expression = "java(usuario instanceof com.groovelink.entitys.Persona ? ((com.groovelink.entitys.Persona)usuario).isPremium() : null)")
     UsuarioResponseDTO toUsuarioResponseDTO(Usuario usuario);
 
     // Persona

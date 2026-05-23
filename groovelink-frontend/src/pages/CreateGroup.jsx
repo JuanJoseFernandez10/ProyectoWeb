@@ -126,7 +126,7 @@ function CreateGroup() {
                                             >
                                                 {amigo.fotoPerfilUrl ? (
                                                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                                        <img src={`${API_URL}${amigo.fotoPerfilUrl}`} alt={amigo.username} className="h-full w-full object-cover" />
+                                                        <img src={`${API_URL}${amigo.fotoPerfilUrl}`} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
                                                     </div>
                                                 ) : (
                                                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

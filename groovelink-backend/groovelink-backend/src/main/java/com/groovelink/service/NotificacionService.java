@@ -7,6 +7,8 @@ import com.groovelink.enums.TipoNotificacion;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.NotificacionRepository;
 import com.groovelink.repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,12 @@ public class NotificacionService {
         return notificacionRepository.findByUsuario_IdOrderByFechaCreacionDesc(usuarioId).stream()
                 .map(this::toDTO)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NotificacionResponseDTO> obtenerNotificacionesPaginadas(Long usuarioId, Pageable pageable) {
+        return notificacionRepository.findByUsuario_IdOrderByFechaCreacionDesc(usuarioId, pageable)
+                .map(this::toDTO);
     }
 
     @Transactional(readOnly = true)

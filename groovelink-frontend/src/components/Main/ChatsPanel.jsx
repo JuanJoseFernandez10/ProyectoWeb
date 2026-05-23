@@ -100,6 +100,7 @@ function ChatsPanel({
                                     <img
                                         src={avatarUrl}
                                         alt={displayName}
+                                        loading="lazy"
                                         className="h-full w-full object-cover"
                                     />
                                 </div>
@@ -151,4 +152,4 @@ function ChatsPanel({
     )
 }
 
-export default ChatsPanel
+export default React.memo(ChatsPanel)

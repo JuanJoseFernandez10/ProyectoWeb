@@ -6,7 +6,8 @@ import { AuthContext } from '../../context/AuthContext';
 function Register({ cambiarModo }) {
     const navigate = useNavigate();
     const { register, isLoading, authError, authFieldErrors, authFieldLabels, clearAuthError } = useContext(AuthContext);
-    const [formData, setFormData] = useState({ username: '', email: '', password: '', role: 'ROLE_USER' });
+    const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '', role: 'ROLE_USER' });
+    const [erroresLocales, setErroresLocales] = useState({});
     const hasFieldErrors = Object.keys(authFieldErrors || {}).length > 0;
 
     const getFieldErrorMessage = (field, fallbackLabel) => {
@@ -21,8 +22,24 @@ function Register({ cambiarModo }) {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const validarFormulario = () => {
+        const errs = {}
+        if (!formData.email.includes('@') || !formData.email.includes('.')) {
+            errs.email = 'El email no es válido'
+        }
+        if (formData.password.length < 6) {
+            errs.password = 'La contraseña debe tener al menos 6 caracteres'
+        }
+        if (formData.password !== formData.confirmPassword) {
+            errs.confirmPassword = 'Las contraseñas no coinciden'
+        }
+        setErroresLocales(errs)
+        return Object.keys(errs).length === 0
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (!validarFormulario()) return
         try {
             await register(formData);
             navigate('/personalize');
@@ -74,10 +91,10 @@ function Register({ cambiarModo }) {
 
             <div className="mb-8">
                 <label className="block text-ink mb-2" htmlFor="password">
-                    Password
+                    Contraseña (mín. 6 caracteres)
                 </label>
                 <input
-                    className={`${authFieldErrors?.password ? 'inputs-custom-error' : 'inputs-custom'} w-full`}
+                    className={`${authFieldErrors?.password || erroresLocales.password ? 'inputs-custom-error' : 'inputs-custom'} w-full`}
                     name="password"
                     id="password"
                     type="password"
@@ -87,6 +104,27 @@ function Register({ cambiarModo }) {
                 />
                 {authFieldErrors?.password ? (
                 <p className="field-error-message">{getFieldErrorMessage('password', 'Contrasena')}</p>
+                ) : null}
+                {erroresLocales.password ? (
+                <p className="field-error-message">{erroresLocales.password}</p>
+                ) : null}
+            </div>
+
+            <div className="mb-8">
+                <label className="block text-ink mb-2" htmlFor="confirmPassword">
+                    Confirmar contraseña
+                </label>
+                <input
+                    className={`${erroresLocales.confirmPassword ? 'inputs-custom-error' : 'inputs-custom'} w-full`}
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                />
+                {erroresLocales.confirmPassword ? (
+                <p className="field-error-message">{erroresLocales.confirmPassword}</p>
                 ) : null}
             </div>
 

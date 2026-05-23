@@ -47,7 +47,6 @@ export default function PerfilUsuario() {
         setEstadoAmistad('NINGUNA')
       }
     } catch (err) {
-      console.error(err)
     } finally {
       setAccionando(false)
     }
@@ -58,7 +57,6 @@ export default function PerfilUsuario() {
       const chat = await crearChatPrivado(Number(id))
       navigate(`/chats?chatId=${chat.id}`)
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -122,12 +120,13 @@ export default function PerfilUsuario() {
             <p className="text-ink-soft">@{perfil.username}</p>
           </div>
 
-          <div className="mb-8">
-            <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col md:flex-row md:gap-8 mb-8">
+            <div className="md:w-1/3 flex flex-col items-center mb-6 md:mb-0">
               {perfil.fotoPerfilUrl ? (
                 <img
                   src={buildApiUrl(perfil.fotoPerfilUrl)}
                   alt="Foto de perfil"
+                  loading="lazy"
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"
                 />
               ) : (
@@ -136,32 +135,37 @@ export default function PerfilUsuario() {
                 </div>
               )}
               {perfil.premium && (
-                <span className="mt-2 inline-block bg-accent text-ink px-3 py-1 rounded-full text-sm font-bold">
+                <span className="mt-2 inline-flex items-center gap-1 bg-gradient-to-r from-amber-400 to-amber-500 text-ink px-4 py-1.5 rounded-full text-sm font-extrabold shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
                   Premium
                 </span>
               )}
             </div>
-          </div>
 
-          <div className="rounded-lg border border-secondary/20 bg-background/80 p-4 mb-8">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-ink-soft text-sm">Usuario</label>
-                <p className="text-ink font-semibold">@{perfil.username}</p>
-              </div>
-              {perfil.ubicacion && (
-                <div>
-                  <label className="block text-ink-soft text-sm">Ubicación</label>
-                  <p className="text-ink font-semibold">{perfil.ubicacion}</p>
+            <div className="md:w-2/3">
+              <div className="rounded-lg border border-secondary/20 bg-background/80 p-4 mb-8">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-ink-soft text-sm">Usuario</label>
+                    <p className="text-ink font-semibold">@{perfil.username}</p>
+                  </div>
+                  {perfil.ubicacion && (
+                    <div>
+                      <label className="block text-ink-soft text-sm">Ubicación</label>
+                      <p className="text-ink font-semibold">{perfil.ubicacion}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            {perfil.descripcion && (
-              <div className="mt-4">
-                <label className="block text-ink-soft text-sm">Descripción</label>
-                <p className="text-ink mt-1">{perfil.descripcion}</p>
+                {perfil.descripcion && (
+                  <div className="mt-4">
+                    <label className="block text-ink-soft text-sm">Descripción</label>
+                    <p className="text-ink mt-1">{perfil.descripcion}</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {!esMiPerfil && (

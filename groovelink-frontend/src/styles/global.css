@@ -1,11 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
     font-family: "Montserrat", sans-serif;
     background: linear-gradient(180deg, #fff8ea 0%, #ffefcc 100%);
     color: #4b2f13;
     overflow-x: hidden;
+}
+
+.dark body,
+body.dark {
+    background: linear-gradient(180deg, #1a1410 0%, #0f0b08 100%);
+    color: #f0e2d0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -24,6 +32,17 @@ h1, h2, h3, h4, h5, h6 {
     --color-ink-soft: #6a4520;
 
     --font-cursive: "Montserrat", sans-serif;
+}
+
+.dark {
+    --color-primary: #d4952e;
+    --color-secondary: #b86e1f;
+    --color-accent: #a87a30;
+    --color-background: #1a1410;
+    --color-text-primary: #1c1a17;
+    --color-text-secondary: #a89070;
+    --color-ink: #f0e2d0;
+    --color-ink-soft: #c4a88a;
 }
 
 .page-surface {

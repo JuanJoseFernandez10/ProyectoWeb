@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 public class RegisterRequestDTO {
 
     @NotBlank(message = "El username es obligatorio")
@@ -14,6 +15,7 @@ public class RegisterRequestDTO {
     private String email;
 
     @NotBlank(message = "La password es obligatoria")
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
     @NotNull(message = "Elegir un rol es obligatorio")

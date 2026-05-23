@@ -29,11 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,14 +79,14 @@ public class EventoService {
 
     public Page<Evento> findAllOrdenadosPorMeGustas(Pageable pageable) {
         Page<Evento> page = eventoRepository.findAllOrderByMeGustasDesc(pageable);
-        page.forEach(this::cargarNumeroMeGustas);
+        cargarContadores(page.getContent(), null);
         return page;
     }
 
     @Transactional(readOnly = true)
     public Page<EventoResponseDTO> findAllOrdenadosPorMeGustasDto(Pageable pageable) {
         Page<Evento> page = eventoRepository.findAllOrderByMeGustasDesc(pageable);
-        page.forEach(this::cargarNumeroMeGustas);
+        cargarContadores(page.getContent(), null);
         return page.map(evento -> {
             EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
             completarPortada(dto, evento);
@@ -97,45 +97,85 @@ public class EventoService {
     @Transactional(readOnly = true)
     public Page<EventoResponseDTO> findAllOrdenadosPorMeGustasDto(Pageable pageable, Long usuarioId) {
         Page<Evento> page = eventoRepository.findAllOrderByMeGustasDesc(pageable);
-        page.forEach(this::cargarNumeroMeGustas);
+        cargarContadores(page.getContent(), usuarioId);
+        Set<Long> likedIds = obtenerIdsLiked(page.getContent().stream().map(Evento::getId).collect(Collectors.toList()), usuarioId);
         return page.map(evento -> {
             EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
             completarPortada(dto, evento);
-            if (usuarioId != null) {
-                dto.setLikedByMe(
-                    personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
-                );
-            }
+            dto.setLikedByMe(likedIds.contains(evento.getId()));
             return dto;
         });
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EventoResponseDTO> findFilteredDto(Long generoId, Long aptitudId, String ubicacion,
+                                                     Pageable pageable, Long usuarioId) {
+        List<Evento> eventos;
+        long total;
+
+        if (ubicacion != null && !ubicacion.isBlank()) {
+            Page<Evento> all = eventoRepository.findFiltered(generoId, aptitudId, Pageable.unpaged());
+            List<Evento> filtered = all.getContent().stream()
+                .filter(e -> e.getUbicacion() != null &&
+                       e.getUbicacion().toLowerCase().contains(ubicacion.toLowerCase()))
+                .collect(Collectors.toList());
+            total = filtered.size();
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), filtered.size());
+            eventos = start >= filtered.size() ? List.of() : filtered.subList(start, end);
+        } else {
+            Page<Evento> page = eventoRepository.findFiltered(generoId, aptitudId, pageable);
+            total = page.getTotalElements();
+            eventos = page.getContent();
+        }
+
+        cargarContadores(eventos, usuarioId);
+        Set<Long> likedIds = obtenerIdsLiked(eventos.stream().map(Evento::getId).collect(Collectors.toList()), usuarioId);
+
+        List<EventoResponseDTO> dtos = eventos.stream().map(evento -> {
+            EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
+            completarPortada(dto, evento);
+            dto.setLikedByMe(likedIds.contains(evento.getId()));
+            return dto;
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(dtos, pageable, total);
     }
 
     @Transactional(readOnly = true)
     public Page<EventoResponseDTO> findRecomendadosDto(Pageable pageable, Long usuarioId) {
         Persona persona = personaRepository.findById(usuarioId).orElse(null);
 
-        if (persona == null || persona.getAptitudes() == null || persona.getGeneros() == null ||
-            (persona.getAptitudes().isEmpty() && persona.getGeneros().isEmpty())) {
+        if (persona == null) {
             return findAllOrdenadosPorMeGustasDto(pageable, usuarioId);
         }
 
-        List<Long> generoIds = persona.getGeneros().stream()
-                .map(pg -> pg.getGenero().getId())
-                .toList();
-        List<Long> aptitudIds = persona.getAptitudes().stream()
-                .map(pa -> pa.getAptitud().getId())
-                .toList();
+        List<Long> generoIds = persona.getGeneros() != null
+                ? persona.getGeneros().stream().map(pg -> pg.getGenero().getId()).toList()
+                : List.of();
+        List<Long> aptitudIds = persona.getAptitudes() != null
+                ? persona.getAptitudes().stream().map(pa -> pa.getAptitud().getId()).toList()
+                : List.of();
 
-        Page<Evento> page = eventoRepository.findRecomendados(generoIds, aptitudIds, pageable);
-        page.forEach(this::cargarNumeroMeGustas);
+        if (generoIds.isEmpty() && aptitudIds.isEmpty()) {
+            return findAllOrdenadosPorMeGustasDto(pageable, usuarioId);
+        }
+
+        Page<Evento> page;
+        if (generoIds.isEmpty()) {
+            page = eventoRepository.findRecomendadosPorAptitud(aptitudIds, pageable);
+        } else if (aptitudIds.isEmpty()) {
+            page = eventoRepository.findRecomendadosPorGenero(generoIds, pageable);
+        } else {
+            page = eventoRepository.findRecomendados(generoIds, aptitudIds, pageable);
+        }
+
+        cargarContadores(page.getContent(), usuarioId);
+        Set<Long> likedIds = obtenerIdsLiked(page.getContent().stream().map(Evento::getId).collect(Collectors.toList()), usuarioId);
         return page.map(evento -> {
             EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
             completarPortada(dto, evento);
-            if (usuarioId != null) {
-                dto.setLikedByMe(
-                    personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
-                );
-            }
+            dto.setLikedByMe(likedIds.contains(evento.getId()));
             return dto;
         });
     }
@@ -162,15 +202,12 @@ public class EventoService {
     @Transactional(readOnly = true)
     public Page<EventoResponseDTO> buscarEventosDto(String q, Pageable pageable, Long usuarioId) {
         Page<Evento> page = eventoRepository.buscarPorNombre(q, pageable);
-        page.forEach(this::cargarNumeroMeGustas);
+        cargarContadores(page.getContent(), usuarioId);
+        Set<Long> likedIds = obtenerIdsLiked(page.getContent().stream().map(Evento::getId).collect(Collectors.toList()), usuarioId);
         return page.map(evento -> {
             EventoResponseDTO dto = mapper.toEventoResponseDTO(evento);
             completarPortada(dto, evento);
-            if (usuarioId != null) {
-                dto.setLikedByMe(
-                    personaMeGustaEventoRepository.existsByUsuario_IdAndEvento_Id(usuarioId, evento.getId())
-                );
-            }
+            dto.setLikedByMe(likedIds.contains(evento.getId()));
             return dto;
         });
     }
@@ -178,8 +215,15 @@ public class EventoService {
     @Transactional(readOnly = true)
     public List<Evento> findEventosPublicadosPorUsuario(Long usuarioId) {
         List<Evento> eventos = eventoRepository.findEventosPublicadosPorUsuario(usuarioId);
-        eventos.forEach(this::cargarNumeroMeGustas);
+        cargarContadores(eventos, null);
         return eventos;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Evento> findEventosPublicadosPorUsuario(Long usuarioId, Pageable pageable) {
+        Page<Evento> page = eventoRepository.findEventosPublicadosPorUsuario(usuarioId, pageable);
+        cargarContadores(page.getContent(), null);
+        return page;
     }
 
     @Transactional
@@ -242,15 +286,18 @@ public class EventoService {
 
         personaUneEventoRepository.save(asistencia);
 
-        Chat eventChat = chatRepository.findByEventoId(eventoId)
-                .orElseGet(() -> {
-                    Chat newChat = new Chat();
-                    newChat.setNombre(evento.getNombre());
-                    newChat.setEsGrupal(true);
-                    newChat.setEventoId(eventoId);
-                    newChat.setParticipantes(new java.util.ArrayList<>());
-                    return chatRepository.save(newChat);
-                });
+        Optional<Chat> existingChat = chatRepository.findByEventoId(eventoId);
+        Chat eventChat;
+        if (existingChat.isPresent()) {
+            eventChat = existingChat.get();
+        } else {
+            eventChat = new Chat();
+            eventChat.setNombre(evento.getNombre());
+            eventChat.setEsGrupal(true);
+            eventChat.setEventoId(eventoId);
+            eventChat.setParticipantes(new java.util.ArrayList<>());
+            eventChat = chatRepository.save(eventChat);
+        }
 
         if (eventChat.getParticipantes() == null) {
             eventChat.setParticipantes(new java.util.ArrayList<>());
@@ -284,11 +331,6 @@ public class EventoService {
     public void eliminarEvento(Long eventoId) {
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
-
-        if (evento.getFotos() != null) {
-            evento.getFotos().forEach(foto -> fotoEventoService.eliminarFoto(foto.getId()));
-        }
-
         eventoRepository.delete(evento);
     }
 
@@ -318,6 +360,27 @@ public class EventoService {
                     return eventoGenero;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void cargarContadores(List<Evento> eventos, Long usuarioId) {
+        if (eventos.isEmpty()) return;
+        List<Long> ids = eventos.stream().map(Evento::getId).collect(Collectors.toList());
+
+        Map<Long, Long> likesMap = personaMeGustaEventoRepository.countByEventoIds(ids)
+            .stream().collect(Collectors.toMap(arr -> (Long) arr[0], arr -> (Long) arr[1]));
+        Map<Long, Long> asistentesMap = personaUneEventoRepository.countByEventoIds(ids)
+            .stream().collect(Collectors.toMap(arr -> (Long) arr[0], arr -> (Long) arr[1]));
+
+        for (Evento e : eventos) {
+            e.setNumeroMeGustas(likesMap.getOrDefault(e.getId(), 0L).intValue());
+            e.setNumeroAsistentes(asistentesMap.getOrDefault(e.getId(), 0L).intValue());
+        }
+    }
+
+    private Set<Long> obtenerIdsLiked(List<Long> eventoIds, Long usuarioId) {
+        if (usuarioId == null) return Collections.emptySet();
+        return personaMeGustaEventoRepository.findByEventoIdsAndUsuarioId(eventoIds, usuarioId)
+            .stream().map(arr -> (Long) arr[0]).collect(Collectors.toSet());
     }
 
     public void cargarNumeroMeGustas(Evento evento) {

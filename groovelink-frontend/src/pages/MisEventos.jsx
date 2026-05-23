@@ -139,8 +139,10 @@ function MisEventos() {
                 const eventsData = await eventsResponse.json()
                 if (active) {
                     setProfile(profileData)
-                    setEventos(Array.isArray(eventsData) ? eventsData : [])
-                    setEventosUnidos(Array.isArray(joinedData) ? joinedData : [])
+                    const misEventos = Array.isArray(eventsData) ? eventsData : (eventsData?.eventos ?? [])
+                    setEventos(misEventos)
+                    const unidos = Array.isArray(joinedData) ? joinedData : (joinedData?.eventos ?? [])
+                    setEventosUnidos(unidos)
                 }
             } catch (requestError) {
                 if (active) {
@@ -167,9 +169,13 @@ function MisEventos() {
                     <button type="button" className="btn-ghost px-4 py-2 text-sm" onClick={() => navigate('/home')}>
                         Volver al home
                     </button>
-                    {canCreateEvent && (
+                    {canCreateEvent ? (
                         <button type="button" className="btn-primary px-4 py-2 text-sm" onClick={() => navigate('/event/new')}>
                             Crear evento
+                        </button>
+                    ) : (
+                        <button type="button" className="bg-gradient-to-r from-amber-400 to-amber-500 text-ink font-extrabold px-4 py-2 text-sm rounded-xl shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all" onClick={() => navigate('/premium')}>
+                            Premium para crear eventos
                         </button>
                     )}
                 </div>
@@ -236,8 +242,24 @@ function MisEventos() {
                             </div>
                         </>
                     ) : (
-                        /* No premium: igualmente muestra los unidos */
+                        /* No premium: upsell + unidos */
                         <>
+                            <div className="mt-6 rounded-2xl border border-amber-300/30 bg-gradient-to-br from-amber-50 to-amber-100/30 p-5 text-center">
+                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-ink" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-black text-ink mb-1">¿Quieres crear tus propios eventos?</h3>
+                                <p className="text-sm text-ink-soft mb-4">Activa Premium gratis y empieza a organizar eventos, consigue tu insignia exclusiva y mucho más.</p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/premium')}
+                                    className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-ink font-extrabold px-6 py-2.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all duration-200"
+                                >
+                                    Hazte Premium Gratis
+                                </button>
+                            </div>
                             <div className="mt-6">
                                 <h2 className="mb-4 text-xl font-bold text-ink">A los que te has unido ({eventosUnidos.length})</h2>
                                 {eventosUnidos.length === 0 ? (

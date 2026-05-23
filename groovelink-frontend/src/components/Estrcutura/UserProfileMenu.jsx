@@ -71,8 +71,8 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
     const canCreateEvent = useMemo(() => {
         if (!rawRole) return false
         const role = String(rawRole)
-        return role === 'ROLE_EMPRESA' || role === 'ROLE_ADMIN'
-    }, [rawRole])
+        return role === 'ROLE_EMPRESA' || role === 'ROLE_ADMIN' || user?.premium === true
+    }, [rawRole, user?.premium])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -132,6 +132,7 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
                     <img
                         src={profileImage.startsWith('http') ? profileImage : `${API_URL}${profileImage}`}
                         alt={`Foto de ${displayName}`}
+                        loading="lazy"
                         className="h-9 w-9 rounded-full object-cover border border-text-primary/50"
                     />
                 ) : (
@@ -182,11 +183,32 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
                         </button>
                         <button
                             type="button"
-                            className="btn-ghost w-full justify-start py-2! px-3! bg-background/40! border-transparent! shadow-none! text-ink-soft! cursor-not-allowed"
-                            disabled
+                            className={`btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! ${
+                              user?.premium ? 'text-amber-600! hover:bg-amber-50! hover:border-amber-200!' : 'text-ink! hover:bg-background! hover:border-secondary/25!'
+                            }`}
+                            onClick={() => { setMenuOpen(false); navigate('/premium') }}
                         >
-                            Ajustes (próximamente)
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                          {user?.premium ? 'Premium ★' : 'Premium'}
                         </button>
+                        <button
+                            type="button"
+                            className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-ink! hover:bg-background! hover:border-secondary/25!"
+                            onClick={() => { setMenuOpen(false); navigate('/settings') }}
+                        >
+                            Ajustes
+                        </button>
+                        {rawRole === 'ROLE_ADMIN' && (
+                            <button
+                                type="button"
+                                className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-purple-700! hover:bg-purple-50! hover:border-purple-200!"
+                                onClick={() => { setMenuOpen(false); navigate('/groove-admin') }}
+                            >
+                                Panel de Administración
+                            </button>
+                        )}
                         <button
                             type="button"
                             className="btn-ghost w-full justify-start py-2! px-3! bg-transparent! border-transparent! shadow-none! text-red-700! hover:bg-red-50! hover:border-red-200!"

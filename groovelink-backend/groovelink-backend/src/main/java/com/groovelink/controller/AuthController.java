@@ -11,6 +11,7 @@ import com.groovelink.entitys.Usuario;
 import com.groovelink.enums.Rol;
 import com.groovelink.exception.DuplicateResourceException;
 import com.groovelink.security.JwtProvider;
+import com.groovelink.service.EmailService;
 import com.groovelink.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,17 +32,20 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     private final UsuarioService usuarioService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public AuthController(
             AuthenticationManager authenticationManager,
             JwtProvider jwtProvider,
             UsuarioService usuarioService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            EmailService emailService
     ) {
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.usuarioService = usuarioService;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -56,16 +60,18 @@ public class AuthController {
             .map(Rol::valueOf)
             .orElse(Rol.ROLE_USER);
 
-        String email = usuarioService.findByUsername(authentication.getName())
-                .map(Usuario::getEmail)
+        Usuario usuarioLogueado = usuarioService.findByUsername(authentication.getName())
                 .orElse(null);
+        String email = usuarioLogueado != null ? usuarioLogueado.getEmail() : null;
+        boolean premium = usuarioLogueado instanceof Persona persona && persona.isPremium();
 
         return new LoginResponseDTO(
                 "Login correcto",
                 authentication.getName(),
                 email,
                 authority,
-                token
+                token,
+                premium
         );
     }
 
@@ -86,17 +92,22 @@ public class AuthController {
 
         Usuario saved = usuarioService.save(usuario);
 
+        emailService.enviarBienvenida(saved.getEmail(), saved.getUsername());
+
         Authentication authentication = authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken.unauthenticated(
                         request.getUsername(), request.getPassword())
         );
         String token = jwtProvider.generateToken(authentication);
 
+        boolean premiumRegistro = saved instanceof Persona personaReg && personaReg.isPremium();
+
         return new RegisterResponseDTO(
                 "Registro correcto",
                 saved.getUsername(),
                 saved.getRol(),
-                token
+                token,
+                premiumRegistro
         );
     }
 
@@ -108,7 +119,8 @@ public class AuthController {
                 null,
                 null,
                 null,
-                null
+                null,
+                false
         );
     }
 

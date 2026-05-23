@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 
 function getCurrentUsername() {
     try {
@@ -16,10 +16,6 @@ function ChatConversation({ chatName, chatImage, messages, onSend, onClose, show
     const [input, setInput] = useState('')
     const bottomRef = useRef(null)
     const currentUsername = getCurrentUsername()
-
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -41,7 +37,7 @@ function ChatConversation({ chatName, chatImage, messages, onSend, onClose, show
                 )}
                 {chatImage && (
                     <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full cursor-pointer" onClick={onProfileClick}>
-                        <img src={chatImage} alt={chatName} className="h-full w-full object-cover" />
+                        <img src={chatImage} alt={chatName} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                 )}
                 <h4
@@ -121,4 +117,4 @@ function ChatConversation({ chatName, chatImage, messages, onSend, onClose, show
     )
 }
 
-export default ChatConversation
+export default React.memo(ChatConversation)

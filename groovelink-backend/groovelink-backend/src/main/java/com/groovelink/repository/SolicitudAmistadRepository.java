@@ -1,7 +1,10 @@
 package com.groovelink.repository;
 
 import com.groovelink.entitys.SolicitudAmistad;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,6 +20,10 @@ public interface SolicitudAmistadRepository extends JpaRepository<SolicitudAmist
     @Query("SELECT s FROM SolicitudAmistad s WHERE (s.solicitante.id = :usuarioId OR s.solicitado.id = :usuarioId) AND s.estado = 'ACEPTADA'")
     List<SolicitudAmistad> findAmistadesByUsuarioId(@Param("usuarioId") Long usuarioId);
 
+    @Query(value = "SELECT s FROM SolicitudAmistad s WHERE (s.solicitante.id = :usuarioId OR s.solicitado.id = :usuarioId) AND s.estado = 'ACEPTADA'",
+           countQuery = "SELECT COUNT(s) FROM SolicitudAmistad s WHERE (s.solicitante.id = :usuarioId OR s.solicitado.id = :usuarioId) AND s.estado = 'ACEPTADA'")
+    Page<SolicitudAmistad> findAmistadesByUsuarioId(@Param("usuarioId") Long usuarioId, Pageable pageable);
+
     @Query("SELECT s FROM SolicitudAmistad s WHERE s.solicitado.id = :usuarioId AND s.estado = 'PENDIENTE'")
     List<SolicitudAmistad> findSolicitudesRecibidasByUsuarioId(@Param("usuarioId") Long usuarioId);
 
@@ -28,4 +35,8 @@ public interface SolicitudAmistadRepository extends JpaRepository<SolicitudAmist
            "OR (s.solicitante.id = :usuarioId2 AND s.solicitado.id = :usuarioId1)) " +
            "AND s.estado = 'ACEPTADA'")
     boolean sonAmigos(@Param("usuarioId1") Long usuarioId1, @Param("usuarioId2") Long usuarioId2);
+
+    @Modifying
+    @Query("DELETE FROM SolicitudAmistad s WHERE s.solicitante.id = :usuarioId OR s.solicitado.id = :usuarioId")
+    void eliminarTodasPorUsuario(@Param("usuarioId") Long usuarioId);
 }

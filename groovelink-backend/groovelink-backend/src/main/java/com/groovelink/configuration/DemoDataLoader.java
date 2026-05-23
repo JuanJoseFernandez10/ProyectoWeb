@@ -20,6 +20,7 @@ import com.groovelink.entitys.relations.PersonaComentarioEvento;
 import com.groovelink.entitys.relations.PersonaGenero;
 import com.groovelink.entitys.relations.PersonaMeGustaEvento;
 import com.groovelink.entitys.relations.PersonaUneEvento;
+import com.groovelink.entitys.Reporte;
 import com.groovelink.enums.Rol;
 import com.groovelink.repository.AdministradorRepository;
 import com.groovelink.repository.AptitudRepository;
@@ -29,6 +30,7 @@ import com.groovelink.repository.GeneroRepository;
 import com.groovelink.repository.MensajeRepository;
 import com.groovelink.repository.PerfilRepository;
 import com.groovelink.repository.PersonaRepository;
+import com.groovelink.repository.ReporteRepository;
 import com.groovelink.repository.UsuarioRepository;
 import com.groovelink.repository.relations.EventoAptitudRepository;
 import com.groovelink.repository.relations.EventoGeneroRepository;
@@ -65,6 +67,7 @@ public class DemoDataLoader implements CommandLineRunner {
     private final PersonaUneEventoRepository personaUneEventoRepository;
     private final ChatRepository chatRepository;
     private final MensajeRepository mensajeRepository;
+    private final ReporteRepository reporteRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DemoDataLoader(
@@ -83,6 +86,7 @@ public class DemoDataLoader implements CommandLineRunner {
             PersonaUneEventoRepository personaUneEventoRepository,
             ChatRepository chatRepository,
             MensajeRepository mensajeRepository,
+            ReporteRepository reporteRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.administradorRepository = administradorRepository;
@@ -99,6 +103,7 @@ public class DemoDataLoader implements CommandLineRunner {
         this.personaUneEventoRepository = personaUneEventoRepository;
         this.chatRepository = chatRepository;
         this.mensajeRepository = mensajeRepository;
+        this.reporteRepository = reporteRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -180,6 +185,8 @@ public class DemoDataLoader implements CommandLineRunner {
         ensureChats();
         ensureMensajes();
 
+        ensureReportes();
+
         long usuarios = usuarioRepository.count();
         long eventos = eventoRepository.count();
         long asistencias = personaUneEventoRepository.count();
@@ -189,9 +196,10 @@ public class DemoDataLoader implements CommandLineRunner {
         long perfilesCount = perfilRepository.count();
         long chats = chatRepository.count();
         long mensajes = mensajeRepository.count();
+        long reportes = reporteRepository.count();
 
-        log.info("Demo seed summary: usuarios={}, eventos={}, asistencias={}, megustas={}, aptitudes={}, generos={}, perfiles={}, chats={}, mensajes={}",
-            usuarios, eventos, asistencias, megustas, aptitudesCount, generosCount, perfilesCount, chats, mensajes);
+        log.info("Demo seed summary: usuarios={}, eventos={}, asistencias={}, megustas={}, aptitudes={}, generos={}, perfiles={}, chats={}, mensajes={}, reportes={}",
+            usuarios, eventos, asistencias, megustas, aptitudesCount, generosCount, perfilesCount, chats, mensajes, reportes);
     }
 
     private Administrador ensureAdministrador(String username, String email, String rawPassword, String cargo) {
@@ -400,5 +408,56 @@ public class DemoDataLoader implements CommandLineRunner {
                 .filter(u -> u instanceof Persona)
                 .map(u -> (Persona) u)
                 .orElse(null);
+    }
+
+    private void ensureReportes() {
+        if (reporteRepository.count() > 0) return;
+
+        Persona juan = findPersona("juan");
+        Persona maria = findPersona("maria");
+        Persona carlos = findPersona("carlos");
+        if (juan == null || maria == null || carlos == null) return;
+
+        List<Evento> eventos = eventoRepository.findAll();
+
+        Reporte r1 = new Reporte();
+        r1.setReportero(juan);
+        r1.setTipoContenido("EVENTO");
+        r1.setIdContenido(eventos.get(0).getId());
+        r1.setMotivo("Contenido inapropiado");
+        r1.setDetalleAdicional("El evento contiene descripciones que pueden resultar ofensivas");
+        r1.setEstado("PENDIENTE");
+        r1.setFechaReporte(LocalDateTime.now());
+        reporteRepository.save(r1);
+
+        Reporte r2 = new Reporte();
+        r2.setReportero(maria);
+        r2.setTipoContenido("EVENTO");
+        r2.setIdContenido(eventos.get(1).getId());
+        r2.setMotivo("Información engañosa");
+        r2.setDetalleAdicional("La fecha del evento no coincide con la realidad");
+        r2.setEstado("PENDIENTE");
+        r2.setFechaReporte(LocalDateTime.now().minusDays(1));
+        reporteRepository.save(r2);
+
+        Reporte r3 = new Reporte();
+        r3.setReportero(carlos);
+        r3.setTipoContenido("EVENTO");
+        r3.setIdContenido(eventos.get(2).getId());
+        r3.setMotivo("Spam");
+        r3.setDetalleAdicional("Este evento se ha promocionado de forma repetitiva en múltiples ocasiones");
+        r3.setEstado("RESUELTO");
+        r3.setFechaReporte(LocalDateTime.now().minusDays(3));
+        reporteRepository.save(r3);
+
+        Reporte r4 = new Reporte();
+        r4.setReportero(juan);
+        r4.setTipoContenido("EVENTO");
+        r4.setIdContenido(eventos.get(3).getId());
+        r4.setMotivo("Otro");
+        r4.setDetalleAdicional("El evento no cumple con las normas de la comunidad");
+        r4.setEstado("PENDIENTE");
+        r4.setFechaReporte(LocalDateTime.now().minusHours(5));
+        reporteRepository.save(r4);
     }
 }

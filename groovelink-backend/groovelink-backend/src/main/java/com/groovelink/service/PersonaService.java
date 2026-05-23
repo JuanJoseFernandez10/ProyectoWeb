@@ -5,7 +5,9 @@ import com.groovelink.entitys.Genero;
 import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.relations.PersonaAptitud;
 import com.groovelink.entitys.relations.PersonaGenero;
-import com.groovelink.exception.*;
+import com.groovelink.exception.BusinessException;
+import com.groovelink.exception.DuplicateResourceException;
+import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.*;
 import com.groovelink.repository.relations.PersonaAptitudRepository;
 import com.groovelink.repository.relations.PersonaGeneroRepository;
@@ -151,5 +153,19 @@ public class PersonaService {
     @Cacheable(value = "personasPremium")
     public List<Persona> findAllPremium() {
         return personaRepository.findByPremiumTrue();
+    }
+
+    @Transactional
+    @CacheEvict(value = { "personas", "personasPremium" }, allEntries = true)
+    public Persona activarPremium(Long personaId) {
+        Persona persona = personaRepository.findById(personaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Persona", personaId));
+
+        if (persona.isPremium()) {
+            throw new BusinessException("Ya eres usuario premium");
+        }
+
+        persona.setPremium(true);
+        return personaRepository.save(persona);
     }
 }

@@ -15,6 +15,8 @@ import com.groovelink.service.ChatService;
 import com.groovelink.service.MensajeService;
 import com.groovelink.service.relations.FotoEventoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -66,16 +68,15 @@ public class ChatRestController {
     }
 
     @GetMapping("/{chatId}/messages")
-    public ResponseEntity<List<MensajeResponseDTO>> getMessages(@PathVariable Long chatId) {
-        List<Mensaje> mensajes = mensajeService.findByChat(chatId);
-        List<MensajeResponseDTO> dtos = mensajes.stream()
-                .map(mapper::toMensajeResponseDTO)
-                .toList();
-
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<Page<MensajeResponseDTO>> getMessages(@PathVariable Long chatId,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "20") int size) {
+        Page<Mensaje> mensajes = mensajeService.findByChatPaginado(chatId, PageRequest.of(page, size));
+        return ResponseEntity.ok(mensajes.map(mapper::toMensajeResponseDTO));
     }
 
     @PostMapping("/privado/{usuarioId}")
+    @Transactional
     public ResponseEntity<ChatResponseDTO> createOrGetPrivateChat(@PathVariable Long usuarioId,
                                                                    Authentication auth) {
         Usuario current = usuarioRepository.findByUsername(auth.getName())
@@ -108,6 +109,7 @@ public class ChatRestController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<ChatResponseDTO> createChat(@RequestBody @Valid CrearChatRequest request,
                                                        Authentication auth) {
         Usuario usuario = usuarioRepository.findByUsername(auth.getName())

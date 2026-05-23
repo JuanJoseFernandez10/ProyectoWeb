@@ -42,6 +42,7 @@ function GroupsPanel({ events }) {
                                 <img
                                     src={`${API_URL}${event.imagen}`}
                                     alt={event.nombre}
+                                    loading="lazy"
                                     className="h-full w-full object-cover"
                                 />
                             </div>

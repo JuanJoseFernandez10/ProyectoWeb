@@ -14,9 +14,9 @@ import com.groovelink.entitys.relations.PersonaUneEvento;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.mapper.GrooveLinkMapper;
+import com.groovelink.repository.relations.FotoEventoRepository;
 import com.groovelink.repository.relations.PersonaMeGustaEventoRepository;
 import com.groovelink.repository.relations.PersonaUneEventoRepository;
-import com.groovelink.dto.response.UsuarioBasicoDTO;
 import com.groovelink.service.EventoService;
 import com.groovelink.service.PerfilService;
 import com.groovelink.service.relations.FotoEventoService;
@@ -25,10 +25,11 @@ import com.groovelink.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -43,6 +44,7 @@ public class EventoController {
     private final GrooveLinkMapper mapper;
     private final PersonaMeGustaEventoRepository personaMeGustaEventoRepository;
     private final PersonaUneEventoRepository personaUneEventoRepository;
+    private final FotoEventoRepository fotoEventoRepository;
 
     public EventoController(EventoService eventoService, 
                           FotoEventoService fotoEventoService, 
@@ -50,7 +52,8 @@ public class EventoController {
                           PerfilService perfilService,
                           GrooveLinkMapper mapper,
                           PersonaMeGustaEventoRepository personaMeGustaEventoRepository,
-                          PersonaUneEventoRepository personaUneEventoRepository) {
+                          PersonaUneEventoRepository personaUneEventoRepository,
+                          FotoEventoRepository fotoEventoRepository) {
         this.eventoService = eventoService;
         this.fotoEventoService = fotoEventoService;
         this.usuarioService = usuarioService;
@@ -58,18 +61,31 @@ public class EventoController {
         this.mapper = mapper;
         this.personaMeGustaEventoRepository = personaMeGustaEventoRepository;
         this.personaUneEventoRepository = personaUneEventoRepository;
+        this.fotoEventoRepository = fotoEventoRepository;
     }
 
     @Transactional(readOnly = true)
     @GetMapping("/mis-eventos")
-    public List<EventoResponseDTO> misEventos(Authentication authentication,
-                                             @RequestParam(required = false) Long usuarioId,
-                                             @RequestParam(required = false) String username) {
+    public EventosResponseDTO misEventos(Authentication authentication,
+                                         @RequestParam(required = false) Long usuarioId,
+                                         @RequestParam(required = false) String username,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "10") int size) {
         Usuario usuario = resolverUsuarioObjetivo(authentication, usuarioId, username);
+        Pageable pageable = PageRequest.of(page, size);
 
-        return eventoService.findEventosPublicadosPorUsuario(usuario.getId()).stream()
-            .map(evento -> convertirEvento(evento, false))
-                .collect(Collectors.toList());
+        Page<Evento> eventosPage = eventoService.findEventosPublicadosPorUsuario(usuario.getId(), pageable);
+        List<EventoResponseDTO> dtos = convertirEventos(eventosPage.getContent(), false);
+
+        EventosResponseDTO response = new EventosResponseDTO();
+        response.setEventos(dtos);
+        response.setTotal((int) eventosPage.getTotalElements());
+        response.setPage(eventosPage.getNumber());
+        response.setSize(eventosPage.getSize());
+        response.setTotalPages(eventosPage.getTotalPages());
+        response.setHasNext(eventosPage.hasNext());
+        response.setHasPrevious(eventosPage.hasPrevious());
+        return response;
     }
 
     // POST /eventos - crear nuevo evento
@@ -265,15 +281,28 @@ public class EventoController {
 
     @GetMapping("/unidos")
     @Transactional(readOnly = true)
-    public List<EventoResponseDTO> eventosUnidos(Authentication authentication) {
+    public EventosResponseDTO eventosUnidos(Authentication authentication,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
         Long usuarioId = obtenerPersonaId(authentication);
-        return personaUneEventoRepository.findByUsuario_Id(usuarioId).stream()
-            .map(pue -> {
-                Evento evento = pue.getEvento();
-                eventoService.cargarNumeroMeGustas(evento);
-                return convertirEvento(evento, false);
-            })
-            .collect(java.util.stream.Collectors.toList());
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PersonaUneEvento> puePage = personaUneEventoRepository.findByUsuario_Id(usuarioId, pageable);
+        List<Evento> eventos = puePage.getContent().stream()
+            .map(PersonaUneEvento::getEvento)
+            .collect(Collectors.toList());
+        eventoService.cargarContadores(eventos, null);
+        List<EventoResponseDTO> dtos = convertirEventos(eventos, false);
+
+        EventosResponseDTO response = new EventosResponseDTO();
+        response.setEventos(dtos);
+        response.setTotal((int) puePage.getTotalElements());
+        response.setPage(puePage.getNumber());
+        response.setSize(puePage.getSize());
+        response.setTotalPages(puePage.getTotalPages());
+        response.setHasNext(puePage.hasNext());
+        response.setHasPrevious(puePage.hasPrevious());
+        return response;
     }
 
     private boolean esPersona(Authentication authentication) {
@@ -352,6 +381,57 @@ public class EventoController {
         .collect(Collectors.toList()));
 
     return response;
+    }
+
+    private List<EventoResponseDTO> convertirEventos(List<Evento> eventos, boolean incluirInfoPrivada) {
+        if (eventos.isEmpty()) return List.of();
+
+        List<Long> ids = eventos.stream().map(Evento::getId).collect(Collectors.toList());
+
+        Map<Long, FotoEventoResponseDTO> portadaMap = fotoEventoRepository
+            .findByEvento_IdInAndEsPortadaTrue(ids).stream()
+            .collect(Collectors.toMap(f -> f.getEvento().getId(), this::convertirFoto));
+
+        Map<Long, List<FotoEventoResponseDTO>> fotosMap = fotoEventoRepository
+            .findByEvento_IdInAndEsPortadaFalseOrderByIdAsc(ids).stream()
+            .collect(Collectors.groupingBy(f -> f.getEvento().getId(),
+                Collectors.mapping(this::convertirFoto, Collectors.toList())));
+
+        Map<Long, List<UsuarioBasicoDTO>> participantesMap = personaUneEventoRepository.findByEvento_IdIn(ids).stream()
+            .collect(Collectors.groupingBy(
+                pue -> pue.getEvento().getId(),
+                Collectors.mapping(pue -> toUsuarioBasicoDTO(pue.getUsuario()), Collectors.toList())
+            ));
+
+        return eventos.stream().map(evento -> {
+            EventoResponseDTO dto = new EventoResponseDTO();
+            dto.setCodigo(evento.getId());
+            dto.setNombre(evento.getNombre());
+            dto.setUbicacion(evento.getUbicacion());
+            dto.setDescripcion(evento.getDescripcion());
+            dto.setFechaInicio(evento.getFechaInicio());
+            dto.setFechaFinal(evento.getFechaFinal());
+            dto.setFechaCreacion(evento.getFechaCreacion());
+            dto.setPublicadoPorUsername(evento.getPublicado() != null ? evento.getPublicado().getUsername() : null);
+            dto.setNumeroAsistentes(evento.getNumeroAsistentes());
+            dto.setNumeroMeGustas(evento.getNumeroMeGustas());
+            dto.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
+                .map(relacion -> relacion.getAptitud().getNombre())
+                .collect(Collectors.toList()));
+            dto.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
+                .map(relacion -> relacion.getGenero().getNombre())
+                .collect(Collectors.toList()));
+            if (incluirInfoPrivada) {
+                dto.setRutaPortada("/fotos-evento/" + evento.getId() + "/portada/archivo");
+                dto.setRutaFotos("/fotos-evento/" + evento.getId() + "/todas");
+            }
+            FotoEventoResponseDTO portada = portadaMap.get(evento.getId());
+            dto.setPortada(portada);
+            dto.setImagen(portada != null ? portada.getFotoUrl() : null);
+            dto.setFotos(fotosMap.getOrDefault(evento.getId(), List.of()));
+            dto.setParticipantes(participantesMap.getOrDefault(evento.getId(), List.of()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     private UsuarioBasicoDTO toUsuarioBasicoDTO(Usuario u) {

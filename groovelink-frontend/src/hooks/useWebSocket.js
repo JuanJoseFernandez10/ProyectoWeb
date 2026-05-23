@@ -33,8 +33,10 @@ export function connectWebSocket() {
         connectHeaders: {
             Authorization: `Bearer ${token}`,
         },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 10000,
+        heartbeatOutgoing: 10000,
         onConnect: () => {
-            console.log('[WS] Connected successfully')
             notifyListeners()
             Object.entries(subscriptions).forEach(([key, sub]) => {
                 if (!sub.active) {
@@ -43,17 +45,14 @@ export function connectWebSocket() {
                 }
             })
         },
-        onStompError: (error) => {
-            console.error('[WS] Connection error:', error)
+        onStompError: () => {
             notifyListeners()
         },
         onWebSocketClose: () => {
-            console.log('[WS] Connection closed')
             notifyListeners()
         },
     })
 
-    console.log('[WS] Connecting to', `${API_URL}/ws`)
     stompClient.activate()
 }
 

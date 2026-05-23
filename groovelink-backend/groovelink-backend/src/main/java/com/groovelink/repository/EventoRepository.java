@@ -30,6 +30,10 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
     @Query("SELECT e FROM Evento e WHERE e.publicado.id = :usuarioId")
     List<Evento> findEventosPublicadosPorUsuario(@Param("usuarioId") Long usuarioId);
 
+    @Query(value = "SELECT e FROM Evento e WHERE e.publicado.id = :usuarioId",
+           countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.publicado.id = :usuarioId")
+    Page<Evento> findEventosPublicadosPorUsuario(@Param("usuarioId") Long usuarioId, Pageable pageable);
+
     @Query(
         value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE AND LOWER(e.nombre) LIKE LOWER(CONCAT('%', :q, '%')) GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
         countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND LOWER(e.nombre) LIKE LOWER(CONCAT('%', :q, '%'))"
@@ -37,10 +41,46 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
     Page<Evento> buscarPorNombre(@Param("q") String q, Pageable pageable);
 
     @Query(
-        value = "SELECT DISTINCT e FROM Evento e LEFT JOIN e.megustas m LEFT JOIN e.generos eg LEFT JOIN e.aptitudes ea WHERE e.fechaFinal >= CURRENT_DATE AND (eg.genero.id IN :generoIds OR ea.aptitud.id IN :aptitudIds) GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
-        countQuery = "SELECT COUNT(DISTINCT e) FROM Evento e LEFT JOIN e.generos eg LEFT JOIN e.aptitudes ea WHERE e.fechaFinal >= CURRENT_DATE AND (eg.genero.id IN :generoIds OR ea.aptitud.id IN :aptitudIds)"
+        value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "(EXISTS (SELECT 1 FROM EventoGenero eg3 WHERE eg3.evento = e AND eg3.genero.id IN :generoIds) " +
+                "OR EXISTS (SELECT 1 FROM EventoAptitud ea3 WHERE ea3.evento = e AND ea3.aptitud.id IN :aptitudIds)) " +
+                "GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "(EXISTS (SELECT 1 FROM EventoGenero eg3 WHERE eg3.evento = e AND eg3.genero.id IN :generoIds) " +
+                "OR EXISTS (SELECT 1 FROM EventoAptitud ea3 WHERE ea3.evento = e AND ea3.aptitud.id IN :aptitudIds))"
     )
     Page<Evento> findRecomendados(@Param("generoIds") List<Long> generoIds,
                                    @Param("aptitudIds") List<Long> aptitudIds,
                                    Pageable pageable);
+
+    @Query(
+        value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE " +
+                "AND (:generoId IS NULL OR EXISTS (SELECT 1 FROM EventoGenero eg2 WHERE eg2.evento = e AND eg2.genero.id = :generoId)) " +
+                "AND (:aptitudId IS NULL OR EXISTS (SELECT 1 FROM EventoAptitud ea2 WHERE ea2.evento = e AND ea2.aptitud.id = :aptitudId)) " +
+                "GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE " +
+                "AND (:generoId IS NULL OR EXISTS (SELECT 1 FROM EventoGenero eg2 WHERE eg2.evento = e AND eg2.genero.id = :generoId)) " +
+                "AND (:aptitudId IS NULL OR EXISTS (SELECT 1 FROM EventoAptitud ea2 WHERE ea2.evento = e AND ea2.aptitud.id = :aptitudId))"
+    )
+    Page<Evento> findFiltered(@Param("generoId") Long generoId,
+                               @Param("aptitudId") Long aptitudId,
+                               Pageable pageable);
+
+    @Query(
+        value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "EXISTS (SELECT 1 FROM EventoGenero eg3 WHERE eg3.evento = e AND eg3.genero.id IN :generoIds) " +
+                "GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "EXISTS (SELECT 1 FROM EventoGenero eg3 WHERE eg3.evento = e AND eg3.genero.id IN :generoIds)"
+    )
+    Page<Evento> findRecomendadosPorGenero(@Param("generoIds") List<Long> generoIds, Pageable pageable);
+
+    @Query(
+        value = "SELECT e FROM Evento e LEFT JOIN e.megustas m WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "EXISTS (SELECT 1 FROM EventoAptitud ea3 WHERE ea3.evento = e AND ea3.aptitud.id IN :aptitudIds) " +
+                "GROUP BY e ORDER BY COUNT(m) DESC, e.fechaCreacion DESC",
+        countQuery = "SELECT COUNT(e) FROM Evento e WHERE e.fechaFinal >= CURRENT_DATE AND " +
+                "EXISTS (SELECT 1 FROM EventoAptitud ea3 WHERE ea3.evento = e AND ea3.aptitud.id IN :aptitudIds)"
+    )
+    Page<Evento> findRecomendadosPorAptitud(@Param("aptitudIds") List<Long> aptitudIds, Pageable pageable);
 }

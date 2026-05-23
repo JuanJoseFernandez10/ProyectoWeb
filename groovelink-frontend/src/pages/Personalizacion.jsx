@@ -1,7 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import GustosAptitudes from '../components/ComponentesSignLog/Personalizacion/GustosAptitudes';
 import { personalizarPerfil, subirFotoPerfil } from '../api/user';
+import { activarPremium } from '../api/premium';
 
 /**
  * Página de personalización post-registro (2 pasos)
@@ -65,11 +67,6 @@ function Personalizacion() {
       }
 
       setSuccess(true);
-
-      // Redirigir al home después de 1.5 segundos
-      setTimeout(() => {
-        navigate('/home');
-      }, 1500);
     } catch (err) {
       setError(err.message || 'Error al guardar la personalización');
     } finally {
@@ -77,22 +74,9 @@ function Personalizacion() {
     }
   };
 
-  // Pantalla de éxito
+  // Pantalla de éxito con recomendación premium
   if (success) {
-    return (
-      <div className="page-surface min-h-screen flex flex-col items-center justify-center px-4">
-        <div className="card-panel max-w-md w-full p-10 text-center">
-          <div className="text-6xl mb-6">🎉</div>
-          <h1 className="text-3xl font-black text-ink mb-4">
-            ¡Perfil configurado!
-          </h1>
-          <p className="text-ink-soft text-lg mb-6">
-            Tu perfil está listo. Te redirigimos al inicio...
-          </p>
-          <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </div>
-    );
+    return <PremiumRecomendacion navigate={navigate} />;
   }
 
   return (
@@ -154,6 +138,7 @@ function Personalizacion() {
                   <img
                     src={fotoPreview}
                     alt="Preview"
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -236,6 +221,94 @@ function Personalizacion() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Componente de recomendación premium post-registro
+function PremiumRecomendacion({ navigate }) {
+  const { user, setUser } = useContext(AuthContext);
+  const [activando, setActivando] = useState(false);
+  const [skipped, setSkipped] = useState(false);
+
+  const handleActivarPremium = async () => {
+    setActivando(true);
+    try {
+      await activarPremium();
+      const usuarioActualizado = { ...user, premium: true };
+      setUser(usuarioActualizado);
+      const session = JSON.parse(localStorage.getItem('groovelink_auth') || '{}');
+      localStorage.setItem('groovelink_auth', JSON.stringify({ ...session, user: usuarioActualizado }));
+    } catch {
+      // Silently fail, user can activate later
+    } finally {
+      setActivando(false);
+      navigate('/home');
+    }
+  };
+
+  const handleSkip = () => {
+    setSkipped(true);
+    navigate('/home');
+  };
+
+  if (skipped) {
+    return (
+      <div className="page-surface min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="card-panel max-w-md w-full p-10 text-center">
+          <div className="text-6xl mb-6">🎉</div>
+          <h1 className="text-3xl font-black text-ink mb-4">¡Perfil configurado!</h1>
+          <p className="text-ink-soft text-lg mb-6">Tu perfil está listo. Te redirigimos al inicio...</p>
+          <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-surface min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="card-panel max-w-lg w-full p-8 md:p-10 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 mb-5 shadow-lg shadow-amber-500/30">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-ink" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-black text-ink mb-2">¿Quieres crear eventos?</h1>
+        <p className="text-ink-soft mb-6">
+          Tu perfil ya está listo. Activa Premium gratis y empieza a organizar tus propios eventos musicales.
+        </p>
+        <div className="flex flex-col gap-2 mb-6 text-left max-w-xs mx-auto">
+          <div className="flex items-center gap-2 text-sm text-ink-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            Crea eventos ilimitados
+          </div>
+          <div className="flex items-center gap-2 text-sm text-ink-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            Insignia exclusiva en tu perfil
+          </div>
+          <div className="flex items-center gap-2 text-sm text-ink-soft">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            Mayor visibilidad para tus eventos
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            type="button"
+            disabled={activando}
+            onClick={handleActivarPremium}
+            className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-ink font-extrabold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 transition-all duration-200 disabled:opacity-50"
+          >
+            {activando ? 'Activando...' : 'Activar Premium Gratis'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSkip}
+            className="btn-ghost px-6 py-3"
+          >
+            Ahora no
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

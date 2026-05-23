@@ -73,6 +73,7 @@ export function AuthProvider({ children }) {
             username: response?.username ?? fallbackUser?.username ?? null,
             email: response?.email ?? fallbackUser?.email ?? null,
             role: response?.role ?? fallbackUser?.role ?? null,
+            premium: response?.premium ?? fallbackUser?.premium ?? false,
         };
 
         return rootUser;

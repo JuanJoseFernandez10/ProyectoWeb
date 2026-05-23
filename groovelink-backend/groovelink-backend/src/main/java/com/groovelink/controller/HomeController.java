@@ -37,6 +37,9 @@ public class HomeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "false") boolean recomendados,
+            @RequestParam(required = false) Long generoId,
+            @RequestParam(required = false) Long aptitudId,
+            @RequestParam(required = false) String ubicacion,
             Authentication authentication
     ) {
         int safePage = Math.max(page, 0);
@@ -54,16 +57,21 @@ public class HomeController {
             }
         }
 
+        boolean hasFilters = generoId != null || aptitudId != null || (ubicacion != null && !ubicacion.isBlank());
+
         Page<EventoResponseDTO> eventosPage;
-        if (recomendados && usuarioId != null) {
+        if (hasFilters) {
+            eventosPage = eventoService.findFilteredDto(
+                generoId, aptitudId, ubicacion,
+                PageRequest.of(safePage, safeSize), usuarioId
+            );
+        } else if (recomendados && usuarioId != null) {
             eventosPage = eventoService.findRecomendadosDto(
-                PageRequest.of(safePage, safeSize),
-                usuarioId
+                PageRequest.of(safePage, safeSize), usuarioId
             );
         } else {
             eventosPage = eventoService.findAllOrdenadosPorMeGustasDto(
-                PageRequest.of(safePage, safeSize),
-                usuarioId
+                PageRequest.of(safePage, safeSize), usuarioId
             );
         }
 

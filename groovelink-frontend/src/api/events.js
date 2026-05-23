@@ -30,12 +30,15 @@ async function requestJson(path, options = {}) {
     return data
 }
 
-export function getHomeEvents({ page = 0, size = 5, recomendados = false } = {}) {
+export function getHomeEvents({ page = 0, size = 5, recomendados = false, generoId, aptitudId, ubicacion } = {}) {
     const params = new URLSearchParams({
         page: String(page),
         size: String(size),
         recomendados: String(recomendados),
     })
+    if (generoId != null) params.set('generoId', String(generoId))
+    if (aptitudId != null) params.set('aptitudId', String(aptitudId))
+    if (ubicacion) params.set('ubicacion', ubicacion)
 
     return requestJson(`/home?${params.toString()}`, {
         auth: true,

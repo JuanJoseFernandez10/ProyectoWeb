@@ -17,6 +17,9 @@ public interface FotoEventoRepository extends JpaRepository<FotoEvento, Long> {
     // Obtener todas las fotos que NO son portada
     List<FotoEvento> findByEvento_IdAndEsPortadaFalseOrderByIdAsc(Long eventoId);
 
+    List<FotoEvento> findByEvento_IdInAndEsPortadaTrue(List<Long> eventoIds);
+    List<FotoEvento> findByEvento_IdInAndEsPortadaFalseOrderByIdAsc(List<Long> eventoIds);
+
     // Contar fotos que no son portada
     Long countByEvento_IdAndEsPortadaFalse(Long eventoId);
     

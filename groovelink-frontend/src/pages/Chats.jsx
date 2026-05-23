@@ -117,6 +117,7 @@ function Chats() {
                                                 <img
                                                     src={avatarUrl}
                                                     alt={displayName}
+                                                    loading="lazy"
                                                     className="h-full w-full object-cover"
                                                 />
                                             </div>

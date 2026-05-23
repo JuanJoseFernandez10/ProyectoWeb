@@ -65,7 +65,7 @@ export function useChat() {
 
         fetchChatMessages(chatId)
             .then((data) => {
-                setMessages((prev) => ({ ...prev, [chatId]: data || [] }))
+                setMessages((prev) => ({ ...prev, [chatId]: data?.content || data || [] }))
             })
             .catch(() => {
                 setMessages((prev) => ({ ...prev, [chatId]: [] }))
