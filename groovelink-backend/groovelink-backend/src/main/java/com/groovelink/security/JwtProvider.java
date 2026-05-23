@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 
 @Service
@@ -27,7 +29,7 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        SecretKey key = buildSigningKey();
 
         return Jwts.builder()
                 .setSubject(username)
@@ -41,7 +43,7 @@ public class JwtProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        SecretKey key = buildSigningKey();
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -52,7 +54,7 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            SecretKey key = buildSigningKey();
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
@@ -70,5 +72,13 @@ public class JwtProvider {
             log.error("JWT claims string is empty: {}", ex);
         }
         return false;
+    }
+
+    private SecretKey buildSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 64) {
+            keyBytes = Arrays.copyOf(keyBytes, 64);
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
