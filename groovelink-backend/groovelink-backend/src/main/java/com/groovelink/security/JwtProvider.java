@@ -16,7 +16,7 @@ public class JwtProvider {
 
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
 
-    @Value("${app.jwt.secret:mySecretKeyThatIsLongEnoughForHS512AlgorithmAndCannotBeShort}")
+    @Value("${app.jwt.secret:5OhCU8uoptY1wHNj2gzIZl7fW6LniexqmakQ4RS9GrMAFVJdPvXs3DbyEKB0cT}")
     private String jwtSecret;
 
     @Value("${app.jwt.expiration:86400000}")
