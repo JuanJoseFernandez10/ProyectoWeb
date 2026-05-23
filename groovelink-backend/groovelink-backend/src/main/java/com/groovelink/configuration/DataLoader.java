@@ -2,6 +2,7 @@ package com.groovelink.configuration;
 
 import com.groovelink.entitys.Administrador;
 import com.groovelink.enums.Rol;
+import com.groovelink.entitys.Usuario;
 import com.groovelink.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @ConditionalOnProperty(name = "app.seed.default-admin.enabled", havingValue = "true")
@@ -42,23 +44,32 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
-
-        boolean exists = usuarioRepository.existsByUsername(adminUsername);
-
-        if (!exists) {
+        usuarioRepository.findByUsername(adminUsername).ifPresentOrElse(usuario -> {
+            Administrador admin;
+            if (usuario instanceof Administrador administrador) {
+                admin = administrador;
+            } else {
+                usuarioRepository.delete(usuario);
+                admin = new Administrador();
+                admin.setUsername(adminUsername);
+                admin.setRol(Rol.ROLE_ADMIN);
+            }
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode(adminPassword));
+            admin.setCargo(adminCargo);
+            usuarioRepository.save(admin);
+            log.info("Default admin user updated: {}", adminUsername);
+        }, () -> {
             Administrador admin = new Administrador();
             admin.setUsername(adminUsername);
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRol(Rol.ROLE_ADMIN);
             admin.setCargo(adminCargo);
-
             usuarioRepository.save(admin);
-
             log.info("Default admin user created: {}", adminUsername);
-        } else {
-            log.info("Default admin user already exists: {}", adminUsername);
-        }
+        });
     }
 }
