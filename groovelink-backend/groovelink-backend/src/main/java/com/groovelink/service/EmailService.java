@@ -1,5 +1,6 @@
 package com.groovelink.service;
 
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,12 +14,16 @@ public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     private final JavaMailSender mailSender;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    public EmailService(Optional<JavaMailSender> mailSender) {
+        this.mailSender = mailSender.orElse(null);
     }
 
     @Async
     public void enviarCorreo(String to, String subject, String body) {
+        if (mailSender == null) {
+            log.info("Email no configurado. No se envió correo a {}", to);
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
