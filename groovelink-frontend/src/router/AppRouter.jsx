@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import { lazy, Suspense } from "react"
 import Header from "../components/Estrcutura/Header"
 import Footer from "../components/Estrcutura/Footer"
+import { Analytics } from "@vercel/analytics/next"
 
 const Index = lazy(() => import("../pages/index"))
 const AccesPage = lazy(() => import("../pages/AccesPage"))
@@ -50,6 +51,7 @@ export default function AppRouter() {
     return (
         <BrowserRouter>
             <Layout />
+            <Analytics />
         </BrowserRouter>
     )
 }
