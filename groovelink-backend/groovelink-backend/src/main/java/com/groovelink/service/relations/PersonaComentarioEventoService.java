@@ -3,8 +3,8 @@ package com.groovelink.service.relations;
 import com.groovelink.entitys.relations.PersonaComentarioEvento;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.EventoRepository;
+import com.groovelink.repository.UsuarioRepository;
 import com.groovelink.repository.relations.PersonaComentarioEventoRepository;
-import com.groovelink.repository.PersonaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +14,14 @@ import java.util.List;
 public class PersonaComentarioEventoService {
 
     private final PersonaComentarioEventoRepository comentarioRepository;
-    private final PersonaRepository personaRepository;
+    private final UsuarioRepository usuarioRepository;
     private final EventoRepository eventoRepository;
 
     public PersonaComentarioEventoService(PersonaComentarioEventoRepository comentarioRepository,
-                                          PersonaRepository personaRepository,
+                                          UsuarioRepository usuarioRepository,
                                           EventoRepository eventoRepository) {
         this.comentarioRepository = comentarioRepository;
-        this.personaRepository = personaRepository;
+        this.usuarioRepository = usuarioRepository;
         this.eventoRepository = eventoRepository;
     }
 
@@ -31,8 +31,8 @@ public class PersonaComentarioEventoService {
 
     @Transactional
     public PersonaComentarioEvento agregarComentario(PersonaComentarioEvento comentario) {
-        personaRepository.findById(comentario.getUsuario().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Persona", comentario.getUsuario().getId()));
+        usuarioRepository.findById(comentario.getUsuario().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", comentario.getUsuario().getId()));
 
         eventoRepository.findById(comentario.getEvento().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", comentario.getEvento().getId()));

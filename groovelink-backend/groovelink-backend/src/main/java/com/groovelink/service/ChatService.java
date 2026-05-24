@@ -55,7 +55,7 @@ public class ChatService {
     public Chat findOrCreatePrivateChat(Long usuarioId1, Long usuarioId2) {
         List<Chat> chatsUsuario1 = chatRepository.findByParticipantes_Id(usuarioId1);
         for (Chat chat : chatsUsuario1) {
-            if (!chat.isEsGrupal() && chat.getEventoId() == null) {
+            if (!chat.isEsGrupal() && chat.getEventoId() == null && chat.getParticipantes() != null) {
                 boolean containsOther = chat.getParticipantes().stream()
                         .anyMatch(p -> p.getId().equals(usuarioId2));
                 if (containsOther && chat.getParticipantes().size() == 2) {

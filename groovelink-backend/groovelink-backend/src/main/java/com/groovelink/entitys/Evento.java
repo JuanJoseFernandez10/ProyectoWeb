@@ -59,10 +59,10 @@ public class Evento {
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<FotoEvento> fotos;
 
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<EventoAptitud> aptitudes;
 
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<EventoGenero> generos;
 
 	public Long getId() {

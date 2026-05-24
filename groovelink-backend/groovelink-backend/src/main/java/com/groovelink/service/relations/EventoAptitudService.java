@@ -20,12 +20,4 @@ public class EventoAptitudService {
         return eventoAptitudRepository.findByEvento_Id(eventoId);
     }
 
-    @Transactional
-    public EventoAptitud agregarAptitudAEvento(Long eventoId, Long aptitudId) {
-        // aquí faltaría cargar Evento y Aptitud, pero por ahora lo dejo simple
-        EventoAptitud ea = new EventoAptitud();
-        // ea.setEvento(evento);
-        // ea.setAptitud(aptitud);
-        return eventoAptitudRepository.save(ea);
-    }
 }

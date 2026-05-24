@@ -9,6 +9,7 @@ import com.groovelink.repository.relations.PersonaComentarioEventoRepository;
 import com.groovelink.repository.relations.PersonaMeGustaEventoRepository;
 import com.groovelink.repository.relations.PersonaUneEventoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class DashboardService {
         this.personaComentarioEventoRepository = personaComentarioEventoRepository;
     }
 
+    @Transactional(readOnly = true)
     public DashboardEstadisticasDTO obtenerEstadisticas(Usuario usuario) {
         List<Evento> eventos = eventoRepository.findEventosPublicadosPorUsuario(usuario.getId());
 
@@ -48,6 +50,7 @@ public class DashboardService {
         return new DashboardEstadisticasDTO(totalEventos, totalAsistentes, totalMeGustas, totalComentarios);
     }
 
+    @Transactional(readOnly = true)
     public List<EventoStatsDTO> obtenerEventosConStats(Usuario usuario) {
         List<Evento> eventos = eventoRepository.findEventosPublicadosPorUsuario(usuario.getId());
         List<EventoStatsDTO> resultado = new ArrayList<>();

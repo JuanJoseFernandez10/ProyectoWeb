@@ -105,7 +105,6 @@ public class PersonaService {
     @Transactional
     @CacheEvict(value = "personas", allEntries = true)
     public void reemplazarAptitudes(Long usuarioId, List<Long> aptitudesIds) {
-        // Delete all existing aptitudes for this user
         personaAptitudRepository.deleteByUsuario_Id(usuarioId);
         
         if (aptitudesIds == null || aptitudesIds.isEmpty()) {
@@ -114,6 +113,9 @@ public class PersonaService {
         
         Persona persona = personaRepository.findById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Persona", usuarioId));
+        if (persona.getAptitudes() != null) {
+            persona.getAptitudes().clear();
+        }
         
         for (Long aptitudId : aptitudesIds) {
             Aptitud aptitud = aptitudRepository.findById(aptitudId)
@@ -129,7 +131,6 @@ public class PersonaService {
     @Transactional
     @CacheEvict(value = "personas", allEntries = true)
     public void reemplazarGeneros(Long usuarioId, List<Long> generosIds) {
-        // Delete all existing generos for this user
         personaGeneroRepository.deleteByUsuario_Id(usuarioId);
         
         if (generosIds == null || generosIds.isEmpty()) {
@@ -138,6 +139,9 @@ public class PersonaService {
         
         Persona persona = personaRepository.findById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Persona", usuarioId));
+        if (persona.getGeneros() != null) {
+            persona.getGeneros().clear();
+        }
         
         for (Long generoId : generosIds) {
             Genero genero = generoRepository.findById(generoId)

@@ -7,7 +7,6 @@ import com.groovelink.entitys.Usuario;
 import com.groovelink.entitys.relations.FotoEvento;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
-import com.groovelink.exception.InvalidOperationException;
 import com.groovelink.service.relations.FotoEventoService;
 import com.groovelink.mapper.GrooveLinkMapper;
 import com.groovelink.service.EventoService;

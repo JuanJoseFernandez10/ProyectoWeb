@@ -178,7 +178,7 @@ public class EventoController {
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
         // Verificar que el usuario sea el creador del evento
-        if (!evento.getPublicado().getId().equals(usuario.getId())) {
+        if (evento.getPublicado() == null || !evento.getPublicado().getId().equals(usuario.getId())) {
             throw new BusinessException("No tienes permisos para editar este evento");
         }
 
@@ -215,7 +215,7 @@ public class EventoController {
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
         // Verificar que el usuario sea el creador del evento
-        if (!evento.getPublicado().getId().equals(usuario.getId())) {
+        if (evento.getPublicado() == null || !evento.getPublicado().getId().equals(usuario.getId())) {
             throw new BusinessException("No tienes permisos para eliminar este evento");
         }
 
@@ -224,22 +224,22 @@ public class EventoController {
 
     @PostMapping("/{eventoId}/me-gusta")
     public void darMeGusta(@PathVariable Long eventoId, Authentication authentication) {
-        eventoService.darMeGusta(obtenerPersonaId(authentication), eventoId);
+        eventoService.darMeGusta(obtenerUsuarioId(authentication), eventoId);
     }
 
     @DeleteMapping("/{eventoId}/me-gusta")
     public void quitarMeGusta(@PathVariable Long eventoId, Authentication authentication) {
-        eventoService.quitarMeGusta(obtenerPersonaId(authentication), eventoId);
+        eventoService.quitarMeGusta(obtenerUsuarioId(authentication), eventoId);
     }
 
     @PostMapping("/{eventoId}/unirse")
     public void unirseEvento(@PathVariable Long eventoId, Authentication authentication) {
-        eventoService.inscribirEnEvento(obtenerPersonaId(authentication), eventoId);
+        eventoService.inscribirEnEvento(obtenerUsuarioId(authentication), eventoId);
     }
 
     @DeleteMapping("/{eventoId}/unirse")
     public void salirEvento(@PathVariable Long eventoId, Authentication authentication) {
-        eventoService.cancelarAsistencia(obtenerPersonaId(authentication), eventoId);
+        eventoService.cancelarAsistencia(obtenerUsuarioId(authentication), eventoId);
     }
 
     @GetMapping("/buscar")
@@ -284,7 +284,7 @@ public class EventoController {
     public EventosResponseDTO eventosUnidos(Authentication authentication,
                                             @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "10") int size) {
-        Long usuarioId = obtenerPersonaId(authentication);
+        Long usuarioId = obtenerUsuarioId(authentication);
         Pageable pageable = PageRequest.of(page, size);
 
         Page<PersonaUneEvento> puePage = personaUneEventoRepository.findByUsuario_Id(usuarioId, pageable);
@@ -305,17 +305,7 @@ public class EventoController {
         return response;
     }
 
-    private boolean esPersona(Authentication authentication) {
-        try {
-            Usuario usuario = usuarioService.findByUsername(authentication.getName())
-                .orElseThrow(() -> new BusinessException("Usuario autenticado no encontrado"));
-            return usuario instanceof Persona;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private Long obtenerPersonaId(Authentication authentication) {
+    private Long obtenerUsuarioId(Authentication authentication) {
         Usuario usuario = usuarioService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new BusinessException("Usuario autenticado no encontrado"));
 

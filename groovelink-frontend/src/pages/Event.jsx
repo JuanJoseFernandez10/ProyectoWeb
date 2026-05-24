@@ -58,6 +58,8 @@ function mapEvent(event) {
         likes: event.numeroMeGustas ?? 0,
         organizer: event.publicadoPorUsername,
         likedByMe: Boolean(event.likedByMe),
+        aptitudes: Array.isArray(event.aptitudes) ? event.aptitudes : [],
+        generos: Array.isArray(event.generos) ? event.generos : [],
         image: event.portada?.fotoUrl ? `${API_URL}${event.portada.fotoUrl}` : event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo.png',
         portada: event.portada ?? null,
         fotos: Array.isArray(event.fotos) ? event.fotos : [],

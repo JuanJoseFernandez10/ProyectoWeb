@@ -266,8 +266,8 @@ public class EventoService {
 
     @Transactional
     public void inscribirEnEvento(Long personaId, Long eventoId) {
-        Persona persona = personaRepository.findById(personaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Persona", personaId));
+        Usuario usuario = usuarioRepository.findById(personaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", personaId));
 
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
@@ -281,7 +281,7 @@ public class EventoService {
         }
 
         PersonaUneEvento asistencia = new PersonaUneEvento();
-        asistencia.setUsuario(persona);
+        asistencia.setUsuario(usuario);
         asistencia.setEvento(evento);
 
         personaUneEventoRepository.save(asistencia);
@@ -306,7 +306,7 @@ public class EventoService {
         boolean yaEnChat = eventChat.getParticipantes().stream()
                 .anyMatch(p -> p.getId().equals(personaId));
         if (!yaEnChat) {
-            eventChat.getParticipantes().add(persona);
+            eventChat.getParticipantes().add(usuario);
             chatRepository.save(eventChat);
         }
     }

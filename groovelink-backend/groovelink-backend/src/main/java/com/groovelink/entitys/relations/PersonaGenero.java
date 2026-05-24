@@ -1,7 +1,7 @@
 package com.groovelink.entitys.relations;
 
 import com.groovelink.entitys.Genero;
-import com.groovelink.entitys.Persona;
+import com.groovelink.entitys.Usuario;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +20,7 @@ public class PersonaGenero {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
-    private Persona usuario;
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "id_genero", nullable = false)
@@ -34,11 +34,11 @@ public class PersonaGenero {
 		this.id = id;
 	}
 
-	public Persona getUsuario() {
+	public Usuario getUsuario() {
 		return usuario;
 	}
 
-	public void setUsuario(Persona usuario) {
+	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
 

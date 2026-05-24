@@ -3,7 +3,7 @@ package com.groovelink.entitys.relations;
 import java.time.LocalDateTime;
 
 import com.groovelink.entitys.Evento;
-import com.groovelink.entitys.Persona;
+import com.groovelink.entitys.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +24,7 @@ public class PersonaComentarioEvento {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
-    private Persona usuario;
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "codigo_evento", nullable = false)
@@ -44,11 +44,11 @@ public class PersonaComentarioEvento {
 		this.id = id;
 	}
 
-	public Persona getUsuario() {
+	public Usuario getUsuario() {
 		return usuario;
 	}
 
-	public void setUsuario(Persona usuario) {
+	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
 	}
 
