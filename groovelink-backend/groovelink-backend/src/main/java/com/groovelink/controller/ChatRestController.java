@@ -142,7 +142,7 @@ public class ChatRestController {
         if (chat.getEventoId() != null) {
             fotoEventoService.findPortadaByEvento(chat.getEventoId())
                     .ifPresent(portada ->
-                            dto.setImagen("/fotos-evento/" + chat.getEventoId() + "/portada/archivo")
+                            dto.setImagen(portada.getRutaArchivo())
                     );
         }
 

@@ -12,19 +12,13 @@ import com.groovelink.mapper.GrooveLinkMapper;
 import com.groovelink.service.EventoService;
 import com.groovelink.service.UsuarioService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
 
-import java.io.IOException;
 import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -98,13 +92,6 @@ public class FotoEventoController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
-    @GetMapping(value = "/{eventoId}/portada/archivo", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<ByteArrayResource> obtenerPortadaArchivo(@PathVariable Long eventoId) {
-        return fotoEventoService.findPortadaByEvento(eventoId)
-                .map(this::servirArchivo)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     // Obtener todas las fotos de un evento (sin portada)
     @GetMapping("/{eventoId}/todas")
     public ResponseEntity<List<FotoEventoResponseDTO>> obtenerTodasLasFotos(@PathVariable Long eventoId) {
@@ -125,16 +112,6 @@ public class FotoEventoController {
         return fotoEventoService.findByEventoAndNombreFoto(eventoId, nombreFoto)
                 .map(this::convertirAResponse)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping(value = "/{eventoId}/{nombreFoto}/archivo", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<ByteArrayResource> obtenerFotoArchivo(
-            @PathVariable Long eventoId,
-            @PathVariable String nombreFoto) {
-
-        return fotoEventoService.findByEventoAndNombreFoto(eventoId, nombreFoto)
-                .map(this::servirArchivo)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -206,18 +183,5 @@ public class FotoEventoController {
         return mapper.construirFotoUrl(foto);
     }
 
-    private ResponseEntity<ByteArrayResource> servirArchivo(FotoEvento foto) {
-        try {
-            Path ruta = fotoEventoService.obtenerRutaFoto(foto);
-            byte[] bytes = Files.readAllBytes(ruta);
-            String contentType = Optional.ofNullable(Files.probeContentType(ruta)).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + ruta.getFileName() + "\"")
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(new ByteArrayResource(bytes));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 }

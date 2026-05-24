@@ -101,10 +101,8 @@ public interface GrooveLinkMapper {
 
     @Named("construirFotoUrl")
     default String construirFotoUrl(com.groovelink.entitys.relations.FotoEvento foto) {
-        if (Boolean.TRUE.equals(foto.getEsPortada())) {
-            return "/fotos-evento/" + foto.getEvento().getId() + "/portada/archivo";
-        }
-        return "/fotos-evento/" + foto.getEvento().getId() + "/" + foto.getNombreFoto() + "/archivo";
+        if (foto.getRutaArchivo() == null) return null;
+        return foto.getRutaArchivo();
     }
 
     default FotoEventoResponseDTO toFotoEventoResponseDTO(FotoEvento foto) {

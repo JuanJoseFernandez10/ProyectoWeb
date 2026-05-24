@@ -60,7 +60,7 @@ function mapEvent(event) {
         likedByMe: Boolean(event.likedByMe),
         aptitudes: Array.isArray(event.aptitudes) ? event.aptitudes : [],
         generos: Array.isArray(event.generos) ? event.generos : [],
-        image: event.portada?.fotoUrl ? `${API_URL}${event.portada.fotoUrl}` : event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo.png',
+        image: event.portada?.fotoUrl ? event.portada.fotoUrl : event.imagen?.startsWith('http') ? event.imagen : event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo.png',
         portada: event.portada ?? null,
         fotos: Array.isArray(event.fotos) ? event.fotos : [],
         rutaPortada: event.rutaPortada,

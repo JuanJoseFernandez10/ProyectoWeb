@@ -355,16 +355,15 @@ public class EventoController {
         .map(relacion -> relacion.getGenero().getId())
         .collect(Collectors.toList()));
 
-    if (incluirInfoPrivada) {
-        response.setRutaPortada("/fotos-evento/" + eventoId + "/portada/archivo");
-        response.setRutaFotos("/fotos-evento/" + eventoId + "/todas");
-    }
-
     FotoEventoResponseDTO portada = fotoEventoService.findPortadaByEvento(eventoId)
         .map(this::convertirFoto)
         .orElse(null);
     response.setPortada(portada);
     response.setImagen(portada != null ? portada.getFotoUrl() : null);
+    if (incluirInfoPrivada) {
+        response.setRutaPortada(portada != null ? portada.getFotoUrl() : null);
+        response.setRutaFotos(null);
+    }
 
     response.setFotos(fotoEventoService.findFotosByEvento(eventoId)
         .stream()
@@ -423,13 +422,13 @@ public class EventoController {
             dto.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
                 .map(relacion -> relacion.getGenero().getId())
                 .collect(Collectors.toList()));
-            if (incluirInfoPrivada) {
-                dto.setRutaPortada("/fotos-evento/" + evento.getId() + "/portada/archivo");
-                dto.setRutaFotos("/fotos-evento/" + evento.getId() + "/todas");
-            }
             FotoEventoResponseDTO portada = portadaMap.get(evento.getId());
             dto.setPortada(portada);
             dto.setImagen(portada != null ? portada.getFotoUrl() : null);
+            if (incluirInfoPrivada) {
+                dto.setRutaPortada(portada != null ? portada.getFotoUrl() : null);
+                dto.setRutaFotos(null);
+            }
             dto.setFotos(fotosMap.getOrDefault(evento.getId(), List.of()));
             dto.setParticipantes(participantesMap.getOrDefault(evento.getId(), List.of()));
             return dto;

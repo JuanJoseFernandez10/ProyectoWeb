@@ -100,7 +100,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded, canManage 
                 <div className="mt-5 overflow-hidden rounded-3xl border border-secondary/20 bg-ink shadow-lg shadow-secondary/10">
                     <div className="relative aspect-video min-h-56">
                         <img
-                            src={`${API_URL}${portada.fotoUrl}`}
+                            src={portada.fotoUrl}
                             alt={portada.nombreFoto || 'Portada del evento'}
                             loading="lazy"
                             className="h-full w-full object-cover"
@@ -125,7 +125,7 @@ function EventPhotosPanel({ eventId, portada, fotos = [], onUploaded, canManage 
                             <div className="aspect-4/3 bg-primary/10">
                                 {foto.fotoUrl ? (
                                     <img
-                                        src={`${API_URL}${foto.fotoUrl}`}
+                                        src={foto.fotoUrl}
                                         alt={foto.nombreFoto || 'Foto del evento'}
                                         loading="lazy"
                                         className="h-full w-full object-cover"
