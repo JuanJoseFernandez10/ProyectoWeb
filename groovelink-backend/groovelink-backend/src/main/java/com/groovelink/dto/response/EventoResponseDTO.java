@@ -21,8 +21,10 @@ public class EventoResponseDTO {
     private LocalDateTime fechaCreacion;
 
     private String publicadoPorUsername;   
-    private List<String> aptitudes;       
-    private List<String> generos;         
+    private List<String> aptitudes;
+    private List<Long> aptitudesIds;
+    private List<String> generos;
+    private List<Long> generosIds;
     private Integer numeroAsistentes;
     private Integer numeroMeGustas;
     private List<UsuarioBasicoDTO> participantes;

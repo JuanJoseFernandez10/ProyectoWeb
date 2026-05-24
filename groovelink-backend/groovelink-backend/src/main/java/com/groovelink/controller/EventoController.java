@@ -355,8 +355,14 @@ public class EventoController {
     response.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
         .map(relacion -> relacion.getAptitud().getNombre())
         .collect(Collectors.toList()));
+    response.setAptitudesIds(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
+        .map(relacion -> relacion.getAptitud().getId())
+        .collect(Collectors.toList()));
     response.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
         .map(relacion -> relacion.getGenero().getNombre())
+        .collect(Collectors.toList()));
+    response.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
+        .map(relacion -> relacion.getGenero().getId())
         .collect(Collectors.toList()));
 
     if (incluirInfoPrivada) {
@@ -418,8 +424,14 @@ public class EventoController {
             dto.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
                 .map(relacion -> relacion.getAptitud().getNombre())
                 .collect(Collectors.toList()));
+            dto.setAptitudesIds(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
+                .map(relacion -> relacion.getAptitud().getId())
+                .collect(Collectors.toList()));
             dto.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
                 .map(relacion -> relacion.getGenero().getNombre())
+                .collect(Collectors.toList()));
+            dto.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
+                .map(relacion -> relacion.getGenero().getId())
                 .collect(Collectors.toList()));
             if (incluirInfoPrivada) {
                 dto.setRutaPortada("/fotos-evento/" + evento.getId() + "/portada/archivo");

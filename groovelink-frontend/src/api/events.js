@@ -99,6 +99,14 @@ export function getMyJoinedEvents() {
     })
 }
 
+export function getAptitudes() {
+    return requestJson('/aptitudes')
+}
+
+export function getGeneros() {
+    return requestJson('/generos')
+}
+
 export function searchEvents({ q, page = 0, size = 6 }) {
     const params = new URLSearchParams({
         q: String(q),

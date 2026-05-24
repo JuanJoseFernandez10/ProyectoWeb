@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { API_URL } from '../api/config';
 import { getAuthToken } from '../api/authSession';
 import EventPhotosPanel from '../components/Main/EventPhotosPanel';
-import { getEventForEdit } from '../api/events';
+import { getEventForEdit, getAptitudes, getGeneros } from '../api/events';
 
 export default function EventEdicion() {
   const navigate = useNavigate();
@@ -29,6 +29,9 @@ export default function EventEdicion() {
     generosIds: []
   });
 
+  const [aptitudesList, setAptitudesList] = useState([]);
+  const [generosList, setGenerosList] = useState([]);
+
   const [enviando, setEnviando] = useState(false);
   const [loading, setLoading] = useState(isEdit);
   const [eventoPrivado, setEventoPrivado] = useState(null);
@@ -52,6 +55,13 @@ export default function EventEdicion() {
 
   const cargarDatos = useCallback(async () => {
     try {
+      const [aptitudes, generos] = await Promise.all([
+        getAptitudes(),
+        getGeneros()
+      ]);
+      setAptitudesList(aptitudes);
+      setGenerosList(generos);
+
       if (isEdit) {
         const token = getAuthToken();
         if (!token) {
@@ -67,8 +77,8 @@ export default function EventEdicion() {
             descripcion: evento.descripcion,
             fechaInicio: evento.fechaInicio,
             fechaFinal: evento.fechaFinal,
-            aptitudesIds: [],
-            generosIds: []
+            aptitudesIds: evento.aptitudesIds || [],
+            generosIds: evento.generosIds || []
           });
         } catch (error) {
           if (error?.status === 401) {
@@ -94,6 +104,24 @@ export default function EventEdicion() {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleToggleAptitud = (aptitudId) => {
+    setFormData(prev => ({
+      ...prev,
+      aptitudesIds: prev.aptitudesIds.includes(aptitudId)
+        ? prev.aptitudesIds.filter(id => id !== aptitudId)
+        : [...prev.aptitudesIds, aptitudId]
+    }));
+  };
+
+  const handleToggleGenero = (generoId) => {
+    setFormData(prev => ({
+      ...prev,
+      generosIds: prev.generosIds.includes(generoId)
+        ? prev.generosIds.filter(id => id !== generoId)
+        : [...prev.generosIds, generoId]
     }));
   };
 
@@ -310,6 +338,52 @@ export default function EventEdicion() {
                     className="inputs-custom"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Aptitudes */}
+              <div>
+                <label className="block text-ink-soft text-sm font-medium mb-2">
+                  Aptitudes
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {aptitudesList.map(aptitud => (
+                    <button
+                      key={aptitud.id}
+                      type="button"
+                      onClick={() => handleToggleAptitud(aptitud.id)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        formData.aptitudesIds.includes(aptitud.id)
+                          ? 'bg-secondary text-white shadow-sm'
+                          : 'bg-gray-100 text-ink-soft hover:bg-gray-200'
+                      }`}
+                    >
+                      {aptitud.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Géneros */}
+              <div>
+                <label className="block text-ink-soft text-sm font-medium mb-2">
+                  Géneros
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {generosList.map(genero => (
+                    <button
+                      key={genero.id}
+                      type="button"
+                      onClick={() => handleToggleGenero(genero.id)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        formData.generosIds.includes(genero.id)
+                          ? 'bg-secondary text-white shadow-sm'
+                          : 'bg-gray-100 text-ink-soft hover:bg-gray-200'
+                      }`}
+                    >
+                      {genero.nombre}
+                    </button>
+                  ))}
                 </div>
               </div>
 
