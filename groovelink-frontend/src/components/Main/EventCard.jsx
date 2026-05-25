@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiking = false }) {
 
     return (
-        <article className={`event-card min-w-0 w-full rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 max-[500px]:rounded-xl max-[500px]:backdrop-blur-none sm:rounded-3xl sm:shadow-xl ${
+        <article className={`event-card min-w-0 max-w-full w-full overflow-hidden rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 max-[500px]:rounded-xl max-[500px]:backdrop-blur-none sm:rounded-3xl sm:shadow-xl ${
             featured ? 'lg:grid lg:grid-cols-[220px_minmax(0,1fr)]' : ''
         }`}>
             <div className={`h-32 sm:h-44 ${featured ? 'min-h-36 max-[500px]:min-h-28 sm:min-h-50' : ''}`}>

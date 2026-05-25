@@ -3,7 +3,7 @@ import EventCard from './EventCard'
 
 function EventsSection({ featuredEvent, events, totalEvents, pagination, loading, error, onNextPage, onPreviousPage, onLikeEvent, onUnlikeEvent, likingEventId, title }) {
     return (
-        <section className="card-shell min-w-0 flex flex-col gap-5 p-4 max-[500px]:p-3 max-[360px]:p-2 sm:p-5 md:gap-6 md:p-6">
+        <section className="card-shell min-w-0 overflow-hidden flex flex-col gap-5 p-4 max-[500px]:p-3 max-[360px]:p-2 sm:p-5 md:gap-6 md:p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div className="space-y-2">
                     <p className="text-sm font-extrabold uppercase tracking-[0.2em] text-secondary">Eventos</p>
