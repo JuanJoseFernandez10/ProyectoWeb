@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 import { obtenerAmigos } from '../api/friends'
 import { createGroupChat } from '../api/chat'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 
 function CreateGroup() {
     const navigate = useNavigate()
@@ -126,7 +126,7 @@ function CreateGroup() {
                                             >
                                                 {amigo.fotoPerfilUrl ? (
                                                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                                        <img src={amigo.fotoPerfilUrl?.startsWith('http') ? amigo.fotoPerfilUrl : `${API_URL}${amigo.fotoPerfilUrl}`} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
+                                                        <img src={resolveImage(amigo.fotoPerfilUrl)} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
                                                     </div>
                                                 ) : (
                                                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

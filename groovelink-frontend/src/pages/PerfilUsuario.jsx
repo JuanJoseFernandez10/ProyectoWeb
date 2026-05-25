@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
 import { obtenerPerfilUsuario, obtenerEstadoAmistad, solicitarAmistad, eliminarAmistad, cancelarSolicitud, crearChatPrivado } from '../api/friends'
 
@@ -126,7 +126,7 @@ export default function PerfilUsuario() {
             <div className="md:w-1/3 flex flex-col items-center mb-6 md:mb-0">
               {perfil.fotoPerfilUrl ? (
                 <img
-                  src={buildApiUrl(perfil.fotoPerfilUrl)}
+                  src={resolveImage(perfil.fotoPerfilUrl)}
                   alt="Foto de perfil"
                   loading="lazy"
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"

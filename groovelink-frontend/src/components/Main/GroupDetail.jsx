@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../../api/config'
+import { API_URL, resolveImage } from '../../api/config'
 import { fetchChatParticipantes } from '../../api/chat'
 import { AuthContext } from '../../context/AuthContext'
 
@@ -22,7 +22,7 @@ function GroupDetail({ chat, onClose }) {
     if (!chat) return null
 
     const chatName = chat.nombre || 'Chat'
-    const chatImage = chat.imagen ? `${API_URL}${chat.imagen}` : null
+    const chatImage = resolveImage(chat.imagen)
     const descripcion = chat.descripcion || ''
 
     return (
@@ -80,7 +80,7 @@ function GroupDetail({ chat, onClose }) {
                             >
                                 {p.fotoPerfilUrl ? (
                                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                        <img src={p.fotoPerfilUrl?.startsWith('http') ? p.fotoPerfilUrl : `${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
+                                        <img src={resolveImage(p.fotoPerfilUrl)} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
                                     </div>
                                 ) : (
                                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

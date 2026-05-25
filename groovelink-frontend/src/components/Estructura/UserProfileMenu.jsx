@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_URL } from '../../api/config'
+import { API_URL, resolveImage } from '../../api/config'
 import { getAuthToken } from '../../api/authSession'
 
 function UserProfileMenu({ user, onLogout, onGoHome }) {
@@ -130,7 +130,7 @@ function UserProfileMenu({ user, onLogout, onGoHome }) {
             >
                 {profileImage ? (
                     <img
-                        src={profileImage.startsWith('http') ? profileImage : `${API_URL}${profileImage}`}
+                        src={resolveImage(profileImage)}
                         alt={`Foto de ${displayName}`}
                         loading="lazy"
                         className="h-9 w-9 rounded-full object-cover border border-text-primary/50"

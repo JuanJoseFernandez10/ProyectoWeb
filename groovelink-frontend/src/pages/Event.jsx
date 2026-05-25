@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
 import { getEventById, getRelatedEvents, likeEvent, unlikeEvent, joinEvent, leaveEvent, getMyJoinedEvents } from '../api/events'
 import EventComments from '../components/Main/EventComments'
@@ -424,7 +424,7 @@ function Event() {
                                                     >
                                                         {p.fotoPerfilUrl ? (
                                                             <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 overflow-hidden rounded-full">
-                                                                <img src={p.fotoPerfilUrl?.startsWith('http') ? p.fotoPerfilUrl : `${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
+                                                                <img src={resolveImage(p.fotoPerfilUrl)} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
                                                             </div>
                                                         ) : (
                                                             <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

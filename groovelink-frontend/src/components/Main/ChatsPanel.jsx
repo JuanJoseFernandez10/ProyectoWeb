@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ChatConversation from './ChatConversation'
-import { API_URL } from '../../api/config'
+import { API_URL, resolveImage } from '../../api/config'
 
 function getCurrentUsername() {
     try {
@@ -24,12 +24,12 @@ function getOtherUsername(chat, currentUsername) {
 
 function getChatAvatar(chat, currentUsername) {
     if (chat.esGrupal && chat.imagen) {
-        return `${API_URL}${chat.imagen}`
+        return resolveImage(chat.imagen)
     }
     if (!chat.esGrupal && chat.participantesFotos && chat.participantesUsernames) {
         const other = chat.participantesUsernames.find((u) => u !== currentUsername)
         if (other && chat.participantesFotos[other]) {
-            return `${API_URL}${chat.participantesFotos[other]}`
+            return resolveImage(chat.participantesFotos[other])
         }
     }
     return null
@@ -52,7 +52,7 @@ function ChatsPanel({
         return (
             <ChatConversation
                 chatName={activeChatName}
-                chatImage={activeChatImage ? `${API_URL}${activeChatImage}` : null}
+                chatImage={resolveImage(activeChatImage)}
                 messages={messages[activeChatId] || []}
                 onSend={(content) => onSendMessage(activeChatId, content)}
                 onClose={onCloseChat}

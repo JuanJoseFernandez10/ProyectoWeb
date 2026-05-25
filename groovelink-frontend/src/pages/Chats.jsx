@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChat } from '../hooks/useChat'
 import ChatConversation from '../components/Main/ChatConversation'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 import { AuthContext } from '../context/AuthContext'
 
 function getOtherUsername(chat, currentUsername) {
@@ -14,12 +14,12 @@ function getOtherUsername(chat, currentUsername) {
 
 function getChatAvatar(chat, currentUsername) {
     if (chat.esGrupal && chat.imagen) {
-        return `${API_URL}${chat.imagen}`
+        return resolveImage(chat.imagen)
     }
     if (!chat.esGrupal && chat.participantesFotos && chat.participantesUsernames) {
         const other = chat.participantesUsernames.find((u) => u !== currentUsername)
         if (other && chat.participantesFotos[other]) {
-            return `${API_URL}${chat.participantesFotos[other]}`
+            return resolveImage(chat.participantesFotos[other])
         }
     }
     return null
@@ -165,7 +165,7 @@ function Chats() {
                         {activeChat ? (
                             <ChatConversation
                                 chatName={getActiveChatName()}
-                                chatImage={getActiveChatImage() ? `${API_URL}${getActiveChatImage()}` : null}
+                                chatImage={resolveImage(getActiveChatImage())}
                                 messages={messages[activeChat] || []}
                                 onSend={(content) => sendMessage(activeChat, content)}
                                 onClose={closeChat}

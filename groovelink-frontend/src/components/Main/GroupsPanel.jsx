@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { API_URL } from '../../api/config'
+import { API_URL, resolveImage } from '../../api/config'
 
 function GroupsPanel({ events }) {
     return (
@@ -37,10 +37,10 @@ function GroupsPanel({ events }) {
                                 {event.numeroAsistentes ?? 0} asistentes
                             </span>
                         </div>
-                        {event.imagen && (
+                        {(event.portada?.fotoUrl || event.imagen) && (
                             <div className="mt-3 h-20 overflow-hidden rounded-xl">
                                 <img
-                                    src={`${API_URL}${event.imagen}`}
+                                    src={resolveImage(event.portada?.fotoUrl || event.imagen)}
                                     alt={event.nombre}
                                     loading="lazy"
                                     className="h-full w-full object-cover"

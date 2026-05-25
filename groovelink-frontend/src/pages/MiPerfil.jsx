@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_URL } from '../api/config';
+import { API_URL, resolveImage } from '../api/config';
 import { getAuthToken } from '../api/authSession';
 
 export default function MiPerfil() {
@@ -28,8 +28,6 @@ export default function MiPerfil() {
       return fallbackMessage;
     }
   };
-
-  const buildApiUrl = (path) => `${API_URL}${path.startsWith('/') ? path : `/${path}`}`;
 
   useEffect(() => { document.title = 'Mi Perfil - GrooveLink' }, [])
 
@@ -219,7 +217,7 @@ export default function MiPerfil() {
                 />
               ) : perfil.fotoPerfilUrl ? (
                 <img
-                  src={buildApiUrl(perfil.fotoPerfilUrl)}
+                  src={resolveImage(perfil.fotoPerfilUrl)}
                   alt="Foto de perfil"
                   loading="lazy"
                   className="w-32 h-32 rounded-full object-cover border-4 border-primary"

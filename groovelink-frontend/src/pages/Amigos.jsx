@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { obtenerAmigos, obtenerSolicitudesRecibidas, responderSolicitud, buscarUsuarios } from '../api/friends'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 
 export default function Amigos() {
   useEffect(() => { document.title = 'Amigos - GrooveLink' }, [])
@@ -48,8 +48,6 @@ export default function Amigos() {
     } catch (err) {
     }
   }
-
-  const buildApiUrl = (path) => `${API_URL}${path.startsWith('/') ? path : `/${path}`}`
 
   if (loading) {
     return (
@@ -129,7 +127,7 @@ export default function Amigos() {
                   >
                     {u.fotoPerfilUrl ? (
                       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <img src={buildApiUrl(u.fotoPerfilUrl)} alt={u.username} loading="lazy" className="h-full w-full object-cover" />
+                        <img src={resolveImage(u.fotoPerfilUrl)} alt={u.username} loading="lazy" className="h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-sm font-black text-secondary">
@@ -170,7 +168,7 @@ export default function Amigos() {
                 >
                   {amigo.fotoPerfilUrl ? (
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                      <img src={buildApiUrl(amigo.fotoPerfilUrl)} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
+                      <img src={resolveImage(amigo.fotoPerfilUrl)} alt={amigo.username} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-base font-black text-secondary">
@@ -201,7 +199,7 @@ export default function Amigos() {
                 >
                   {sol.solicitante.fotoPerfilUrl ? (
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                      <img src={buildApiUrl(sol.solicitante.fotoPerfilUrl)} alt={sol.solicitante.username} loading="lazy" className="h-full w-full object-cover" />
+                      <img src={resolveImage(sol.solicitante.fotoPerfilUrl)} alt={sol.solicitante.username} loading="lazy" className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-base font-black text-secondary">

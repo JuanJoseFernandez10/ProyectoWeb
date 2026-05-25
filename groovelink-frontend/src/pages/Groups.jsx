@@ -6,7 +6,7 @@ import { fetchMyChats } from '../api/chat'
 import { useChat } from '../hooks/useChat'
 import ChatConversation from '../components/Main/ChatConversation'
 import GroupDetail from '../components/Main/GroupDetail'
-import { API_URL } from '../api/config'
+import { API_URL, resolveImage } from '../api/config'
 
 function Groups() {
     const navigate = useNavigate()
@@ -83,7 +83,7 @@ function Groups() {
 
     if (activeChat) {
         const activeChatData = getActiveChat()
-        const chatImage = getActiveChatImage() ? `${API_URL}${getActiveChatImage()}` : null
+        const chatImage = resolveImage(getActiveChatImage())
         return (
             <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
                 <div className="mx-auto w-full max-w-7xl h-[calc(100vh-12rem)] px-3 sm:px-4">
@@ -168,10 +168,10 @@ function Groups() {
                                     className="rounded-2xl border border-secondary/20 bg-text-primary/50 shadow-md shadow-secondary/10 overflow-hidden transition-transform duration-300 hover:-translate-y-0.5"
                                 >
                                     <Link to={`/event/${eventId}`}>
-                                        {event.imagen && (
+                                        {(event.portada?.fotoUrl || event.imagen) && (
                                             <div className="h-32 overflow-hidden">
                                                 <img
-                                                    src={`${API_URL}${event.imagen}`}
+                                                    src={resolveImage(event.portada?.fotoUrl || event.imagen)}
                                                     alt={event.nombre}
                                                     loading="lazy"
                                                     className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
