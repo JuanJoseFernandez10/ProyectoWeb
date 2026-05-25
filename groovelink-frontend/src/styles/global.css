@@ -50,7 +50,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-shell {
-    @apply rounded-3xl border border-secondary/20 bg-text-primary/50 backdrop-blur-xl shadow-2xl shadow-secondary/20;
+    @apply rounded-3xl border border-secondary/20 bg-text-primary/50 shadow-2xl shadow-secondary/20;
 }
 
 .card-panel {
