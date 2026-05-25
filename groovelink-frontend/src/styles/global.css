@@ -162,57 +162,6 @@ p, h1, h2, h3, h4, h5, h6, li, span, a, label, textarea, input { overflow-wrap: 
 
 img, video, canvas, svg, code, pre { overflow-wrap: normal; word-break: normal; }
 
-@media (max-width: 500px) {
-    .event-card {
-        border-radius: 0.7rem;
-    }
 
-    .event-card-media {
-        min-height: 6rem !important;
-        height: 6rem !important;
-    }
-
-    .event-card-category {
-        left: 0.35rem;
-        top: 0.35rem;
-        max-width: calc(100% - 0.7rem);
-        padding: 0.15rem 0.35rem;
-        font-size: 0.5rem;
-        letter-spacing: 0.03em;
-    }
-
-    .event-card-date {
-        left: 0.35rem;
-        bottom: 0.35rem;
-        border-radius: 0.45rem;
-        padding: 0.2rem 0.35rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .event-card {
-        border-radius: 0.4rem;
-    }
-
-    .event-card-media {
-        min-height: 4.5rem !important;
-        height: 4.5rem !important;
-    }
-
-    .event-card-category {
-        left: 0.25rem;
-        top: 0.25rem;
-        max-width: calc(100% - 0.5rem);
-        padding: 0.1rem 0.25rem;
-        font-size: 0.42rem;
-    }
-
-    .event-card-date {
-        left: 0.25rem;
-        bottom: 0.25rem;
-        border-radius: 0.35rem;
-        padding: 0.15rem 0.25rem;
-    }
-}
 
 
