@@ -135,7 +135,7 @@ function Main() {
     const mapEvent = (event) => ({
         id: event.codigo,
         title: event.nombre,
-        image: event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo-header.png',
+        image: event.portada?.fotoUrl ? event.portada.fotoUrl : event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo-header.png',
         date: formatEventDate(event.fechaInicio),
         time: formatEventTime(event.fechaInicio),
         place: event.ubicacion,
@@ -225,9 +225,9 @@ function Main() {
     }
 
     return (
-        <main className="page-surface min-h-screen py-5 max-[500px]:py-3 sm:py-7 md:py-10">
-            <div className="mx-auto w-full max-w-7xl px-3 max-[500px]:px-2 sm:px-4">
-                <div className="grid gap-4 max-[500px]:gap-3 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+        <main className="page-surface min-h-screen py-5 max-[500px]:py-3 max-[360px]:py-2 sm:py-7 md:py-10">
+            <div className="mx-auto w-full max-w-7xl px-3 max-[500px]:px-2 max-[360px]:px-1.5 sm:px-4">
+                <div className="grid gap-4 max-[500px]:gap-3 max-[360px]:gap-2 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
                     <EventsSection
                         featuredEvent={featuredEvent}
                         events={gridEvents}
@@ -247,7 +247,7 @@ function Main() {
                         likingEventId={likingEventId}
                     />
 
-                    <aside className="grid gap-4 max-[500px]:gap-3 md:gap-6 lg:grid-rows-[auto_auto_1fr]">
+                    <aside className="grid gap-4 max-[500px]:gap-3 max-[360px]:gap-2 md:gap-6 lg:grid-rows-[auto_auto_1fr]">
                         <GroupsPanel events={joinedEvents} />
                         <PremiumBanner />
                         <ChatsPanel

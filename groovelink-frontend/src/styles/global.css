@@ -218,4 +218,44 @@ img, video, canvas, svg, code, pre { overflow-wrap: normal; word-break: normal; 
     }
 }
 
+@media (max-width: 360px) {
+    .event-card {
+        border-radius: 0.5rem;
+    }
+
+    .event-card-media {
+        min-height: 5rem !important;
+        height: 5rem !important;
+    }
+
+    .event-card-body {
+        gap: 0.3rem;
+        padding: 0.4rem;
+    }
+
+    .event-card-meta {
+        gap: 0.2rem;
+        font-size: 0.55rem;
+    }
+
+    .event-card-title {
+        font-size: 0.9rem;
+        line-height: 1.05;
+    }
+
+    .event-card-description {
+        font-size: 0.75rem;
+        line-height: 1.2;
+    }
+
+    .event-card-actions {
+        gap: 0.25rem;
+    }
+
+    .event-card-button {
+        padding: 0.3rem 0.5rem !important;
+        font-size: 0.72rem !important;
+    }
+}
+
 

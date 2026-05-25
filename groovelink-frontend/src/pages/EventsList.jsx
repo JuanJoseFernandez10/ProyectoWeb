@@ -90,7 +90,7 @@ function EventsList() {
     const mapEvent = (event) => ({
         id: event.codigo,
         title: event.nombre,
-        image: event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo-header.png',
+        image: event.portada?.fotoUrl ? event.portada.fotoUrl : event.imagen ? `${API_URL}${event.imagen}` : '/assets/logo-header.png',
         date: formatEventDate(event.fechaInicio),
         time: formatEventTime(event.fechaInicio),
         place: event.ubicacion,
@@ -156,8 +156,8 @@ function EventsList() {
         : filtersActive ? 'Eventos filtrados' : undefined
 
     return (
-        <main className="page-surface min-h-screen py-5 sm:py-7 md:py-10">
-            <div className="mx-auto w-full max-w-5xl px-3 sm:px-4">
+        <main className="page-surface min-h-screen py-5 max-[500px]:py-3 max-[360px]:py-2 sm:py-7 md:py-10">
+            <div className="mx-auto w-full max-w-5xl px-3 max-[500px]:px-2 max-[360px]:px-1.5 sm:px-4">
                 {isSearch && (
                     <div className="mb-4">
                         <button type="button" onClick={() => navigate('/events')} className="btn-ghost px-4 py-2 text-sm">

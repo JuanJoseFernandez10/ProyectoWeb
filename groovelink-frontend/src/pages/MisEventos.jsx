@@ -33,12 +33,25 @@ function MisEventos() {
 
     const renderEventCard = (evento, showEdit = false) => {
         const eventId = evento.codigo ?? evento.id
+        const fotoUrl = evento.portada?.fotoUrl
+            ? evento.portada.fotoUrl
+            : evento.imagen
+                ? `${API_URL}${evento.imagen}`
+                : null
         return (
             <article key={eventId} className="overflow-hidden rounded-3xl border border-secondary/20 bg-background/80 shadow-sm">
-                <div className="h-40 bg-gradient-to-br from-primary/35 via-secondary/25 to-background/80 flex items-end p-4">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-ink-soft">{formatDate(evento.fechaInicio)}</p>
-                        <h2 className="mt-1 text-2xl font-black text-ink">{evento.nombre}</h2>
+                <div className={`relative h-40 flex items-end p-4 ${fotoUrl ? '' : 'bg-gradient-to-br from-primary/35 via-secondary/25 to-background/80'}`}>
+                    {fotoUrl && (
+                        <img
+                            src={fotoUrl}
+                            alt={evento.nombre}
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    )}
+                    {fotoUrl && <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/30 to-transparent" />}
+                    <div className="relative z-10">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-text-primary">{formatDate(evento.fechaInicio)}</p>
+                        <h2 className={`mt-1 text-2xl font-black ${fotoUrl ? 'text-text-primary' : 'text-ink'}`}>{evento.nombre}</h2>
                     </div>
                 </div>
                 <div className="p-4">
@@ -163,7 +176,7 @@ function MisEventos() {
     }, [])
 
     return (
-        <main className="page-surface min-h-screen px-4 py-8 md:px-6 md:py-10">
+        <main className="page-surface min-h-screen px-4 py-8 max-[500px]:px-3 max-[500px]:py-5 max-[360px]:px-2 max-[360px]:py-3 md:px-6 md:py-10">
             <div className="mx-auto w-full max-w-7xl">
                 <div className="mb-6 flex items-center justify-between gap-3">
                     <button type="button" className="btn-ghost px-4 py-2 text-sm" onClick={() => navigate('/home')}>
