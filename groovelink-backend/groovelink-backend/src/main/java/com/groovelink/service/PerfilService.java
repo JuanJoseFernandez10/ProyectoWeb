@@ -16,23 +16,31 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PerfilService {
 
     private final Cloudinary cloudinary;
-    private final String folder;
+    private final String cloudinaryFolder;
+    private final String localBaseDir;
     private final PerfilRepository perfilRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public PerfilService(Cloudinary cloudinary,
-                         @Value("${app.cloudinary.folder}") String folder,
+    public PerfilService(Optional<Cloudinary> cloudinary,
+                         @Value("${app.cloudinary.folder}") String cloudinaryFolder,
+                         @Value("${app.fotos-perfil.base-dir}") String localBaseDir,
                          PerfilRepository perfilRepository,
                          UsuarioRepository usuarioRepository) {
-        this.cloudinary = cloudinary;
-        this.folder = folder;
+        this.cloudinary = cloudinary.orElse(null);
+        this.cloudinaryFolder = cloudinaryFolder;
+        this.localBaseDir = localBaseDir;
         this.perfilRepository = perfilRepository;
         this.usuarioRepository = usuarioRepository;
     }
@@ -53,8 +61,7 @@ public class PerfilService {
         dto.setDescripcion(perfil.getDescripcion());
         dto.setFotoPerfilUrl(perfil.getRutaFotoPerfil() != null ? "/usuarios/perfiles/" + usuarioId + "/foto" : null);
         dto.setUbicacion(perfil.getUbicacion());
-        
-        // Si es Persona, mostrar premium flag
+
         if (usuario instanceof Persona persona) {
             dto.setPremium(persona.isPremium());
         }
@@ -87,7 +94,7 @@ public class PerfilService {
     @Transactional
     public PerfilResponseDTO actualizarPersonalizacion(Long usuarioId, String descripcion, String ubicacion) {
         Perfil perfil = obtenerOCrearPerfil(usuarioId);
-        
+
         if (descripcion != null) {
             perfil.setDescripcion(descripcion);
         }
@@ -96,7 +103,7 @@ public class PerfilService {
         }
         perfil.setFechaActualizacion(LocalDateTime.now());
         perfilRepository.save(perfil);
-        
+
         return obtenerPerfil(usuarioId);
     }
 
@@ -105,18 +112,34 @@ public class PerfilService {
         Perfil perfil = obtenerOCrearPerfil(usuarioId);
 
         try {
-            String publicId = folder + "/perfiles/usuario_" + usuarioId + "/fotoperfil";
+            if (cloudinary != null) {
+                String publicId = cloudinaryFolder + "/perfiles/usuario_" + usuarioId + "/fotoperfil";
 
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(archivo.getBytes(),
-                ObjectUtils.asMap(
-                    "public_id", publicId,
-                    "overwrite", true,
-                    "resource_type", "image"
-                ));
+                Map<?, ?> uploadResult = cloudinary.uploader().upload(archivo.getBytes(),
+                    ObjectUtils.asMap(
+                        "public_id", publicId,
+                        "overwrite", true,
+                        "resource_type", "image"
+                    ));
 
-            String url = (String) uploadResult.get("secure_url");
+                String url = (String) uploadResult.get("secure_url");
+                perfil.setRutaFotoPerfil(url);
+            } else {
+                Path usuarioDir = Paths.get(localBaseDir, "usuario_" + usuarioId);
+                Files.createDirectories(usuarioDir);
 
-            perfil.setRutaFotoPerfil(url);
+                String extension = "";
+                String originalFilename = archivo.getOriginalFilename();
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+
+                Path rutaArchivo = usuarioDir.resolve("fotoperfil" + extension);
+                Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+                perfil.setRutaFotoPerfil(rutaArchivo.toString());
+            }
+
             perfil.setFechaActualizacion(LocalDateTime.now());
             perfilRepository.save(perfil);
 

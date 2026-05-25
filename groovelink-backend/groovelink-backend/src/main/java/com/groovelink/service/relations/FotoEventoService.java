@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,16 +25,19 @@ import java.util.Optional;
 public class FotoEventoService {
 
     private final Cloudinary cloudinary;
-    private final String folder;
+    private final String cloudinaryFolder;
+    private final String localBaseDir;
     private final FotoEventoRepository fotoEventoRepository;
     private final EventoRepository eventoRepository;
 
-    public FotoEventoService(Cloudinary cloudinary,
-                             @Value("${app.cloudinary.folder}") String folder,
+    public FotoEventoService(Optional<Cloudinary> cloudinary,
+                             @Value("${app.cloudinary.folder}") String cloudinaryFolder,
+                             @Value("${app.fotos-evento.base-dir}") String localBaseDir,
                              FotoEventoRepository fotoEventoRepository,
                              EventoRepository eventoRepository) {
-        this.cloudinary = cloudinary;
-        this.folder = folder;
+        this.cloudinary = cloudinary.orElse(null);
+        this.cloudinaryFolder = cloudinaryFolder;
+        this.localBaseDir = localBaseDir;
         this.fotoEventoRepository = fotoEventoRepository;
         this.eventoRepository = eventoRepository;
     }
@@ -97,16 +105,7 @@ public class FotoEventoService {
         }
 
         try {
-            String publicId = folder + "/" + generarNombreCarpeta(eventoId) + "/" + nombreFoto;
-
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(archivo.getBytes(),
-                ObjectUtils.asMap(
-                    "public_id", publicId,
-                    "overwrite", true,
-                    "resource_type", "image"
-                ));
-
-            String url = (String) uploadResult.get("secure_url");
+            String url = subirArchivo(eventoId, archivo, nombreFoto);
 
             FotoEvento fotoEvento = new FotoEvento();
             fotoEvento.setEvento(evento);
@@ -115,8 +114,45 @@ public class FotoEventoService {
             fotoEvento.setRutaArchivo(url);
             return fotoEventoRepository.save(fotoEvento);
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo subir la foto a Cloudinary: " + e.getMessage());
+            throw new RuntimeException("No se pudo subir la foto: " + e.getMessage());
         }
+    }
+
+    private String subirArchivo(Long eventoId, MultipartFile archivo, String nombreFoto) throws IOException {
+        if (cloudinary != null) {
+            return subirACloudinary(eventoId, archivo, nombreFoto);
+        }
+        return guardarLocal(eventoId, archivo, nombreFoto);
+    }
+
+    private String subirACloudinary(Long eventoId, MultipartFile archivo, String nombreFoto) throws IOException {
+        String publicId = cloudinaryFolder + "/" + generarNombreCarpeta(eventoId) + "/" + nombreFoto;
+
+        Map<?, ?> uploadResult = cloudinary.uploader().upload(archivo.getBytes(),
+            ObjectUtils.asMap(
+                "public_id", publicId,
+                "overwrite", true,
+                "resource_type", "image"
+            ));
+
+        return (String) uploadResult.get("secure_url");
+    }
+
+    private String guardarLocal(Long eventoId, MultipartFile archivo, String nombreFoto) throws IOException {
+        String nombreCarpeta = generarNombreCarpeta(eventoId);
+        Path rutaDirectorio = Paths.get(localBaseDir, nombreCarpeta);
+        Files.createDirectories(rutaDirectorio);
+
+        String extension = "";
+        String originalFilename = archivo.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        Path rutaArchivo = rutaDirectorio.resolve(nombreFoto + extension);
+        Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+        return rutaArchivo.toString();
     }
 
     @Transactional
@@ -124,30 +160,54 @@ public class FotoEventoService {
         FotoEvento fotoEvento = fotoEventoRepository.findById(fotoId)
                 .orElseThrow(() -> new ResourceNotFoundException("FotoEvento", fotoId));
 
+        eliminarArchivo(fotoEvento.getRutaArchivo());
+
+        fotoEventoRepository.delete(fotoEvento);
+    }
+
+    private void eliminarArchivo(String rutaArchivo) {
+        if (rutaArchivo == null) return;
+
+        if (rutaArchivo.contains(cloudinaryFolder)) {
+            eliminarDeCloudinary(rutaArchivo);
+        } else {
+            eliminarLocal(rutaArchivo);
+        }
+    }
+
+    private void eliminarDeCloudinary(String rutaArchivo) {
+        if (cloudinary == null) return;
+
         try {
-            String publicId = extraerPublicId(fotoEvento.getRutaArchivo());
+            String publicId = extraerPublicId(rutaArchivo);
             if (publicId != null) {
                 cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
             }
         } catch (Exception e) {
             throw new RuntimeException("No se pudo eliminar la foto de Cloudinary: " + e.getMessage());
         }
+    }
 
-        fotoEventoRepository.delete(fotoEvento);
+    private void eliminarLocal(String rutaArchivo) {
+        try {
+            Files.deleteIfExists(Paths.get(rutaArchivo));
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo eliminar el archivo local: " + e.getMessage());
+        }
     }
 
     public String obtenerUrlFoto(FotoEvento fotoEvento) {
         if (fotoEvento.getRutaArchivo() == null) {
-            throw new ResourceNotFoundException("FotoEvento sin URL en Cloudinary", fotoEvento.getId());
+            throw new ResourceNotFoundException("FotoEvento sin URL", fotoEvento.getId());
         }
         return fotoEvento.getRutaArchivo();
     }
 
     private String extraerPublicId(String url) {
-        if (url == null || !url.contains(folder)) return null;
+        if (url == null || !url.contains(cloudinaryFolder)) return null;
 
         try {
-            int folderIndex = url.indexOf(folder);
+            int folderIndex = url.indexOf(cloudinaryFolder);
             int extensionIndex = url.lastIndexOf('.');
             if (extensionIndex < 0) extensionIndex = url.length();
             return url.substring(folderIndex, extensionIndex);
