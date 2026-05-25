@@ -109,8 +109,9 @@ public class GlobalExceptionHandler {
         log.error("Unhandled exception caught by GlobalExceptionHandler", ex);
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("message", "Ups, ocurrio un error interno. Intentalo de nuevo en unos minutos.");
+        body.put("message", ex.getMessage() != null ? ex.getMessage() : "Ups, ocurrio un error interno. Intentalo de nuevo en unos minutos.");
         body.put("errorCode", "INTERNAL_SERVER_ERROR");
+        body.put("debug", ex.getClass().getName());
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
