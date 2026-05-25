@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface FotoEventoRepository extends JpaRepository<FotoEvento, Long> {
     List<FotoEvento> findByEvento_IdOrderByIdAsc(Long eventoId);
     
-    // Obtener la portada del evento
-    Optional<FotoEvento> findByEvento_IdAndEsPortadaTrue(Long eventoId);
+    // Obtener la portada del evento (usa findFirst por si hay duplicados)
+    Optional<FotoEvento> findFirstByEvento_IdAndEsPortadaTrue(Long eventoId);
     
     // Obtener todas las fotos que NO son portada
     List<FotoEvento> findByEvento_IdAndEsPortadaFalseOrderByIdAsc(Long eventoId);

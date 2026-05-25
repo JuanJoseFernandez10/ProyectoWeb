@@ -45,7 +45,7 @@ public class FotoEventoService {
 
     @Transactional(readOnly = true)
     public Optional<FotoEvento> findPortadaByEvento(Long eventoId) {
-        return fotoEventoRepository.findByEvento_IdAndEsPortadaTrue(eventoId);
+        return fotoEventoRepository.findFirstByEvento_IdAndEsPortadaTrue(eventoId);
     }
 
     @Transactional(readOnly = true)
