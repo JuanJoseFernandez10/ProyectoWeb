@@ -253,8 +253,8 @@ function Event() {
                         </span>
                     </div>
 
-                    <section className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.85fr)]">
-                        <article className="card-shell overflow-hidden">
+                    <section className="grid gap-6 grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.85fr)]">
+                        <article className="card-shell min-w-0 overflow-hidden">
                             {loading ? (
                                 <div className="flex min-h-90 items-center justify-center px-6 py-10 text-sm font-medium text-ink-soft">
                                     Cargando evento...
