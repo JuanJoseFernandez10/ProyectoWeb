@@ -57,42 +57,42 @@ INSERT INTO administrador (id, cargo) VALUES (currval('usuario_id_seq'), 'SUPERA
 -- carlos_garcia
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('carlos_garcia', 'carlos@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '60 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
--- maria_lopez
+-- maria_lopez (premium)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('maria_lopez', 'maria@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '50 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
 -- alejandro_m
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('alejandro_m', 'alejandro@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '45 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- laura_sevilla
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('laura_sevilla', 'laura@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '40 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- david_ruiz
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('david_ruiz', 'david@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '35 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- ana_perez
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('ana_perez', 'ana@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '30 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- javi_rodri
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('javi_rodri', 'javi@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '25 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- sara_mm
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('sara_mm', 'sara@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '20 days', 'ROLE_USER');
-INSERT INTO persona (id) VALUES (currval('usuario_id_seq'));
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 
 -- ============================================================
 -- PERFILES
