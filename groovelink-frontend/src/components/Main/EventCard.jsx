@@ -27,7 +27,7 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2 p-3 max-[500px]:gap-1.5 max-[500px]:p-2 sm:gap-4 sm:p-5 md:p-6">
+            <div className="flex min-w-0 overflow-hidden flex-col gap-2 p-3 max-[500px]:gap-1.5 max-[500px]:p-2 sm:gap-4 sm:p-5 md:p-6">
                 <div className="space-y-1 max-[500px]:space-y-0.5 sm:space-y-2">
                     <div className="flex flex-wrap items-center gap-1 text-[11px] font-semibold text-ink-soft max-[500px]:text-[10px] sm:gap-2 sm:text-xs">
                         <span className="max-w-[8rem] truncate rounded-full border border-secondary/25 bg-primary/30 px-1.5 py-0.5 max-[500px]:px-1.5 max-[500px]:py-0 sm:px-3 sm:py-1">{event.place}</span>

@@ -48,7 +48,7 @@ function EventsSection({ featuredEvent, events, totalEvents, pagination, loading
 
             {!loading && !error && events.length > 0 && (
                 <>
-                    <div className="grid gap-5 max-[500px]:gap-3 max-[360px]:gap-2 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid min-w-0 gap-5 max-[500px]:gap-3 max-[360px]:gap-2 md:grid-cols-2 xl:grid-cols-3">
                         {events.map((event) => (
                             <EventCard
                                 key={event.id}
