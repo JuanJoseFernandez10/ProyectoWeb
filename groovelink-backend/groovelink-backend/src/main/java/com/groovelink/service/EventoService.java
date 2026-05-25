@@ -192,6 +192,17 @@ public class EventoService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Evento> findByIdWithDetails(Long id) {
+        Optional<Evento> evento = eventoRepository.findById(id);
+        evento.ifPresent(e -> {
+            e.getAptitudes().size();
+            e.getGeneros().size();
+            cargarNumeroMeGustas(e);
+        });
+        return evento;
+    }
+
     @Cacheable(value = "eventos", key = "#id")
     public Optional<Evento> findById(Long id) {
         Optional<Evento> evento = eventoRepository.findById(id);

@@ -123,10 +123,9 @@ public class EventoController {
     }
 
     // GET /eventos/{eventoId}
-    @Transactional(readOnly = true)
     @GetMapping("/{eventoId}")
     public EventoResponseDTO cargarEvento(@PathVariable Long eventoId, Authentication authentication) {
-        Evento evento = eventoService.findById(eventoId)
+        Evento evento = eventoService.findByIdWithDetails(eventoId)
                 .orElseThrow(() -> new BusinessException("Evento no encontrado"));
         
         Long usuarioId = null;
@@ -149,13 +148,12 @@ public class EventoController {
         return dto;
     }
 
-        @Transactional(readOnly = true)
-        @GetMapping("/{eventoId}/edicion")
-        public EventoResponseDTO cargarEventoParaEdicion(@PathVariable Long eventoId, Authentication authentication) {
+    @GetMapping("/{eventoId}/edicion")
+    public EventoResponseDTO cargarEventoParaEdicion(@PathVariable Long eventoId, Authentication authentication) {
         Usuario usuario = usuarioService.findByUsername(authentication.getName())
             .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
 
-        Evento evento = eventoService.findById(eventoId)
+        Evento evento = eventoService.findByIdWithDetails(eventoId)
             .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
         if (evento.getPublicado() == null || !evento.getPublicado().getId().equals(usuario.getId())) {
@@ -174,7 +172,7 @@ public class EventoController {
         Usuario usuario = usuarioService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
 
-        Evento evento = eventoService.findById(eventoId)
+        Evento evento = eventoService.findByIdWithDetails(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
         // Verificar que el usuario sea el creador del evento
