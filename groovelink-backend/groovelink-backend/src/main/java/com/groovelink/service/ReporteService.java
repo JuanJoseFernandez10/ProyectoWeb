@@ -1,5 +1,6 @@
 package com.groovelink.service;
 
+import com.groovelink.entitys.EstadoReporte;
 import com.groovelink.entitys.Reporte;
 import com.groovelink.exception.ResourceNotFoundException;
 import com.groovelink.repository.ReporteRepository;
@@ -22,7 +23,7 @@ public class ReporteService {
         Reporte reporte = reporteRepository.findById(reporteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reporte", reporteId));
 
-        reporte.setEstado(nuevoEstado);
+        reporte.setEstado(EstadoReporte.valueOf(nuevoEstado));
         reporte.setFechaRevision(java.time.LocalDateTime.now());
 
         return reporteRepository.save(reporte);

@@ -15,6 +15,8 @@ export default function PerfilUsuario() {
 
   const esMiPerfil = user && perfil && user.username === perfil.username
 
+  useEffect(() => { document.title = perfil ? `${perfil.username} - GrooveLink` : 'Perfil - GrooveLink' }, [perfil])
+
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -114,7 +116,7 @@ export default function PerfilUsuario() {
   return (
     <div className="page-surface min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="card-shell p-8">
+        <div className="card-shell p-4 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-ink mb-2">{perfil.username}</h1>
             <p className="text-ink-soft">@{perfil.username}</p>
@@ -146,7 +148,7 @@ export default function PerfilUsuario() {
 
             <div className="md:w-2/3">
               <div className="rounded-lg border border-secondary/20 bg-background/80 p-4 mb-8">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 break-words">
                   <div>
                     <label className="block text-ink-soft text-sm">Usuario</label>
                     <p className="text-ink font-semibold">@{perfil.username}</p>

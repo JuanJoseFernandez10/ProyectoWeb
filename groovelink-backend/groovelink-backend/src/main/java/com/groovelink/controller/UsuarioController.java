@@ -3,6 +3,7 @@ package com.groovelink.controller;
 import com.groovelink.dto.request.PerfilUpdateRequestDTO;
 import com.groovelink.dto.request.CambiarEmailRequestDTO;
 import com.groovelink.dto.request.CambiarPasswordRequestDTO;
+import com.groovelink.dto.request.DeleteAccountRequestDTO;
 import com.groovelink.dto.request.PersonalizarRequestDTO;
 import com.groovelink.dto.response.PerfilResponseDTO;
 import com.groovelink.entitys.Persona;
@@ -13,17 +14,13 @@ import com.groovelink.service.PerfilService;
 import com.groovelink.service.PersonaService;
 import com.groovelink.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -98,22 +95,13 @@ public class UsuarioController {
         return perfilService.obtenerPerfil(usuario.getId());
     }
 
-    // GET /perfiles/{usuarioId}/foto - descargar foto de perfil
+    // GET /perfiles/{usuarioId}/foto - descargar foto de perfil (redirige a Cloudinary)
     @GetMapping("/perfiles/{usuarioId}/foto")
-    public ResponseEntity<ByteArrayResource> descargarFotoPerfil(@PathVariable Long usuarioId) {
-        try {
-            Path rutaFoto = perfilService.obtenerFotoPerfil(usuarioId);
-            byte[] fotoData = Files.readAllBytes(rutaFoto);
-            ByteArrayResource resource = new ByteArrayResource(fotoData);
-
-            String contentType = determinarContentType(rutaFoto);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header("Content-Disposition", "inline; filename=\"fotoperfil\"")
-                    .body(resource);
-        } catch (IOException e) {
-            throw new BusinessException("No se pudo leer la foto de perfil: " + e.getMessage());
-        }
+    public ResponseEntity<Void> descargarFotoPerfil(@PathVariable Long usuarioId) {
+        String url = perfilService.obtenerUrlFotoPerfil(usuarioId);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(url))
+                .build();
     }
 
     @PutMapping("/me/email")
@@ -135,10 +123,11 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<Void> eliminarCuenta(Authentication authentication) {
+    public ResponseEntity<Void> eliminarCuenta(Authentication authentication,
+                                               @Valid @RequestBody DeleteAccountRequestDTO request) {
         Usuario usuario = usuarioService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
-        usuarioService.eliminarCuenta(usuario.getId());
+        usuarioService.eliminarCuenta(usuario.getId(), request.getPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -169,15 +158,4 @@ public class UsuarioController {
         }
     }
 
-    private String determinarContentType(Path ruta) {
-        String filename = ruta.getFileName().toString().toLowerCase();
-        if (filename.endsWith(".png")) {
-            return "image/png";
-        } else if (filename.endsWith(".gif")) {
-            return "image/gif";
-        } else if (filename.endsWith(".webp")) {
-            return "image/webp";
-        }
-        return "image/jpeg";
-    }
 }

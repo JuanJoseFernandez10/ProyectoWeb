@@ -1,108 +1,67 @@
-import { API_URL } from "./config";
-import { getAuthToken } from "./authSession";
+import api from './client'
 
-async function adminRequest(url, method, body) {
-    const token = getAuthToken()
-    const response = await fetch(`${API_URL}/api/admin${url}`, {
-        method,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
-        },
-        body: body ? JSON.stringify(body) : undefined,
-    })
-    let data = null
-    try { data = await response.json() } catch { data = null }
-    if (!response.ok) {
-        throw new Error(data?.message || `Error en la solicitud`)
-    }
-    return data
-}
-
-// ─── USUARIOS ────────────────────────────────────────────────────────────────
+const ADMIN_PREFIX = '/api/admin'
 
 export async function adminFetchUsuarios(page = 0, size = 20) {
-    const data = await adminRequest(`/usuarios?page=${page}&size=${size}`, "GET")
-    return {
-        items: data.content || data || [],
-        total: data.totalElements || 0,
-        totalPages: data.totalPages || 0,
-    }
+    const data = await api.get(`${ADMIN_PREFIX}/usuarios?page=${page}&size=${size}`, { auth: true })
+    return { items: data.content || data || [], total: data.totalElements || 0, totalPages: data.totalPages || 0 }
 }
 
 export async function adminFetchUsuario(id) {
-    return adminRequest(`/usuarios/${id}`, "GET")
+    return api.get(`${ADMIN_PREFIX}/usuarios/${id}`, { auth: true })
 }
 
 export async function adminUpdateUsuario(id, body) {
-    return adminRequest(`/usuarios/${id}`, "PUT", body)
+    return api.put(`${ADMIN_PREFIX}/usuarios/${id}`, { body, auth: true })
 }
 
 export async function adminFetchUsuarioDetalle(id) {
-    return adminRequest(`/usuarios/${id}/detalle`, "GET")
+    return api.get(`${ADMIN_PREFIX}/usuarios/${id}/detalle`, { auth: true })
 }
 
 export function adminEliminarUsuario(id) {
-    return adminRequest(`/usuarios/${id}`, "DELETE")
+    return api.del(`${ADMIN_PREFIX}/usuarios/${id}`, { auth: true })
 }
 
-// ─── EVENTOS ─────────────────────────────────────────────────────────────────
-
 export async function adminFetchEventos(page = 0, size = 20) {
-    const data = await adminRequest(`/eventos?page=${page}&size=${size}`, "GET")
-    return {
-        items: data.content || data || [],
-        total: data.totalElements || 0,
-        totalPages: data.totalPages || 0,
-    }
+    const data = await api.get(`${ADMIN_PREFIX}/eventos?page=${page}&size=${size}`, { auth: true })
+    return { items: data.content || data || [], total: data.totalElements || 0, totalPages: data.totalPages || 0 }
 }
 
 export async function adminFetchEvento(id) {
-    return adminRequest(`/eventos/${id}`, "GET")
+    return api.get(`${ADMIN_PREFIX}/eventos/${id}`, { auth: true })
 }
 
 export async function adminFetchEventoDetalle(id) {
-    return adminRequest(`/eventos/${id}/detalle`, "GET")
+    return api.get(`${ADMIN_PREFIX}/eventos/${id}/detalle`, { auth: true })
 }
 
 export function adminEliminarEvento(id) {
-    return adminRequest(`/eventos/${id}`, "DELETE")
+    return api.del(`${ADMIN_PREFIX}/eventos/${id}`, { auth: true })
 }
 
-// ─── REPORTES ────────────────────────────────────────────────────────────────
-
 export async function adminFetchReportes(page = 0, size = 20) {
-    const data = await adminRequest(`/reportes?page=${page}&size=${size}`, "GET")
-    return {
-        items: data.content || data || [],
-        total: data.totalElements || 0,
-        totalPages: data.totalPages || 0,
-    }
+    const data = await api.get(`${ADMIN_PREFIX}/reportes?page=${page}&size=${size}`, { auth: true })
+    return { items: data.content || data || [], total: data.totalElements || 0, totalPages: data.totalPages || 0 }
 }
 
 export async function adminFetchReporte(id) {
-    return adminRequest(`/reportes/${id}`, "GET")
+    return api.get(`${ADMIN_PREFIX}/reportes/${id}`, { auth: true })
 }
 
 export function adminResolverReporte(id, estado) {
-    return adminRequest(`/reportes/${id}`, "PUT", { estado })
+    return api.put(`${ADMIN_PREFIX}/reportes/${id}`, { body: { estado }, auth: true })
 }
 
-// ─── CHATS ───────────────────────────────────────────────────────────────────
-
 export async function adminFetchChats() {
-    return adminRequest(`/chats`, "GET")
+    return api.get(`${ADMIN_PREFIX}/chats`, { auth: true })
 }
 
 export async function adminFetchUsuarioChats(usuarioId) {
-    return adminRequest(`/usuarios/${usuarioId}/chats`, "GET")
+    return api.get(`${ADMIN_PREFIX}/usuarios/${usuarioId}/chats`, { auth: true })
 }
 
 export async function adminFetchChatMessages(chatId, page = 0, size = 50) {
-    const data = await adminRequest(`/chats/${chatId}/messages?page=${page}&size=${size}`, "GET")
-    return {
-        items: data.content || data || [],
-        total: data.totalElements || 0,
-        totalPages: data.totalPages || 0,
-    }
+    const data = await api.get(`${ADMIN_PREFIX}/chats/${chatId}/messages?page=${page}&size=${size}`, { auth: true })
+    return { items: data.content || data || [], total: data.totalElements || 0, totalPages: data.totalPages || 0 }
 }

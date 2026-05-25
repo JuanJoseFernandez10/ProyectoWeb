@@ -327,112 +327,67 @@ public class EventoController {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
     }
 
-    private EventoResponseDTO convertirEvento(Evento evento, boolean incluirInfoPrivada) {
-    Long eventoId = evento.getId();
-
-    EventoResponseDTO response = new EventoResponseDTO();
-    response.setCodigo(eventoId);
-    response.setNombre(evento.getNombre());
-    response.setUbicacion(evento.getUbicacion());
-    response.setDescripcion(evento.getDescripcion());
-    response.setFechaInicio(evento.getFechaInicio());
-    response.setFechaFinal(evento.getFechaFinal());
-    response.setFechaCreacion(evento.getFechaCreacion());
-    response.setPublicadoPorUsername(evento.getPublicado() != null ? evento.getPublicado().getUsername() : null);
-    response.setNumeroAsistentes(evento.getNumeroAsistentes());
-    response.setNumeroMeGustas(evento.getNumeroMeGustas());
-
-    response.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
-        .map(relacion -> relacion.getAptitud().getNombre())
-        .collect(Collectors.toList()));
-    response.setAptitudesIds(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
-        .map(relacion -> relacion.getAptitud().getId())
-        .collect(Collectors.toList()));
-    response.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
-        .map(relacion -> relacion.getGenero().getNombre())
-        .collect(Collectors.toList()));
-    response.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
-        .map(relacion -> relacion.getGenero().getId())
-        .collect(Collectors.toList()));
-
-    FotoEventoResponseDTO portada = fotoEventoService.findPortadaByEvento(eventoId)
-        .map(this::convertirFoto)
-        .orElse(null);
-    response.setPortada(portada);
-    response.setImagen(portada != null ? portada.getFotoUrl() : null);
-    if (incluirInfoPrivada) {
-        response.setRutaPortada(portada != null ? portada.getFotoUrl() : null);
-        response.setRutaFotos(null);
+    private EventoResponseDTO toEventoResponseDTO(Evento evento, boolean incluirInfoPrivada, FotoEventoResponseDTO portada, List<FotoEventoResponseDTO> fotos, List<UsuarioBasicoDTO> participantes) {
+        EventoResponseDTO dto = new EventoResponseDTO();
+        dto.setCodigo(evento.getId());
+        dto.setNombre(evento.getNombre());
+        dto.setUbicacion(evento.getUbicacion());
+        dto.setDescripcion(evento.getDescripcion());
+        dto.setFechaInicio(evento.getFechaInicio());
+        dto.setFechaFinal(evento.getFechaFinal());
+        dto.setFechaCreacion(evento.getFechaCreacion());
+        dto.setPublicadoPorUsername(evento.getPublicado() != null ? evento.getPublicado().getUsername() : null);
+        dto.setNumeroAsistentes(evento.getNumeroAsistentes());
+        dto.setNumeroMeGustas(evento.getNumeroMeGustas());
+        dto.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
+            .map(relacion -> relacion.getAptitud().getNombre()).collect(Collectors.toList()));
+        dto.setAptitudesIds(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
+            .map(relacion -> relacion.getAptitud().getId()).collect(Collectors.toList()));
+        dto.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
+            .map(relacion -> relacion.getGenero().getNombre()).collect(Collectors.toList()));
+        dto.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
+            .map(relacion -> relacion.getGenero().getId()).collect(Collectors.toList()));
+        dto.setPortada(portada);
+        dto.setImagen(portada != null ? portada.getFotoUrl() : null);
+        if (incluirInfoPrivada) {
+            dto.setRutaPortada(portada != null ? portada.getFotoUrl() : null);
+            dto.setRutaFotos(null);
+        }
+        dto.setFotos(fotos);
+        dto.setParticipantes(participantes);
+        return dto;
     }
 
-    response.setFotos(fotoEventoService.findFotosByEvento(eventoId)
-        .stream()
-        .map(this::convertirFoto)
-        .collect(Collectors.toList()));
-
-    List<PersonaUneEvento> inscripciones = personaUneEventoRepository.findByEvento_Id(eventoId);
-    response.setParticipantes(inscripciones.stream()
-        .map(inscripcion -> toUsuarioBasicoDTO(inscripcion.getUsuario()))
-        .collect(Collectors.toList()));
-
-    return response;
+    private EventoResponseDTO convertirEvento(Evento evento, boolean incluirInfoPrivada) {
+        Long eventoId = evento.getId();
+        FotoEventoResponseDTO portada = fotoEventoService.findPortadaByEvento(eventoId)
+            .map(this::convertirFoto).orElse(null);
+        List<FotoEventoResponseDTO> fotos = fotoEventoService.findFotosByEvento(eventoId)
+            .stream().map(this::convertirFoto).collect(Collectors.toList());
+        List<UsuarioBasicoDTO> participantes = personaUneEventoRepository.findByEvento_Id(eventoId).stream()
+            .map(inscripcion -> toUsuarioBasicoDTO(inscripcion.getUsuario())).collect(Collectors.toList());
+        return toEventoResponseDTO(evento, incluirInfoPrivada, portada, fotos, participantes);
     }
 
     private List<EventoResponseDTO> convertirEventos(List<Evento> eventos, boolean incluirInfoPrivada) {
         if (eventos.isEmpty()) return List.of();
-
         List<Long> ids = eventos.stream().map(Evento::getId).collect(Collectors.toList());
-
         Map<Long, FotoEventoResponseDTO> portadaMap = fotoEventoRepository
             .findByEvento_IdInAndEsPortadaTrue(ids).stream()
             .collect(Collectors.toMap(f -> f.getEvento().getId(), this::convertirFoto));
-
         Map<Long, List<FotoEventoResponseDTO>> fotosMap = fotoEventoRepository
             .findByEvento_IdInAndEsPortadaFalseOrderByIdAsc(ids).stream()
             .collect(Collectors.groupingBy(f -> f.getEvento().getId(),
                 Collectors.mapping(this::convertirFoto, Collectors.toList())));
-
         Map<Long, List<UsuarioBasicoDTO>> participantesMap = personaUneEventoRepository.findByEvento_IdIn(ids).stream()
             .collect(Collectors.groupingBy(
                 pue -> pue.getEvento().getId(),
-                Collectors.mapping(pue -> toUsuarioBasicoDTO(pue.getUsuario()), Collectors.toList())
-            ));
-
-        return eventos.stream().map(evento -> {
-            EventoResponseDTO dto = new EventoResponseDTO();
-            dto.setCodigo(evento.getId());
-            dto.setNombre(evento.getNombre());
-            dto.setUbicacion(evento.getUbicacion());
-            dto.setDescripcion(evento.getDescripcion());
-            dto.setFechaInicio(evento.getFechaInicio());
-            dto.setFechaFinal(evento.getFechaFinal());
-            dto.setFechaCreacion(evento.getFechaCreacion());
-            dto.setPublicadoPorUsername(evento.getPublicado() != null ? evento.getPublicado().getUsername() : null);
-            dto.setNumeroAsistentes(evento.getNumeroAsistentes());
-            dto.setNumeroMeGustas(evento.getNumeroMeGustas());
-            dto.setAptitudes(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
-                .map(relacion -> relacion.getAptitud().getNombre())
-                .collect(Collectors.toList()));
-            dto.setAptitudesIds(evento.getAptitudes() == null ? List.of() : evento.getAptitudes().stream()
-                .map(relacion -> relacion.getAptitud().getId())
-                .collect(Collectors.toList()));
-            dto.setGeneros(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
-                .map(relacion -> relacion.getGenero().getNombre())
-                .collect(Collectors.toList()));
-            dto.setGenerosIds(evento.getGeneros() == null ? List.of() : evento.getGeneros().stream()
-                .map(relacion -> relacion.getGenero().getId())
-                .collect(Collectors.toList()));
-            FotoEventoResponseDTO portada = portadaMap.get(evento.getId());
-            dto.setPortada(portada);
-            dto.setImagen(portada != null ? portada.getFotoUrl() : null);
-            if (incluirInfoPrivada) {
-                dto.setRutaPortada(portada != null ? portada.getFotoUrl() : null);
-                dto.setRutaFotos(null);
-            }
-            dto.setFotos(fotosMap.getOrDefault(evento.getId(), List.of()));
-            dto.setParticipantes(participantesMap.getOrDefault(evento.getId(), List.of()));
-            return dto;
-        }).collect(Collectors.toList());
+                Collectors.mapping(pue -> toUsuarioBasicoDTO(pue.getUsuario()), Collectors.toList())));
+        return eventos.stream().map(evento -> toEventoResponseDTO(evento, incluirInfoPrivada,
+            portadaMap.get(evento.getId()),
+            fotosMap.getOrDefault(evento.getId(), List.of()),
+            participantesMap.getOrDefault(evento.getId(), List.of())))
+            .collect(Collectors.toList());
     }
 
     private UsuarioBasicoDTO toUsuarioBasicoDTO(Usuario u) {

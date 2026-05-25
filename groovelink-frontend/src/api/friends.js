@@ -1,68 +1,41 @@
-import { API_URL } from './config'
-import { getAuthToken } from './authSession'
-
-async function authFetch(path, options = {}) {
-  const token = getAuthToken()
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-    ...(options.body && !(options.body instanceof FormData) ? { body: JSON.stringify(options.body) } : {}),
-  })
-
-  let data = null
-  try { data = await response.json() } catch { data = null }
-
-  if (!response.ok) {
-    const message = data?.message || 'Error en la solicitud'
-    const error = new Error(message)
-    error.status = response.status
-    throw error
-  }
-
-  return data
-}
+import api from './client'
 
 export function solicitarAmistad(usuarioId) {
-  return authFetch(`/amistad/solicitar/${usuarioId}`, { method: 'POST' })
+    return api.post(`/amistad/solicitar/${usuarioId}`, { auth: true })
 }
 
 export function responderSolicitud(solicitudId, aceptar) {
-  return authFetch(`/amistad/responder/${solicitudId}?aceptar=${aceptar}`, { method: 'PUT' })
+    return api.put(`/amistad/responder/${solicitudId}?aceptar=${aceptar}`, { auth: true })
 }
 
 export function eliminarAmistad(amigoId) {
-  return authFetch(`/amistad/eliminar/${amigoId}`, { method: 'DELETE' })
+    return api.del(`/amistad/eliminar/${amigoId}`, { auth: true })
 }
 
 export function cancelarSolicitud(usuarioId) {
-  return authFetch(`/amistad/cancelar/${usuarioId}`, { method: 'DELETE' })
+    return api.del(`/amistad/cancelar/${usuarioId}`, { auth: true })
 }
 
 export function obtenerAmigos() {
-  return authFetch('/amistad/amigos')
+    return api.get('/amistad/amigos', { auth: true })
 }
 
 export function obtenerSolicitudesRecibidas() {
-  return authFetch('/amistad/solicitudes-recibidas')
+    return api.get('/amistad/solicitudes-recibidas', { auth: true })
 }
 
 export function obtenerEstadoAmistad(usuarioId) {
-  return authFetch(`/amistad/estado/${usuarioId}`)
+    return api.get(`/amistad/estado/${usuarioId}`, { auth: true })
 }
 
 export function obtenerPerfilUsuario(id) {
-  return authFetch(`/usuarios/${id}`)
+    return api.get(`/usuarios/${id}`, { auth: true })
 }
 
 export function buscarUsuarios(q) {
-  return authFetch(`/usuarios/buscar?q=${encodeURIComponent(q)}`)
+    return api.get(`/usuarios/buscar?q=${encodeURIComponent(q)}`, { auth: true })
 }
 
 export function crearChatPrivado(usuarioId) {
-  return authFetch(`/api/chats/privado/${usuarioId}`, { method: 'POST' })
+    return api.post(`/api/chats/privado/${usuarioId}`, { auth: true })
 }

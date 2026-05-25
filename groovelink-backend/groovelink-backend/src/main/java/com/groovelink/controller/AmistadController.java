@@ -2,6 +2,7 @@ package com.groovelink.controller;
 
 import com.groovelink.dto.response.PerfilResponseDTO;
 import com.groovelink.dto.response.UsuarioBasicoDTO;
+import com.groovelink.entitys.EstadoSolicitud;
 import com.groovelink.entitys.SolicitudAmistad;
 import com.groovelink.entitys.Usuario;
 import com.groovelink.exception.ResourceNotFoundException;

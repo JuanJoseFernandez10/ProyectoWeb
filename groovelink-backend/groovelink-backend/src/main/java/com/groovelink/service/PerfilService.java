@@ -1,5 +1,7 @@
 package com.groovelink.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.groovelink.dto.response.PerfilResponseDTO;
 import com.groovelink.entitys.Perfil;
 import com.groovelink.entitys.Persona;
@@ -14,22 +16,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class PerfilService {
 
-    @Value("${app.fotos-perfil.base-dir}")
-    private String baseDir;
-
+    private final Cloudinary cloudinary;
+    private final String folder;
     private final PerfilRepository perfilRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public PerfilService(PerfilRepository perfilRepository, UsuarioRepository usuarioRepository) {
+    public PerfilService(Cloudinary cloudinary,
+                         @Value("${app.cloudinary.folder}") String folder,
+                         PerfilRepository perfilRepository,
+                         UsuarioRepository usuarioRepository) {
+        this.cloudinary = cloudinary;
+        this.folder = folder;
         this.perfilRepository = perfilRepository;
         this.usuarioRepository = usuarioRepository;
     }
@@ -102,19 +105,18 @@ public class PerfilService {
         Perfil perfil = obtenerOCrearPerfil(usuarioId);
 
         try {
-            // Crear directorio para el usuario si no existe
-            Path usuarioDir = crearDirectorioUsuario(usuarioId);
+            String publicId = folder + "/perfiles/usuario_" + usuarioId + "/fotoperfil";
 
-            // Obtener extensión del archivo
-            String extension = obtenerExtensionArchivo(archivo);
-            String nombreArchivo = "fotoperfil" + extension;
-            Path rutaArchivo = usuarioDir.resolve(nombreArchivo);
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(archivo.getBytes(),
+                ObjectUtils.asMap(
+                    "public_id", publicId,
+                    "overwrite", true,
+                    "resource_type", "image"
+                ));
 
-            // Guardar archivo en disco (reemplazar si existe)
-            Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+            String url = (String) uploadResult.get("secure_url");
 
-            // Actualizar perfil con ruta
-            perfil.setRutaFotoPerfil(rutaArchivo.toString());
+            perfil.setRutaFotoPerfil(url);
             perfil.setFechaActualizacion(LocalDateTime.now());
             perfilRepository.save(perfil);
 
@@ -124,52 +126,14 @@ public class PerfilService {
     }
 
     @Transactional(readOnly = true)
-    public Path obtenerFotoPerfil(Long usuarioId) {
+    public String obtenerUrlFotoPerfil(Long usuarioId) {
         Perfil perfil = obtenerOCrearPerfil(usuarioId);
 
         if (perfil.getRutaFotoPerfil() == null) {
             throw new ResourceNotFoundException("Foto de perfil no disponible", usuarioId);
         }
 
-        Path ruta = Paths.get(perfil.getRutaFotoPerfil());
-        if (!Files.exists(ruta)) {
-            throw new ResourceNotFoundException("Foto de perfil no encontrada en disco", usuarioId);
-        }
-
-        return ruta;
-    }
-
-    private Path crearDirectorioUsuario(Long usuarioId) throws IOException {
-        Path usuarioDir = Paths.get(baseDir, "usuario_" + usuarioId);
-        Files.createDirectories(usuarioDir);
-        return usuarioDir;
-    }
-
-    private String obtenerExtensionArchivo(MultipartFile archivo) {
-        String originalFilename = archivo.getOriginalFilename();
-        if (originalFilename != null) {
-            int index = originalFilename.lastIndexOf('.');
-            if (index >= 0) {
-                return originalFilename.substring(index);
-            }
-        }
-
-        String contentType = archivo.getContentType();
-        if (contentType == null) {
-            return ".jpg";
-        }
-
-        if (contentType.contains("png")) {
-            return ".png";
-        }
-        if (contentType.contains("webp")) {
-            return ".webp";
-        }
-        if (contentType.contains("gif")) {
-            return ".gif";
-        }
-
-        return ".jpg";
+        return perfil.getRutaFotoPerfil();
     }
 
     private Perfil obtenerOCrearPerfil(Long usuarioId) {

@@ -156,7 +156,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 .is-visible {
     display: block;
-} 
+}
+
+p, h1, h2, h3, h4, h5, h6, li, span, a, label, textarea, input { overflow-wrap: break-word; word-break: break-word; }
+
+img, video, canvas, svg, code, pre { overflow-wrap: normal; word-break: normal; }
 
 @media (max-width: 500px) {
     .event-card {

@@ -36,8 +36,8 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                             <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 sm:px-3 sm:py-1">{event.organizer}</span>
                         ) : null}
                     </div>
-                    <h3 className="event-card-title text-lg font-black tracking-tight text-ink max-[500px]:text-base max-[500px]:leading-tight sm:text-2xl">{event.title}</h3>
-                    <p className="event-card-description max-w-2xl text-[15px] leading-relaxed text-ink-soft max-[500px]:text-[13px] max-[500px]:leading-snug sm:text-sm">{event.description}</p>
+                    <h3 className="event-card-title break-words text-lg font-black tracking-tight text-ink max-[500px]:text-base max-[500px]:leading-tight sm:text-2xl">{event.title}</h3>
+                    <p className="event-card-description break-words max-w-2xl text-[15px] leading-relaxed text-ink-soft max-[500px]:text-[13px] max-[500px]:leading-snug sm:text-sm">{event.description}</p>
                 </div>
 
                 <div className="event-card-actions flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">

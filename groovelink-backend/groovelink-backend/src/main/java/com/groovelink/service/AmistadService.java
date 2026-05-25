@@ -1,5 +1,6 @@
 package com.groovelink.service;
 
+import com.groovelink.entitys.EstadoSolicitud;
 import com.groovelink.entitys.SolicitudAmistad;
 import com.groovelink.entitys.Usuario;
 import com.groovelink.enums.TipoNotificacion;
@@ -47,11 +48,11 @@ public class AmistadService {
                 .findBySolicitante_IdAndSolicitado_Id(solicitadoId, solicitanteId);
         if (reverse.isPresent()) {
             SolicitudAmistad rev = reverse.get();
-            if ("ACEPTADA".equals(rev.getEstado())) {
+            if (EstadoSolicitud.ACEPTADA == rev.getEstado()) {
                 throw new BusinessException("Ya sois amigos");
             }
-            if ("PENDIENTE".equals(rev.getEstado())) {
-                rev.setEstado("ACEPTADA");
+            if (EstadoSolicitud.PENDIENTE == rev.getEstado()) {
+                rev.setEstado(EstadoSolicitud.ACEPTADA);
                 return solicitudAmistadRepository.save(rev);
             }
         }
@@ -64,7 +65,7 @@ public class AmistadService {
         SolicitudAmistad solicitud = new SolicitudAmistad();
         solicitud.setSolicitante(solicitante);
         solicitud.setSolicitado(solicitado);
-        solicitud.setEstado("PENDIENTE");
+        solicitud.setEstado(EstadoSolicitud.PENDIENTE);
         SolicitudAmistad saved = solicitudAmistadRepository.save(solicitud);
 
         notificacionService.crearNotificacion(
@@ -85,11 +86,11 @@ public class AmistadService {
             throw new BusinessException("No puedes responder a esta solicitud");
         }
 
-        if (!"PENDIENTE".equals(solicitud.getEstado())) {
+        if (EstadoSolicitud.PENDIENTE != solicitud.getEstado()) {
             throw new BusinessException("Esta solicitud ya ha sido respondida");
         }
 
-        solicitud.setEstado(aceptar ? "ACEPTADA" : "RECHAZADA");
+        solicitud.setEstado(aceptar ? EstadoSolicitud.ACEPTADA : EstadoSolicitud.RECHAZADA);
         SolicitudAmistad saved = solicitudAmistadRepository.save(solicitud);
 
         if (aceptar) {
@@ -107,14 +108,14 @@ public class AmistadService {
     public void eliminarAmistad(Long usuarioId, Long amigoId) {
         Optional<SolicitudAmistad> solicitud = solicitudAmistadRepository
                 .findBySolicitante_IdAndSolicitado_Id(usuarioId, amigoId);
-        if (solicitud.isPresent() && "ACEPTADA".equals(solicitud.get().getEstado())) {
+        if (solicitud.isPresent() && EstadoSolicitud.ACEPTADA == solicitud.get().getEstado()) {
             solicitudAmistadRepository.delete(solicitud.get());
             return;
         }
 
         solicitud = solicitudAmistadRepository
                 .findBySolicitante_IdAndSolicitado_Id(amigoId, usuarioId);
-        if (solicitud.isPresent() && "ACEPTADA".equals(solicitud.get().getEstado())) {
+        if (solicitud.isPresent() && EstadoSolicitud.ACEPTADA == solicitud.get().getEstado()) {
             solicitudAmistadRepository.delete(solicitud.get());
             return;
         }
@@ -128,7 +129,7 @@ public class AmistadService {
                 .findBySolicitante_IdAndSolicitado_Id(usuarioId, solicitadoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitud de amistad no encontrada"));
 
-        if (!"PENDIENTE".equals(solicitud.getEstado())) {
+        if (EstadoSolicitud.PENDIENTE != solicitud.getEstado()) {
             throw new BusinessException("Esta solicitud ya no está pendiente");
         }
 
@@ -178,16 +179,16 @@ public class AmistadService {
         Optional<SolicitudAmistad> solicitud = solicitudAmistadRepository
                 .findBySolicitante_IdAndSolicitado_Id(usuarioId, otroUsuarioId);
         if (solicitud.isPresent()) {
-            if ("ACEPTADA".equals(solicitud.get().getEstado())) return "AMIGOS";
-            if ("PENDIENTE".equals(solicitud.get().getEstado())) return "SOLICITADO";
+            if (EstadoSolicitud.ACEPTADA == solicitud.get().getEstado()) return "AMIGOS";
+            if (EstadoSolicitud.PENDIENTE == solicitud.get().getEstado()) return "SOLICITADO";
             return "NINGUNA";
         }
 
         solicitud = solicitudAmistadRepository
                 .findBySolicitante_IdAndSolicitado_Id(otroUsuarioId, usuarioId);
         if (solicitud.isPresent()) {
-            if ("ACEPTADA".equals(solicitud.get().getEstado())) return "AMIGOS";
-            if ("PENDIENTE".equals(solicitud.get().getEstado())) return "PENDIENTE";
+            if (EstadoSolicitud.ACEPTADA == solicitud.get().getEstado()) return "AMIGOS";
+            if (EstadoSolicitud.PENDIENTE == solicitud.get().getEstado()) return "PENDIENTE";
             return "NINGUNA";
         }
 

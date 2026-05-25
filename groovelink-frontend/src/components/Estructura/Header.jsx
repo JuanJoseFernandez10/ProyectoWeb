@@ -17,19 +17,30 @@ function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            setNoLeidas(0)
-            return
-        }
-        const interval = setInterval(() => {
+        if (!isAuthenticated) { setNoLeidas(0); return }
+        
+        const fetchCount = () => {
             contarNoLeidas()
                 .then((data) => setNoLeidas(data?.count ?? 0))
                 .catch(() => {})
+        }
+        
+        fetchCount()
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchCount()
+            }
         }, 15000)
-        contarNoLeidas()
-            .then((data) => setNoLeidas(data?.count ?? 0))
-            .catch(() => {})
-        return () => clearInterval(interval)
+        
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible') fetchCount()
+        }
+        document.addEventListener('visibilitychange', handleVisibility)
+        
+        return () => {
+            clearInterval(interval)
+            document.removeEventListener('visibilitychange', handleVisibility)
+        }
     }, [isAuthenticated])
 
     const navItems = [
@@ -66,11 +77,11 @@ function Header() {
     const isActive = (path) => location.pathname === path
 
     return (
-        <header className="bg-secondary/95 text-text-primary px-3 pb-2.5 shadow-md shadow-secondary/20">
+        <header className="bg-secondary/95 text-text-primary px-3 pb-3 md:pb-2.5 shadow-md shadow-secondary/20">
             <div className="mx-auto max-w-7xl">
                 <div className="flex items-center justify-between gap-3 md:gap-4">
                     <div onClick={() => navigate('/home')} className="cursor-pointer flex items-center flex-none shrink-0">
-                        <img src="/assets/logo-header.png" alt="Logo" className="h-16 sm:h-20 md:h-30 w-auto max-w-none object-contain drop-shadow-sm" />
+                        <img src="/assets/logo-header.png" alt="Logo" className="h-20 sm:h-24 md:h-30 w-auto max-w-none object-contain drop-shadow-sm" />
                     </div>
 
                     <div className="hidden md:flex items-center rounded-2xl border border-text-primary/25 bg-text-primary/10 p-1 gap-1">

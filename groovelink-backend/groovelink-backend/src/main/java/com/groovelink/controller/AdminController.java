@@ -9,6 +9,7 @@ import com.groovelink.entitys.Administrador;
 import com.groovelink.entitys.Chat;
 import com.groovelink.entitys.Evento;
 import com.groovelink.entitys.Mensaje;
+import com.groovelink.entitys.EstadoReporte;
 import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.Reporte;
 import com.groovelink.entitys.Usuario;
@@ -295,7 +296,7 @@ public class AdminController {
         Reporte reporte = reporteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reporte", id));
 
-        reporte.setEstado(estado);
+        reporte.setEstado(EstadoReporte.valueOf(estado));
         reporte.setRevisadoPor(admin);
         reporte.setFechaRevision(LocalDateTime.now());
 

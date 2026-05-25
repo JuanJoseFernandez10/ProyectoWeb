@@ -22,7 +22,7 @@ public class CloudinaryConfig {
     @Bean
     public Cloudinary cloudinary() {
         if (cloudName == null || cloudName.isBlank()) {
-            return null;
+            throw new IllegalStateException("Cloudinary no está configurado. Revisa las variables de entorno CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.");
         }
         return new Cloudinary(Map.of(
             "cloud_name", cloudName,

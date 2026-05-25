@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useContext } from 'react'
 import { fetchMyChats, fetchChatMessages } from '../api/chat'
-import { getAuthToken } from '../api/authSession'
+import { AuthContext } from '../context/AuthContext'
 import {
     connectWebSocket,
     disconnectWebSocket,
@@ -24,7 +24,7 @@ export function useChat() {
         return () => unsub()
     }, [onConnectionChange])
 
-    const token = getAuthToken()
+    const { token } = useContext(AuthContext)
 
     useEffect(() => {
         if (!token) {

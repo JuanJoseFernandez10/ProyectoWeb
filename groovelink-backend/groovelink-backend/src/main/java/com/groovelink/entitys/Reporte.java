@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +35,8 @@ public class Reporte {
     @JoinColumn(name = "revisado_por")
     private Administrador revisadoPor;
 
-    private String estado = "pendiente";
+    @Enumerated(EnumType.STRING)
+    private EstadoReporte estado = EstadoReporte.pendiente;
 
     @Column(name = "fecha_revision")
     private LocalDateTime fechaRevision;
@@ -102,11 +105,11 @@ public class Reporte {
 		this.revisadoPor = revisadoPor;
 	}
 
-	public String getEstado() {
+	public EstadoReporte getEstado() {
 		return estado;
 	}
 
-	public void setEstado(String estado) {
+	public void setEstado(EstadoReporte estado) {
 		this.estado = estado;
 	}
 

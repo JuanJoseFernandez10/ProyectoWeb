@@ -74,6 +74,8 @@ function Event() {
     const { token } = useContext(AuthContext)
     const { id } = useParams()
     const [event, setEvent] = useState(null)
+
+    useEffect(() => { document.title = event ? `${event.title} - GrooveLink` : 'Evento - GrooveLink' }, [event])
     const [relatedEvents, setRelatedEvents] = useState([])
     const [loading, setLoading] = useState(true)
     const [relatedLoading, setRelatedLoading] = useState(true)
@@ -263,7 +265,7 @@ function Event() {
                                 </div>
                             ) : event ? (
                                 <>
-                                    <div className="relative h-64 bg-cover bg-center sm:h-80" style={{ backgroundImage: `url(${event.image})` }}>
+                                    <div className="relative h-64 bg-cover bg-center sm:h-80" style={{ backgroundImage: `url(${event.image})` }} role="img" aria-label={`Imagen del evento ${event.title}`}>
                                         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/35 to-transparent" />
                                         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
                                             <span className="rounded-full bg-text-primary/90 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-ink">
@@ -310,21 +312,29 @@ function Event() {
                                         <div className="grid gap-4 md:grid-cols-2">
                                             <div className="rounded-2xl border border-secondary/20 bg-text-primary/40 p-4">
                                                 <h3 className="text-lg font-black text-ink">Aptitudes</h3>
-                                                <ul className="mt-3 space-y-2 text-sm text-ink-soft">
+                                                <ul className="mt-3 flex flex-wrap gap-2 text-sm text-ink-soft">
                                                     {(event.aptitudes ?? []).length > 0 ? (
-                                                        event.aptitudes.map((aptitud) => <li key={aptitud}>• {aptitud}</li>)
+                                                        event.aptitudes.map((aptitud) => (
+                                                            <li key={aptitud} className="break-words rounded-full bg-secondary/10 px-3 py-1 font-medium">
+                                                                {aptitud}
+                                                            </li>
+                                                        ))
                                                     ) : (
-                                                        <li>• Sin aptitudes cargadas todavía</li>
+                                                        <li className="w-full">Sin aptitudes cargadas todavía</li>
                                                     )}
                                                 </ul>
                                             </div>
                                             <div className="rounded-2xl border border-secondary/20 bg-text-primary/40 p-4">
                                                 <h3 className="text-lg font-black text-ink">Géneros</h3>
-                                                <ul className="mt-3 space-y-2 text-sm text-ink-soft">
+                                                <ul className="mt-3 flex flex-wrap gap-2 text-sm text-ink-soft">
                                                     {(event.generos ?? []).length > 0 ? (
-                                                        event.generos.map((genero) => <li key={genero}>• {genero}</li>)
+                                                        event.generos.map((genero) => (
+                                                            <li key={genero} className="break-words rounded-full bg-secondary/10 px-3 py-1 font-medium">
+                                                                {genero}
+                                                            </li>
+                                                        ))
                                                     ) : (
-                                                        <li>• Sin géneros cargados todavía</li>
+                                                        <li className="w-full">Sin géneros cargados todavía</li>
                                                     )}
                                                 </ul>
                                             </div>
@@ -414,7 +424,7 @@ function Event() {
                                                     >
                                                         {p.fotoPerfilUrl ? (
                                                             <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 overflow-hidden rounded-full">
-                                                                <img src={`${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
+                                                                <img src={p.fotoPerfilUrl?.startsWith('http') ? p.fotoPerfilUrl : `${API_URL}${p.fotoPerfilUrl}`} alt={p.username} loading="lazy" className="h-full w-full object-cover" />
                                                             </div>
                                                         ) : (
                                                             <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-secondary/15 text-xs font-black text-secondary">

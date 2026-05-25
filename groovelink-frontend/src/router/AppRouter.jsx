@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import { lazy, Suspense } from "react"
-import Header from "../components/Estrcutura/Header"
-import Footer from "../components/Estrcutura/Footer"
+import Header from "../components/Estructura/Header"
+import Footer from "../components/Estructura/Footer"
+import NotFound from "../pages/NotFound"
 import { Analytics } from "@vercel/analytics/react"
 
 const Index = lazy(() => import("../pages/index"))
@@ -28,16 +29,6 @@ const AdminChats = lazy(() => import("../pages/AdminChats"))
 const AdminChatDetail = lazy(() => import("../pages/AdminChatDetail"))
 const Dashboard = lazy(() => import("../pages/Dashboard"))
 const Premium = lazy(() => import("../pages/Premium"))
-
-function NotFound() {
-    return (
-        <div className="page-surface flex flex-col items-center justify-center min-h-screen px-4">
-            <h1 className="text-6xl font-black text-ink">404</h1>
-            <p className="mt-4 text-lg text-ink-soft">Página no encontrada</p>
-            <a href="/home" className="btn-primary mt-6 px-6 py-3">Volver al inicio</a>
-        </div>
-    )
-}
 
 function Loading() {
     return (

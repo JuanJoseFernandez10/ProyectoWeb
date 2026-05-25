@@ -75,7 +75,19 @@ public class UsuarioService {
     }
 
     @Transactional
-    public void eliminarCuenta(Long usuarioId) {
+    public void verificarPassword(Long usuarioId, String password) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId));
+
+        if (!passwordEncoder.matches(password, usuario.getPassword())) {
+            throw new BusinessException("La contraseña no es correcta");
+        }
+    }
+
+    @Transactional
+    public void eliminarCuenta(Long usuarioId, String password) {
+        verificarPassword(usuarioId, password);
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", usuarioId));
         usuarioRepository.delete(usuario);

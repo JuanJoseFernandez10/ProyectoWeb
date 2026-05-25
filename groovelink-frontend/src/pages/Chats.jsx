@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChat } from '../hooks/useChat'
 import ChatConversation from '../components/Main/ChatConversation'
 import { API_URL } from '../api/config'
+import { AuthContext } from '../context/AuthContext'
 
 function getOtherUsername(chat, currentUsername) {
     if (!chat.esGrupal && chat.participantesUsernames) {
@@ -24,20 +25,9 @@ function getChatAvatar(chat, currentUsername) {
     return null
 }
 
-function getCurrentUsername() {
-    try {
-        const raw = localStorage.getItem('groovelink_auth')
-        if (raw) {
-            const parsed = JSON.parse(raw)
-            return parsed?.user?.username || null
-        }
-    } catch {
-    }
-    return null
-}
-
 function Chats() {
     const navigate = useNavigate()
+    const { user } = useContext(AuthContext)
     const {
         chats,
         activeChat,
@@ -53,7 +43,7 @@ function Chats() {
         loading,
     } = useChat()
 
-    const currentUsername = getCurrentUsername()
+    const currentUsername = user?.username
     const [searchParams] = useSearchParams()
 
     useEffect(() => {
@@ -104,7 +94,9 @@ function Chats() {
                                 const avatarUrl = getChatAvatar(chat, currentUsername)
                                 const isGroup = chat.esGrupal
 
-                                return (
+    useEffect(() => { document.title = 'Chats - GrooveLink' }, [])
+
+    return (
                                     <button
                                         key={chat.id}
                                         onClick={() => openChat(chat.id)}

@@ -4,6 +4,7 @@ import { obtenerAmigos, obtenerSolicitudesRecibidas, responderSolicitud, buscarU
 import { API_URL } from '../api/config'
 
 export default function Amigos() {
+  useEffect(() => { document.title = 'Amigos - GrooveLink' }, [])
   const navigate = useNavigate()
   const [amigos, setAmigos] = useState([])
   const [solicitudes, setSolicitudes] = useState([])

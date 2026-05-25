@@ -1,21 +1,11 @@
-import React, { useState, useRef } from 'react'
-
-function getCurrentUsername() {
-    try {
-        const raw = localStorage.getItem('groovelink_auth')
-        if (raw) {
-            const parsed = JSON.parse(raw)
-            return parsed?.user?.username || null
-        }
-    } catch {
-    }
-    return null
-}
+import React, { useContext, useState, useRef } from 'react'
+import { AuthContext } from '../../context/AuthContext'
 
 function ChatConversation({ chatName, chatImage, messages, onSend, onClose, showBackButton, onProfileClick, extraHeaderButton }) {
+    const { user } = useContext(AuthContext)
     const [input, setInput] = useState('')
     const bottomRef = useRef(null)
-    const currentUsername = getCurrentUsername()
+    const currentUsername = user?.username
 
     const handleSubmit = (e) => {
         e.preventDefault()

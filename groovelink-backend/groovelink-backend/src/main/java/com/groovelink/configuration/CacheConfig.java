@@ -12,6 +12,8 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
+        // TODO: Add TTL configuration. Consider switching to Caffeine cache manager
+        // with .expireAfterWrite(Duration.ofMinutes(10)) for production.
         return new ConcurrentMapCacheManager(
                 "eventos",
                 "eventosList",

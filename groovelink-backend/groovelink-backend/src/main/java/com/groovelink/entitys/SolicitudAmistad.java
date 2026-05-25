@@ -21,8 +21,9 @@ public class SolicitudAmistad {
     @JoinColumn(name = "id_solicitado", nullable = false)
     private Usuario solicitado;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private String estado = "PENDIENTE";
+    private EstadoSolicitud estado = EstadoSolicitud.PENDIENTE;
 
     @Column(name = "fecha_solicitud")
     private LocalDateTime fechaSolicitud = LocalDateTime.now();
@@ -38,8 +39,8 @@ public class SolicitudAmistad {
     public Usuario getSolicitado() { return solicitado; }
     public void setSolicitado(Usuario solicitado) { this.solicitado = solicitado; }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public EstadoSolicitud getEstado() { return estado; }
+    public void setEstado(EstadoSolicitud estado) { this.estado = estado; }
 
     public LocalDateTime getFechaSolicitud() { return fechaSolicitud; }
     public void setFechaSolicitud(LocalDateTime fechaSolicitud) { this.fechaSolicitud = fechaSolicitud; }
