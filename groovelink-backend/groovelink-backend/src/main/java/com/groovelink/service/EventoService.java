@@ -196,8 +196,8 @@ public class EventoService {
     public Optional<Evento> findByIdWithDetails(Long id) {
         Optional<Evento> evento = eventoRepository.findById(id);
         evento.ifPresent(e -> {
-            e.getAptitudes().size();
-            e.getGeneros().size();
+            if (e.getAptitudes() != null) e.getAptitudes().size();
+            if (e.getGeneros() != null) e.getGeneros().size();
             cargarNumeroMeGustas(e);
         });
         return evento;
