@@ -10,6 +10,8 @@ import com.groovelink.entitys.Evento;
 import com.groovelink.entitys.Persona;
 import com.groovelink.entitys.Empresa;
 import com.groovelink.entitys.Usuario;
+import com.groovelink.entitys.relations.EventoAptitud;
+import com.groovelink.entitys.relations.EventoGenero;
 import com.groovelink.entitys.relations.PersonaUneEvento;
 import com.groovelink.exception.BusinessException;
 import com.groovelink.exception.ResourceNotFoundException;
@@ -188,18 +190,20 @@ public class EventoController {
 
         // Actualizar aptitudes
         if (request.getAptitudesIds() != null) {
-            if (evento.getAptitudes() != null) {
-                evento.getAptitudes().clear();
+            List<EventoAptitud> aptitudes = evento.getAptitudes();
+            if (aptitudes != null) {
+                aptitudes.clear();
+                aptitudes.addAll(eventoService.crearRelacionesAptitudes(evento, request.getAptitudesIds()));
             }
-            evento.setAptitudes(eventoService.crearRelacionesAptitudes(evento, request.getAptitudesIds()));
         }
 
         // Actualizar géneros
         if (request.getGenerosIds() != null) {
-            if (evento.getGeneros() != null) {
-                evento.getGeneros().clear();
+            List<EventoGenero> generos = evento.getGeneros();
+            if (generos != null) {
+                generos.clear();
+                generos.addAll(eventoService.crearRelacionesGeneros(evento, request.getGenerosIds()));
             }
-            evento.setGeneros(eventoService.crearRelacionesGeneros(evento, request.getGenerosIds()));
         }
 
         Evento eventoActualizado = eventoService.save(evento);

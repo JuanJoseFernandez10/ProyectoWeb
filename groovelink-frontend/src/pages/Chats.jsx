@@ -53,6 +53,8 @@ function Chats() {
         }
     }, [searchParams, activeChat, openChat])
 
+    useEffect(() => { document.title = 'Chats - GrooveLink' }, [])
+
     const getOtherUserId = () => {
         if (!activeChat) return null
         const ids = getActiveChatParticipantIds()
@@ -94,9 +96,7 @@ function Chats() {
                                 const avatarUrl = getChatAvatar(chat, currentUsername)
                                 const isGroup = chat.esGrupal
 
-    useEffect(() => { document.title = 'Chats - GrooveLink' }, [])
-
-    return (
+                                return (
                                     <button
                                         key={chat.id}
                                         onClick={() => openChat(chat.id)}
