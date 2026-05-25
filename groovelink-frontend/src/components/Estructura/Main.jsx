@@ -227,7 +227,7 @@ function Main() {
     return (
         <main className="page-surface min-h-screen py-5 max-[500px]:py-3 max-[360px]:py-2 sm:py-7 md:py-10">
             <div className="mx-auto w-full max-w-7xl px-3 max-[500px]:px-2 max-[360px]:px-1.5 sm:px-4">
-                <div className="grid gap-4 max-[500px]:gap-3 max-[360px]:gap-2 md:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+                <div className="grid gap-4 max-[500px]:gap-3 max-[360px]:gap-2 md:gap-6 grid-cols-[minmax(0,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
                     <EventsSection
                         featuredEvent={featuredEvent}
                         events={gridEvents}
