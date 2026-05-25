@@ -374,7 +374,8 @@ public class EventoController {
         List<Long> ids = eventos.stream().map(Evento::getId).collect(Collectors.toList());
         Map<Long, FotoEventoResponseDTO> portadaMap = fotoEventoRepository
             .findByEvento_IdInAndEsPortadaTrue(ids).stream()
-            .collect(Collectors.toMap(f -> f.getEvento().getId(), this::convertirFoto));
+            .collect(Collectors.toMap(f -> f.getEvento().getId(), this::convertirFoto,
+                (existente, reemplazo) -> existente));
         Map<Long, List<FotoEventoResponseDTO>> fotosMap = fotoEventoRepository
             .findByEvento_IdInAndEsPortadaFalseOrderByIdAsc(ids).stream()
             .collect(Collectors.groupingBy(f -> f.getEvento().getId(),

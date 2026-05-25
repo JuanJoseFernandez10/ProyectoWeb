@@ -87,6 +87,15 @@ public class FotoEventoService {
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
 
+        // Si es portada, quitar la portada anterior para evitar duplicados
+        if (esPortada) {
+            fotoEventoRepository.findFirstByEvento_IdAndEsPortadaTrue(eventoId)
+                .ifPresent(portadaAnterior -> {
+                    portadaAnterior.setEsPortada(false);
+                    fotoEventoRepository.save(portadaAnterior);
+                });
+        }
+
         try {
             String publicId = folder + "/" + generarNombreCarpeta(eventoId) + "/" + nombreFoto;
 
