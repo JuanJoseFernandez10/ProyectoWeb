@@ -5,11 +5,11 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
 
     return (
         <article
-            className={`event-card min-w-0 w-full overflow-hidden rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 backdrop-blur-xl max-[500px]:rounded-xl max-[360px]:rounded-lg sm:rounded-3xl sm:shadow-xl ${
+            className={`event-card min-w-0 w-full rounded-2xl border border-secondary/20 bg-text-primary/55 shadow-lg shadow-secondary/10 backdrop-blur-xl max-[500px]:rounded-xl max-[500px]:backdrop-blur-none max-[360px]:rounded-lg sm:rounded-3xl sm:shadow-xl ${
                 featured ? 'lg:grid lg:grid-cols-[220px_minmax(0,1fr)]' : ''
             }`}
         >
-            <div className={`event-card-media relative ${featured ? 'min-h-36 max-[500px]:min-h-28 max-[400px]:min-h-24 sm:min-h-50' : 'h-32 max-[500px]:h-24 max-[400px]:h-20 sm:h-44'}`}>
+            <div className={`event-card-media relative shrink-0 overflow-hidden rounded-t-2xl max-[500px]:rounded-t-xl max-[360px]:rounded-t-lg sm:rounded-t-3xl ${featured ? 'min-h-36 max-[500px]:min-h-28 max-[400px]:min-h-24 sm:min-h-50' : 'h-32 max-[500px]:h-24 max-[400px]:h-20 sm:h-44'}`}>
                 <img
                     src={event.image}
                     alt={event.title}
@@ -27,28 +27,28 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                 </div>
             </div>
 
-            <div className="event-card-body flex flex-col gap-3 p-3 max-[500px]:gap-2 max-[500px]:p-2.5 max-[360px]:gap-1.5 max-[360px]:p-2 sm:gap-4 sm:p-5 md:p-6">
-                <div className="space-y-2">
-                    <div className="event-card-meta flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-ink-soft max-[500px]:text-[10px] max-[360px]:text-[9px] sm:gap-2 sm:text-xs">
-                        <span className="max-w-full truncate rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 max-[360px]:px-1.5 sm:px-3 sm:py-1">{event.place}</span>
-                        <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 max-[360px]:px-1.5 sm:px-3 sm:py-1">{event.attendees} asistentes</span>
+            <div className="event-card-body flex flex-col gap-2 rounded-b-2xl max-[500px]:rounded-b-xl max-[360px]:rounded-b-lg sm:rounded-b-3xl p-3 max-[500px]:gap-1.5 max-[500px]:p-2 max-[360px]:gap-1 max-[360px]:p-1.5 sm:gap-4 sm:p-5 md:p-6">
+                <div className="space-y-1 max-[500px]:space-y-0.5 sm:space-y-2">
+                    <div className="event-card-meta flex flex-wrap items-center gap-1 text-[11px] font-semibold text-ink-soft max-[500px]:text-[10px] max-[360px]:text-[9px] sm:gap-2 sm:text-xs">
+                        <span className="max-w-[8rem] truncate rounded-full border border-secondary/25 bg-primary/30 px-1.5 py-0.5 max-[500px]:px-1.5 max-[500px]:py-0 sm:px-3 sm:py-1">{event.place}</span>
+                        <span className="rounded-full border border-secondary/25 bg-primary/30 px-1.5 py-0.5 max-[500px]:px-1.5 max-[500px]:py-0 sm:px-3 sm:py-1">{event.attendees} asistentes</span>
                         {event.organizer ? (
-                            <span className="rounded-full border border-secondary/25 bg-primary/30 px-2.5 py-0.5 max-[500px]:px-2 max-[500px]:py-0 max-[360px]:px-1.5 sm:px-3 sm:py-1">{event.organizer}</span>
+                            <span className="hidden sm:inline rounded-full border border-secondary/25 bg-primary/30 px-1.5 py-0.5 max-[500px]:px-1.5 max-[500px]:py-0 sm:px-3 sm:py-1">{event.organizer}</span>
                         ) : null}
                     </div>
-                    <h3 className="event-card-title break-words text-lg font-black tracking-tight text-ink max-[500px]:text-base max-[500px]:leading-tight max-[360px]:text-[15px] sm:text-2xl">{event.title}</h3>
-                    <p className="event-card-description break-words max-w-2xl text-[15px] leading-relaxed text-ink-soft max-[500px]:text-[13px] max-[500px]:leading-snug max-[360px]:text-[12px] sm:text-sm">{event.description}</p>
+                    <h3 className="event-card-title break-words text-lg font-black tracking-tight text-ink max-[500px]:text-base max-[500px]:leading-tight max-[360px]:text-[13px] sm:text-2xl">{event.title}</h3>
+                    <p className="event-card-description break-words text-[15px] leading-relaxed text-ink-soft line-clamp-2 max-[500px]:text-[12px] max-[500px]:leading-snug sm:line-clamp-3 sm:text-sm">{event.description}</p>
                 </div>
 
-                <div className="event-card-actions flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 max-[360px]:gap-1">
+                <div className="event-card-actions flex items-center justify-between gap-2 pt-0.5 max-[360px]:gap-1">
                     <button
                         type="button"
                         onClick={() => (event.likedByMe ? onUnlikeEvent?.(event.id) : onLikeEvent?.(event.id))}
                         disabled={isLiking}
-                        className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:scale-110 max-[360px]:text-xs"
+                        className="flex items-center gap-1 text-sm font-semibold transition-all duration-200 hover:scale-110 max-[360px]:text-xs"
                         title={event.likedByMe ? 'Quitar me gusta' : 'Me gusta'}
                     >
-                        <span className="text-xl leading-none max-[360px]:text-lg">
+                        <span className="text-lg leading-none max-[360px]:text-base">
                             {event.likedByMe ? '❤️' : '🤍'}
                         </span>
                         <span className="text-ink-soft">
@@ -57,7 +57,7 @@ function EventCard({ event, featured = false, onLikeEvent, onUnlikeEvent, isLiki
                     </button>
                     <Link
                         to={`/event/${event.id}`}
-                        className="event-card-button btn-ghost w-full px-4 py-2 text-sm text-center max-[500px]:px-3 max-[500px]:py-1.5 max-[500px]:text-[13px] max-[360px]:px-2 max-[360px]:py-1 max-[360px]:text-[12px] sm:w-auto sm:px-5 sm:py-2.5"
+                        className="event-card-button btn-ghost px-3 py-1.5 text-sm max-[500px]:px-2.5 max-[500px]:py-1 max-[500px]:text-[12px] max-[360px]:px-2 max-[360px]:py-1 max-[360px]:text-[11px] sm:w-auto sm:px-5 sm:py-2.5"
                     >
                         Ver mas
                     </Link>
