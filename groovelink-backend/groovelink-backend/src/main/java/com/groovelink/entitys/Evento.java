@@ -6,6 +6,7 @@ import java.util.List;
 import com.groovelink.entitys.relations.EventoAptitud;
 import com.groovelink.entitys.relations.EventoGenero;
 import com.groovelink.entitys.relations.FotoEvento;
+import com.groovelink.entitys.relations.PersonaComentarioEvento;
 import com.groovelink.entitys.relations.PersonaMeGustaEvento;
 import com.groovelink.entitys.relations.PersonaUneEvento;
 
@@ -64,6 +65,9 @@ public class Evento {
 
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<EventoGenero> generos;
+
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<PersonaComentarioEvento> comentarios;
 
 	public Long getId() {
 		return id;
@@ -183,5 +187,13 @@ public class Evento {
 
 	public void setMegustas(List<PersonaMeGustaEvento> megustas) {
 		this.megustas = megustas;
+	}
+
+	public List<PersonaComentarioEvento> getComentarios() {
+		return comentarios;
+	}
+
+	public void setComentarios(List<PersonaComentarioEvento> comentarios) {
+		this.comentarios = comentarios;
 	}
 }

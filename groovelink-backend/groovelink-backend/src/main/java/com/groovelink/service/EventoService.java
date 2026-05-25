@@ -342,6 +342,11 @@ public class EventoService {
     public void eliminarEvento(Long eventoId) {
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoId));
+
+        chatRepository.findByEventoId(eventoId).ifPresent(chat -> {
+            chatRepository.delete(chat);
+        });
+
         eventoRepository.delete(evento);
     }
 

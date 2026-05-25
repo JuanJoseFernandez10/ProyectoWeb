@@ -54,27 +54,27 @@ INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('admin', 'admin@example.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '90 days', 'ROLE_ADMIN');
 INSERT INTO administrador (id, cargo) VALUES (currval('usuario_id_seq'), 'SUPERADMIN');
 
--- carlos_garcia
+-- carlos_garcia (premium, organiza eventos)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('carlos_garcia', 'carlos@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '60 days', 'ROLE_USER');
-INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
 -- maria_lopez (premium)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('maria_lopez', 'maria@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '50 days', 'ROLE_USER');
 INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
--- alejandro_m
+-- alejandro_m (premium, organiza conciertos)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('alejandro_m', 'alejandro@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '45 days', 'ROLE_USER');
-INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
--- laura_sevilla
+-- laura_sevilla (premium, organiza conciertos)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('laura_sevilla', 'laura@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '40 days', 'ROLE_USER');
-INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
--- david_ruiz
+-- david_ruiz (no es premium, solo asiste a eventos)
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('david_ruiz', 'david@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '35 days', 'ROLE_USER');
 INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
@@ -87,12 +87,17 @@ INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
 -- javi_rodri
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('javi_rodri', 'javi@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '25 days', 'ROLE_USER');
-INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
+INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), true);
 
 -- sara_mm
 INSERT INTO usuario (username, email, password, fecha_creacion, rol)
     VALUES ('sara_mm', 'sara@email.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '20 days', 'ROLE_USER');
 INSERT INTO persona (id, premium) VALUES (currval('usuario_id_seq'), false);
+
+-- sala_arena (empresa, organiza conciertos)
+INSERT INTO usuario (username, email, password, fecha_creacion, rol)
+    VALUES ('sala_arena', 'info@salaarena.com', crypt('123456', gen_salt('bf', 10)), NOW() - INTERVAL '60 days', 'ROLE_EMPRESA');
+INSERT INTO empresa (id, direccion) VALUES (currval('usuario_id_seq'), 'Calle Abril 45, Madrid');
 
 -- ============================================================
 -- PERFILES
@@ -112,13 +117,13 @@ VALUES (
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
 VALUES (
     (SELECT id FROM usuario WHERE username = 'alejandro_m'),
-    'Apasionado del deporte y la naturaleza. Escapo a la montaña siempre que puedo. Tambien me gusta la fotografia.',
+    'Apasionado de la musica y los festivales. Escapo a la montaña siempre que puedo.',
     'Valencia', NOW()
 );
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
 VALUES (
     (SELECT id FROM usuario WHERE username = 'laura_sevilla'),
-    'Fotógrafa aficionada, me encanta capturar momentos. Tambien me gusta cocinar y viajar!',
+    'Cantante en una banda indie, me encanta el directo y conocer gente con los mismos gustos.',
     'Sevilla', NOW()
 );
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
@@ -130,13 +135,13 @@ VALUES (
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
 VALUES (
     (SELECT id FROM usuario WHERE username = 'ana_perez'),
-    'Estudiante de bellas artes. Me encanta pintar y ir a exposiciones. También hago yoga.',
+    'Estudiante de bellas artes. Me encanta la musica indie y los conciertos pequeños. Tambien hago yoga.',
     'Granada', NOW()
 );
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
 VALUES (
     (SELECT id FROM usuario WHERE username = 'javi_rodri'),
-    'Gamer y amante de la tecnologia. Me gusta el cine y los planes tranquilos.',
+    'Gamer y amante de la tecnologia. Me encanta el hip-hop y los conciertos en vivo.',
     'Zaragoza', NOW()
 );
 INSERT INTO perfil (id, descripcion, ubicacion, fecha_actualizacion)
@@ -152,11 +157,11 @@ VALUES (
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
 SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'carlos_garcia' AND a.nombre IN ('Baile', 'Música', 'Cine');
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
-SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'maria_lopez' AND a.nombre IN ('Cocina', 'Fotografía', 'Lectura');
+SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'maria_lopez' AND a.nombre IN ('Música', 'Baile', 'Viajes');
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
 SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'alejandro_m' AND a.nombre IN ('Deportes', 'Fotografía', 'Viajes');
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
-SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'laura_sevilla' AND a.nombre IN ('Cocina', 'Fotografía', 'Viajes');
+SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'laura_sevilla' AND a.nombre IN ('Música', 'Baile', 'Viajes');
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
 SELECT u.id, a.id FROM usuario u, aptitud a WHERE u.username = 'david_ruiz' AND a.nombre IN ('Música', 'Cine', 'Running');
 INSERT INTO persona_aptitudes (id_usuario, id_aptitud)
@@ -203,52 +208,54 @@ INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq
 
 INSERT INTO evento (nombre, ubicacion, descripcion, fecha_inicio, fecha_final, publicado, fecha_creacion)
 VALUES (
-    'Taller de Cocina Italiana',
-    'Calle Mayor 23, Madrid',
-    'Aprende a hacer pasta desde cero con ingredientes frescos. Vamos a cocinar raviolis y tiramisú. Despues nos lo comemos todo juntos. Plazas limitadas!',
+    'Noche de Música Electrónica',
+    'Sala Arena, C/ Abril 45, Madrid',
+    'Noche de musica electronica con DJs en vivo. Sonidos techno, house y drum and bass. Ven a bailar hasta el amanecer! Entrada anticipada 10€, en puerta 15€.',
     CURRENT_DATE + 12, CURRENT_DATE + 12,
-    (SELECT id FROM usuario WHERE username = 'maria_lopez'),
+    (SELECT id FROM usuario WHERE username = 'sala_arena'),
     NOW() - INTERVAL '10 days'
 );
-INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Cocina'));
-INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Pop'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Música'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Baile'));
+INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Electrónica'));
 
 INSERT INTO evento (nombre, ubicacion, descripcion, fecha_inicio, fecha_final, publicado, fecha_creacion)
 VALUES (
-    'Ruta de Senderismo por la Sierra',
-    'Puerto de Navacerrada, Madrid',
-    'Ruta guiada por la sierra con vistas espectaculares. Dificultad baja-media, apto para principiantes. Llevar agua y calzado comodo. Comemos alli, cada uno lleva su tupper!',
+    'Festival de Reggaeton',
+    'Plaza de España, Madrid',
+    'El festival de reggaeton mas grande del verano! Actuaciones en directo, food trucks y mucho baile. Vente con tus amigos a disfrutar del mejor perreo.',
     CURRENT_DATE + 8, CURRENT_DATE + 8,
     (SELECT id FROM usuario WHERE username = 'alejandro_m'),
     NOW() - INTERVAL '8 days'
 );
-INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Deportes'));
-INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Viajes'));
-INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Indie'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Música'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Baile'));
+INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Reggaeton'));
 
 INSERT INTO evento (nombre, ubicacion, descripcion, fecha_inicio, fecha_final, publicado, fecha_creacion)
 VALUES (
-    'Torneo de Videojuegos Retro',
-    'Game Over Bar, Calle Fuencarral 45, Madrid',
-    'Torneo de juegos retro con premios! Tendremos Street Fighter, Mario Kart y Guitar Hero. Inscripcion 5€ incluye una consumicion. Os esperamos!',
+    'Concierto de Hip-Hop',
+    'Sala Caracol, C/ Bernardino 23, Madrid',
+    'Concierto de las mejores bandas de hip-hop underground de la escena madrileña. Actuaciones en directo, batallas de freestyle y mucho flow. Ven a representar!',
     CURRENT_DATE + 3, CURRENT_DATE + 3,
     (SELECT id FROM usuario WHERE username = 'javi_rodri'),
     NOW() - INTERVAL '6 days'
 );
-INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Gaming'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Música'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Baile'));
 INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Hip-Hop'));
 
 INSERT INTO evento (nombre, ubicacion, descripcion, fecha_inicio, fecha_final, publicado, fecha_creacion)
 VALUES (
-    'Exposición de Fotografía Urbana',
-    'Galería La Fábrica, C/Alameda 12, Sevilla',
-    'Exposición colectiva de fotografia urbana con artistas locales. Despues de la expo haremos un recorrido fotografico por el barrio de Triana.',
+    'Festival Indie de Primavera',
+    'Teatro Lope de Vega, Sevilla',
+    'Festival de musica indie con bandas emergentes de toda Andalucia. Sonidos frescos, ambiente joven y buena vibra. Dos dias de musica ininterrumpida!',
     CURRENT_DATE + 15, CURRENT_DATE + 17,
     (SELECT id FROM usuario WHERE username = 'laura_sevilla'),
     NOW() - INTERVAL '5 days'
 );
-INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Fotografía'));
-INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Flamenco'));
+INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Música'));
+INSERT INTO evento_generos (id_evento, id_genero) VALUES (currval('evento_id_seq'), (SELECT id FROM genero WHERE nombre = 'Indie'));
 
 INSERT INTO evento (nombre, ubicacion, descripcion, fecha_inicio, fecha_final, publicado, fecha_creacion)
 VALUES (
@@ -256,7 +263,7 @@ VALUES (
     'La Rock House, Bilbao',
     'Jam session abierta para musicos de todos los niveles. Trae tu instrumento y unete! Hay amplis y bateria. Desde las 20:00 hasta que el cuerpo aguante.',
     CURRENT_DATE + 10, CURRENT_DATE + 10,
-    (SELECT id FROM usuario WHERE username = 'david_ruiz'),
+    (SELECT id FROM usuario WHERE username = 'admin'),
     NOW() - INTERVAL '4 days'
 );
 INSERT INTO evento_aptitudes (id_evento, id_aptitud) VALUES (currval('evento_id_seq'), (SELECT id FROM aptitud WHERE nombre = 'Música'));
@@ -319,10 +326,10 @@ FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Noch
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '5 days'
-FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Torneo de Videojuegos Retro';
+FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Concierto de Hip-Hop';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '4 days'
-FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Torneo de Videojuegos Retro';
+FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Concierto de Hip-Hop';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '3 days'
@@ -333,17 +340,17 @@ FROM usuario u, evento e WHERE u.username = 'maria_lopez' AND e.nombre = 'Noche 
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '7 days'
-FROM usuario u, evento e WHERE u.username = 'maria_lopez' AND e.nombre = 'Taller de Cocina Italiana';
+FROM usuario u, evento e WHERE u.username = 'maria_lopez' AND e.nombre = 'Noche de Música Electrónica';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '6 days'
-FROM usuario u, evento e WHERE u.username = 'maria_lopez' AND e.nombre = 'Taller de Cocina Italiana';
+FROM usuario u, evento e WHERE u.username = 'maria_lopez' AND e.nombre = 'Noche de Música Electrónica';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '4 days'
-FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Ruta de Senderismo por la Sierra';
+FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Festival de Reggaeton';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '3 days'
-FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Ruta de Senderismo por la Sierra';
+FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Festival de Reggaeton';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '3 days'
@@ -354,7 +361,7 @@ FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Jam Se
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '2 days'
-FROM usuario u, evento e WHERE u.username = 'laura_sevilla' AND e.nombre = 'Exposición de Fotografía Urbana';
+FROM usuario u, evento e WHERE u.username = 'laura_sevilla' AND e.nombre = 'Festival Indie de Primavera';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '5 days'
@@ -372,32 +379,32 @@ FROM usuario u, evento e WHERE u.username = 'david_ruiz' AND e.nombre = 'Noche d
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '6 days'
-FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Taller de Cocina Italiana';
+FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Noche de Música Electrónica';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '5 days'
-FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Taller de Cocina Italiana';
+FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Noche de Música Electrónica';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '3 days'
-FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Ruta de Senderismo por la Sierra';
+FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Festival de Reggaeton';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '7 days'
-FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Torneo de Videojuegos Retro';
+FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Concierto de Hip-Hop';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '6 days'
-FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Torneo de Videojuegos Retro';
+FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Concierto de Hip-Hop';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '2 days'
-FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Exposición de Fotografía Urbana';
+FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Festival Indie de Primavera';
 
 INSERT INTO persona_une_evento (id_usuario, codigo_evento, fecha_inscripcion)
 SELECT u.id, e.id, NOW() - INTERVAL '4 days'
-FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Exposición de Fotografía Urbana';
+FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Festival Indie de Primavera';
 INSERT INTO persona_megusta_evento (id_usuario, codigo_evento, fecha_megusta)
 SELECT u.id, e.id, NOW() - INTERVAL '3 days'
-FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Exposición de Fotografía Urbana';
+FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Festival Indie de Primavera';
 
 -- ============================================================
 -- COMENTARIOS EN EVENTOS
@@ -415,20 +422,20 @@ SELECT u.id, e.id, 'No pude ir al final pero mis amigos dicen q estuvo muy bien'
 FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Noche de Jazz en el Casco Antiguo';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'Aprendimos a hacer pasta, fue super divertido. El tiramisú quedó brutal!', 4, NOW() - INTERVAL '1 day'
-FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Taller de Cocina Italiana';
+SELECT u.id, e.id, 'La musica electronica estuvo increible, los DJs se salieron!', 4, NOW() - INTERVAL '1 day'
+FROM usuario u, evento e WHERE u.username = 'ana_perez' AND e.nombre = 'Noche de Música Electrónica';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'La organizacion fue un poco caotica pero al final se disfruto', 1, NOW() - INTERVAL '2 days'
-FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Taller de Cocina Italiana';
+SELECT u.id, e.id, 'El sonido era un poco bajo al principio pero luego mejoró. Buen rollo!', 1, NOW() - INTERVAL '2 days'
+FROM usuario u, evento e WHERE u.username = 'carlos_garcia' AND e.nombre = 'Noche de Música Electrónica';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'Las vistas desde arriba son impresionantes. Merece la pena el madrugón', 6, NOW() - INTERVAL '1 day'
-FROM usuario u, evento e WHERE u.username = 'david_ruiz' AND e.nombre = 'Ruta de Senderismo por la Sierra';
+SELECT u.id, e.id, 'El ambiente en la plaza fue una locura, no paré de bailar!', 6, NOW() - INTERVAL '1 day'
+FROM usuario u, evento e WHERE u.username = 'david_ruiz' AND e.nombre = 'Festival de Reggaeton';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'El año pasado fui y estuvo genial, este año repito seguro', 3, NOW() - INTERVAL '3 days'
-FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Ruta de Senderismo por la Sierra';
+SELECT u.id, e.id, 'El año pasado vino mi artista favorito, este año repito seguro', 3, NOW() - INTERVAL '3 days'
+FROM usuario u, evento e WHERE u.username = 'alejandro_m' AND e.nombre = 'Festival de Reggaeton';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
 SELECT u.id, e.id, 'Tocamos hasta las 3 de la mañana jajajaj que buen ambiente', 7, NOW() - INTERVAL '12 hours'
@@ -439,12 +446,12 @@ SELECT u.id, e.id, 'La bateria sonaba que te cagas, menudo pedazo de jam session
 FROM usuario u, evento e WHERE u.username = 'david_ruiz' AND e.nombre = 'Jam Session de Rock';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'Gane el torneo de Mario Kart!! El año q viene os espero para la revancha', 8, NOW() - INTERVAL '1 day'
-FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Torneo de Videojuegos Retro';
+SELECT u.id, e.id, 'Las batallas de freestyle fueron lo mejor, que flow tienen algunos tios', 8, NOW() - INTERVAL '1 day'
+FROM usuario u, evento e WHERE u.username = 'javi_rodri' AND e.nombre = 'Concierto de Hip-Hop';
 
 INSERT INTO persona_comentario_evento (id_usuario, codigo_evento, texto, megustas, fecha)
-SELECT u.id, e.id, 'Las fotos eran preciosas, muy buen trabajo de los artistas locales', 3, NOW() - INTERVAL '2 days'
-FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Exposición de Fotografía Urbana';
+SELECT u.id, e.id, 'Las bandas sonaron genial, el mejor festival indie del año!', 3, NOW() - INTERVAL '2 days'
+FROM usuario u, evento e WHERE u.username = 'sara_mm' AND e.nombre = 'Festival Indie de Primavera';
 
 -- ============================================================
 -- CHATS GRUPALES (uno por evento)
@@ -455,19 +462,19 @@ FROM evento e WHERE e.nombre = 'Noche de Jazz en el Casco Antiguo';
 
 INSERT INTO chat (nombre, descripcion, es_grupal, evento_id, fecha_creacion)
 SELECT e.nombre, 'Chat grupal del evento: ' || e.nombre, true, e.id, NOW() - INTERVAL '3 days'
-FROM evento e WHERE e.nombre = 'Taller de Cocina Italiana';
+FROM evento e WHERE e.nombre = 'Noche de Música Electrónica';
 
 INSERT INTO chat (nombre, descripcion, es_grupal, evento_id, fecha_creacion)
 SELECT e.nombre, 'Chat grupal del evento: ' || e.nombre, true, e.id, NOW() - INTERVAL '3 days'
-FROM evento e WHERE e.nombre = 'Ruta de Senderismo por la Sierra';
+FROM evento e WHERE e.nombre = 'Festival de Reggaeton';
 
 INSERT INTO chat (nombre, descripcion, es_grupal, evento_id, fecha_creacion)
 SELECT e.nombre, 'Chat grupal del evento: ' || e.nombre, true, e.id, NOW() - INTERVAL '3 days'
-FROM evento e WHERE e.nombre = 'Torneo de Videojuegos Retro';
+FROM evento e WHERE e.nombre = 'Concierto de Hip-Hop';
 
 INSERT INTO chat (nombre, descripcion, es_grupal, evento_id, fecha_creacion)
 SELECT e.nombre, 'Chat grupal del evento: ' || e.nombre, true, e.id, NOW() - INTERVAL '3 days'
-FROM evento e WHERE e.nombre = 'Exposición de Fotografía Urbana';
+FROM evento e WHERE e.nombre = 'Festival Indie de Primavera';
 
 INSERT INTO chat (nombre, descripcion, es_grupal, evento_id, fecha_creacion)
 SELECT e.nombre, 'Chat grupal del evento: ' || e.nombre, true, e.id, NOW() - INTERVAL '3 days'
@@ -517,73 +524,73 @@ INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
 SELECT u.id, c.id, 'q bien suena esto!! llegamos en 5 min', NOW() - INTERVAL '1 hour'
 FROM usuario u, chat c WHERE u.username = 'maria_lopez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Noche de Jazz en el Casco Antiguo');
 
--- Chat 2: Taller de Cocina
+-- Chat 2: Noche de Música Electrónica
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'alguien sabe si hay que llevar algo para el taller de cocina?', NOW() - INTERVAL '24 hours'
-FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Taller de Cocina Italiana');
+SELECT u.id, c.id, 'a que hora abre la sala? yo llego sobre las 11', NOW() - INTERVAL '24 hours'
+FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Noche de Música Electrónica');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'solo ganas de comer! ellos ponen los ingredientes', NOW() - INTERVAL '22 hours'
-FROM usuario u, chat c WHERE u.username = 'maria_lopez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Taller de Cocina Italiana');
+SELECT u.id, c.id, 'yo llego antes para pillar sitio cerca del DJ!', NOW() - INTERVAL '22 hours'
+FROM usuario u, chat c WHERE u.username = 'maria_lopez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Noche de Música Electrónica');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'jajajaj perfecto entonces alli nos vemos', NOW() - INTERVAL '20 hours'
-FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Taller de Cocina Italiana');
+SELECT u.id, c.id, 'perfecto pues alli nos vemos!', NOW() - INTERVAL '20 hours'
+FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Noche de Música Electrónica');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'el taller estuvo genial, me lleve las recetas a casa', NOW() - INTERVAL '48 hours'
-FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Taller de Cocina Italiana');
+SELECT u.id, c.id, 'el DJ de techno estuvo brutal, la sesion fue increible', NOW() - INTERVAL '48 hours'
+FROM usuario u, chat c WHERE u.username = 'ana_perez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Noche de Música Electrónica');
 
--- Chat 3: Ruta de Senderismo
+-- Chat 3: Festival de Reggaeton
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'chicos el tiempo para el sabado no pinta bien, lluvia toda la mañana', NOW() - INTERVAL '36 hours'
-FROM usuario u, chat c WHERE u.username = 'alejandro_m' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Ruta de Senderismo por la Sierra');
-
-INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'no pasa nada, yo tengo tienda de campaña por si llueve', NOW() - INTERVAL '35 hours'
-FROM usuario u, chat c WHERE u.username = 'david_ruiz' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Ruta de Senderismo por la Sierra');
-
--- Chat 4: Torneo Retro
-INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'yo voy a daros a todos en street fighter eh!!', NOW() - INTERVAL '18 hours'
-FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Torneo de Videojuegos Retro');
+SELECT u.id, c.id, 'chicos el sabado hay cola desde las 5, mejor llegar temprano', NOW() - INTERVAL '36 hours'
+FROM usuario u, chat c WHERE u.username = 'alejandro_m' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival de Reggaeton');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'tu flipas, yo llevo practicando desde que me apunté', NOW() - INTERVAL '16 hours'
-FROM usuario u, chat c WHERE u.username = 'carlos_garcia' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Torneo de Videojuegos Retro');
+SELECT u.id, c.id, 'yo llevo altavoz para el pre-party mientras esperamos!', NOW() - INTERVAL '35 hours'
+FROM usuario u, chat c WHERE u.username = 'david_ruiz' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival de Reggaeton');
+
+-- Chat 4: Concierto de Hip-Hop
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, c.id, 'yo conozco a uno de los raperos, va a ser una pasada!', NOW() - INTERVAL '18 hours'
+FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Concierto de Hip-Hop');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'pues preparate pq te voy a barrer jajajaj', NOW() - INTERVAL '14 hours'
-FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Torneo de Videojuegos Retro');
+SELECT u.id, c.id, 'el que canta despues del intermedio es una bestia', NOW() - INTERVAL '16 hours'
+FROM usuario u, chat c WHERE u.username = 'carlos_garcia' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Concierto de Hip-Hop');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'jajajaj te gané bien eh! reconoce la derrota', NOW() - INTERVAL '24 hours'
-FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Torneo de Videojuegos Retro');
+SELECT u.id, c.id, 'hacemos un freestyle entre todos no? jajaja', NOW() - INTERVAL '14 hours'
+FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Concierto de Hip-Hop');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'la proxima vez me vengooo, esto no se queda asi', NOW() - INTERVAL '22 hours'
-FROM usuario u, chat c WHERE u.username = 'carlos_garcia' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Torneo de Videojuegos Retro');
-
--- Chat 5: Expo Fotografía
-INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'la expo cuelga mis fotos! estoy super nerviosa', NOW() - INTERVAL '48 hours'
-FROM usuario u, chat c WHERE u.username = 'laura_sevilla' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Exposición de Fotografía Urbana');
+SELECT u.id, c.id, 'el micro sonaba que flipas, el conciertaco de la temporada', NOW() - INTERVAL '24 hours'
+FROM usuario u, chat c WHERE u.username = 'javi_rodri' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Concierto de Hip-Hop');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'tus fotos son una pasada, vas a triunfar seguro', NOW() - INTERVAL '36 hours'
-FROM usuario u, chat c WHERE u.username = 'sara_mm' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Exposición de Fotografía Urbana');
+SELECT u.id, c.id, 'la proxima vez me pongo en primera fila!', NOW() - INTERVAL '22 hours'
+FROM usuario u, chat c WHERE u.username = 'carlos_garcia' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Concierto de Hip-Hop');
+
+-- Chat 5: Festival Indie de Primavera
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, c.id, 'mi banda toca el sabado! estoy super nerviosa', NOW() - INTERVAL '48 hours'
+FROM usuario u, chat c WHERE u.username = 'laura_sevilla' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival Indie de Primavera');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'nosotros vamos el sabado, hay visita guiada no?', NOW() - INTERVAL '24 hours'
-FROM usuario u, chat c WHERE u.username = 'maria_lopez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Exposición de Fotografía Urbana');
+SELECT u.id, c.id, 'tu grupo es una pasada, vais a triunfar seguro', NOW() - INTERVAL '36 hours'
+FROM usuario u, chat c WHERE u.username = 'sara_mm' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival Indie de Primavera');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'si si, a las 12 en la galeria. No llegues tarde q son puntuales!', NOW() - INTERVAL '12 hours'
-FROM usuario u, chat c WHERE u.username = 'laura_sevilla' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Exposición de Fotografía Urbana');
+SELECT u.id, c.id, 'nosotros vamos el sabado, hay entrada anticipada no?', NOW() - INTERVAL '24 hours'
+FROM usuario u, chat c WHERE u.username = 'maria_lopez' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival Indie de Primavera');
 
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
-SELECT u.id, c.id, 'allí estaremos! con cámara y todo jajaja', NOW() - INTERVAL '8 hours'
-FROM usuario u, chat c WHERE u.username = 'sara_mm' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Exposición de Fotografía Urbana');
+SELECT u.id, c.id, 'si si, en la web. No llegues tarde q empiezan puntuales!', NOW() - INTERVAL '12 hours'
+FROM usuario u, chat c WHERE u.username = 'laura_sevilla' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival Indie de Primavera');
+
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, c.id, 'alli estaremos! con camiseta del grupo y todo jajaja', NOW() - INTERVAL '8 hours'
+FROM usuario u, chat c WHERE u.username = 'sara_mm' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Festival Indie de Primavera');
 
 -- Chat 6: Jam Session
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
@@ -601,6 +608,55 @@ FROM usuario u, chat c WHERE u.username = 'david_ruiz' AND c.evento_id = (SELECT
 INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
 SELECT u.id, c.id, 'noo tio, te vas a perder la mejor jam session del año!', NOW() - INTERVAL '5 hours'
 FROM usuario u, chat c WHERE u.username = 'alejandro_m' AND c.evento_id = (SELECT id FROM evento WHERE nombre = 'Jam Session de Rock');
+
+-- ============================================================
+-- CHATS PRIVADOS ENTRE AMIGOS
+-- ============================================================
+
+-- Chat privado: carlos_garcia <-> maria_lopez
+INSERT INTO chat (nombre, es_grupal, fecha_creacion)
+VALUES ('Chat privado', false, NOW() - INTERVAL '25 days');
+INSERT INTO usuario_participa_chat (id_chat, id_usuario)
+SELECT currval('chat_id_seq'), id FROM usuario WHERE username IN ('carlos_garcia', 'maria_lopez');
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'hola! al final nos vemos en el concierto de jazz?', NOW() - INTERVAL '20 days'
+FROM usuario u WHERE u.username = 'carlos_garcia';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'sii yo voy fijo! quedamos alli?', NOW() - INTERVAL '19 days'
+FROM usuario u WHERE u.username = 'maria_lopez';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'perfecto, a las 8 en la puerta entonces!', NOW() - INTERVAL '19 days'
+FROM usuario u WHERE u.username = 'carlos_garcia';
+
+-- Chat privado: alejandro_m <-> david_ruiz
+INSERT INTO chat (nombre, es_grupal, fecha_creacion)
+VALUES ('Chat privado', false, NOW() - INTERVAL '15 days');
+INSERT INTO usuario_participa_chat (id_chat, id_usuario)
+SELECT currval('chat_id_seq'), id FROM usuario WHERE username IN ('alejandro_m', 'david_ruiz');
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'tio vente el finde a la jam session q va a estar brutal', NOW() - INTERVAL '10 days'
+FROM usuario u WHERE u.username = 'alejandro_m';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'no se si podre, estoy liadisimo con el trabajo :(', NOW() - INTERVAL '10 days'
+FROM usuario u WHERE u.username = 'david_ruiz';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'vengaaa hombre, desconecta un rato q te hace falta', NOW() - INTERVAL '9 days'
+FROM usuario u WHERE u.username = 'alejandro_m';
+
+-- Chat privado: javi_rodri <-> sara_mm
+INSERT INTO chat (nombre, es_grupal, fecha_creacion)
+VALUES ('Chat privado', false, NOW() - INTERVAL '5 days');
+INSERT INTO usuario_participa_chat (id_chat, id_usuario)
+SELECT currval('chat_id_seq'), id FROM usuario WHERE username IN ('javi_rodri', 'sara_mm');
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'oye viste el festival indie? las bandas estuvieron guapisimas', NOW() - INTERVAL '4 days'
+FROM usuario u WHERE u.username = 'javi_rodri';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'siiii laura toca el sabado! vamos?', NOW() - INTERVAL '4 days'
+FROM usuario u WHERE u.username = 'sara_mm';
+INSERT INTO mensaje (id_usuario, id_chat, contenido, fecha_envio)
+SELECT u.id, currval('chat_id_seq'), 'dale, quedamos a las 11 y vamos', NOW() - INTERVAL '3 days'
+FROM usuario u WHERE u.username = 'javi_rodri';
 
 -- ============================================================
 -- ACTUALIZAR ULTIMO_MENSAJE DE CADA CHAT
