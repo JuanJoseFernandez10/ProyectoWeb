@@ -8,7 +8,7 @@ TRUNCATE
     persona_comentario_evento,
     persona_megusta_evento,
     persona_une_evento,
-    fotoevento,
+    foto_evento,
     evento_aptitudes,
     evento_generos,
     persona_aptitudes,

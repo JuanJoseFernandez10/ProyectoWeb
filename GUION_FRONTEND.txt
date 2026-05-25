@@ -1,0 +1,376 @@
+========================================================================
+  GUION DE PRESENTACIÓN — GROOVELINK FRONTEND
+  (Aplicación web para descubrir conciertos y conectar con gente)
+========================================================================
+
+Duración estimada: ~10-12 minutos hablando a ritmo normal.
+
+
+────────────────────────────────────────────────────────────────────────
+  1. INTRODUCCIÓN (30s)
+────────────────────────────────────────────────────────────────────────
+
+"GrooveLink es una red social para amantes de la música.
+Permite descubrir conciertos, unirte a ellos, chatear con los
+asistentes y conectar con gente que comparte tus mismos gustos
+musicales.
+
+Está construida con React 19, Tailwind CSS v4 en el frontend,
+y Spring Boot en el backend.
+
+Vamos a verla en funcionamiento."
+
+
+────────────────────────────────────────────────────────────────────────
+  2. LANDING PAGE — Index.jsx (1 min)
+────────────────────────────────────────────────────────────────────────
+
+"Arrancamos en la página principal, el landing.
+
+Aquí tenemos un hero animado con el mensaje:
+'Encuentra tu siguiente plan con gente que vibra como tú'.
+
+Dos botones principales:
+  - 'Crear cuenta o entrar' → te lleva al login/registro.
+  - 'Explorar la web' → te lleva directo al home, aunque sin
+    iniciar sesión no podrás hacer mucho.
+
+Y tres tarjetas que resumen lo que ofrece la app:
+  - Eventos: encuentra conciertos cerca de ti.
+  - Grupos: únete a planes y coordina con los asistentes.
+  - Chats: conoce gente y habla sobre música.
+
+El header y el footer están ocultos en esta página para que
+la landing se vea limpia y sin distracciones."
+
+
+────────────────────────────────────────────────────────────────────────
+  3. REGISTRO E INICIO DE SESIÓN — AccesPage.jsx (1 min 30s)
+────────────────────────────────────────────────────────────────────────
+
+"Hacemos clic en el botón y llegamos al login/register.
+
+Tenemos un panel que alterna entre:
+
+  - LOGIN: usuario y contraseña. Muestra errores por campo
+    si el servidor rechaza algo.
+
+  - REGISTRO: username, email, contraseña, confirmar contraseña,
+    y un selector de rol: USER o EMPRESA.
+    - USER → persona normal, puede unirse a eventos.
+    - EMPRESA → organizador, puede crear conciertos.
+
+El registro tiene validación en cliente (contraseñas iguales,
+email válido) y muestra errores del servidor si el username
+o el email ya existen.
+
+Una vez registrado, te redirige automáticamente a la pantalla
+de personalización."
+
+
+────────────────────────────────────────────────────────────────────────
+  4. PERSONALIZACIÓN — Personalizacion.jsx (1 min)
+────────────────────────────────────────────────────────────────────────
+
+"Después del registro, la app te guía con un wizard de 2 pasos:
+
+  PASO 1 — GustosAptitudes.jsx:
+    Seleccionas tus gustos musicales y aficiones en un grid
+    de botones. Puedes marcar varios. Esto ayuda al algoritmo
+    a recomendarte eventos afines.
+
+  PASO 2:
+    Subes una foto de perfil, escribes una descripción corta
+    y pones tu ubicación.
+
+  Además, ves un banner de PREMIUM explicando los beneficios:
+      - Crear eventos ilimitados
+      - Badge exclusivo
+      - Mayor visibilidad
+
+  Puedes activarlo directamente desde aquí o saltarlo."
+
+
+────────────────────────────────────────────────────────────────────────
+  5. HOME / DASHBOARD PRINCIPAL — Home.jsx + Main.jsx (1 min 30s)
+────────────────────────────────────────────────────────────────────────
+
+"Tras personalizar, llegamos al home.
+
+El layout se divide en dos columnas:
+
+  Columna principal (izquierda):
+    - EventsSection.jsx: un carrusel con el evento destacado
+      (tarjeta horizontal grande) y una cuadrícula con el resto
+      de eventos. Paginación inferior.
+    - Cada EventCard.jsx muestra: imagen, fecha, ubicación,
+      organizador, asistentes, descripción corta, botón de like
+      (corazón) y enlace 'Ver más'.
+    - Las cards están optimizadas con React.memo para no
+      re-renderizar innecesariamente.
+
+  Columna lateral (derecha):
+    - GroupsPanel: los 4 grupos/eventos a los que te has unido.
+    - ChatsPanel: los últimos 4 chats. Puedes abrirlos en un
+      panel emergente dentro del home, sin salir de la página.
+    - Banner de Premium.
+
+  El Header.jsx está arriba con:
+    - Logo + navegación: Inicio, Eventos, Grupos, Chats, Amigos.
+    - Buscador de eventos.
+    - Toggle de tema oscuro/claro.
+    - Campana de notificaciones con contador de no leídas.
+    - Menú de usuario con foto, nombre y opciones desplegables."
+
+
+────────────────────────────────────────────────────────────────────────
+  6. EXPLORAR EVENTOS — EventsList.jsx (1 min)
+────────────────────────────────────────────────────────────────────────
+
+"En la página de Eventos tenemos el listado completo.
+
+Podemos buscar por texto, filtrar por género musical,
+por aptitud, y por ubicación.
+
+Cada evento muestra su tarjeta con like/unlike en tiempo real.
+La paginación va cargando más resultados.
+
+Esto llama al endpoint GET /eventos/buscar con los filtros."
+
+
+────────────────────────────────────────────────────────────────────────
+  7. DETALLE DE EVENTO — Event.jsx (1 min 30s)
+────────────────────────────────────────────────────────────────────────
+
+"Al hacer clic en un evento, entramos al detalle.
+
+Aquí tenemos:
+  - Imagen de cabecera (portada del evento).
+  - Título, descripción completa, fechas, ubicación.
+  - Botón de 'Me gusta' con contador.
+  - Botón de 'Unirse / Abandonar'.
+  - Sección de fotos del evento: si eres el organizador,
+    puedes subir fotos (portada + adicionales).
+  - Lista de participantes con paginación.
+  - Sección de comentarios (EventComments.jsx): los asistentes
+    pueden comentar, y se ven los 'me gustas' de cada comentario.
+  - Eventos relacionados abajo.
+
+Si el usuario es EMPRESA, PREMIUM o ADMIN, ve un botón
+'Editar evento' que lleva al formulario de edición."
+
+
+────────────────────────────────────────────────────────────────────────
+  8. CREAR / EDITAR EVENTO — EventEdicion.jsx (1 min)
+────────────────────────────────────────────────────────────────────────
+
+"Solo pueden crear eventos:
+  - Usuarios PREMIUM
+  - Usuarios EMPRESA
+  - ADMIN
+
+El formulario contiene:
+  - Nombre, ubicación, descripción.
+  - Fecha de inicio y fecha final.
+  - Selección de aptitud (tipo de evento).
+  - Selección de géneros musicales.
+  - Subida de foto de portada y fotos adicionales.
+
+Si es edición (detectado por el parámetro :id en la URL),
+carga los datos existentes y permite modificarlos."
+
+
+────────────────────────────────────────────────────────────────────────
+  9. MIS EVENTOS — MisEventos.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"En 'Mis Eventos' vemos separados:
+  - Eventos que he creado (con enlace a editar).
+  - Eventos a los que me he unido.
+
+Usa el componente EventCarousel para mostrar las tarjetas."
+
+
+────────────────────────────────────────────────────────────────────────
+  10. AMIGOS — Amigos.jsx (1 min)
+────────────────────────────────────────────────────────────────────────
+
+"La página de Amigos tiene dos pestañas:
+
+  - AMIGOS: lista de amigos actuales con buscador interno.
+  - SOLICITUDES: solicitudes de amistad recibidas, con botones
+    de aceptar o rechazar.
+
+  Además, hay un buscador global de usuarios para encontrar
+  y agregar gente.
+
+  Desde el perfil de otro usuario (PerfilUsuario.jsx) puedes:
+    - Enviar solicitud de amistad.
+    - Cancelar solicitud.
+    - Aceptar solicitud.
+    - Eliminar amigo.
+    - Iniciar chat privado."
+
+
+────────────────────────────────────────────────────────────────────────
+  11. CHATS — Chats.jsx (1 min 30s)
+────────────────────────────────────────────────────────────────────────
+
+"El sistema de chat es el corazón social de la app.
+
+Usa WebSocket con STOMP sobre SockJS para mensajería
+en tiempo real.
+
+  - ChatConversation.jsx: muestra los mensajes del chat activo
+    con diseño diferenciado (mensajes propios a la derecha,
+    ajenos a la izquierda). Input para enviar mensajes.
+
+  - ChatsPanel.jsx: en el home, muestra los últimos chats
+    y permite abrirlos en un panel lateral.
+
+  - La página /chats muestra todos los chats: privados y
+    grupales.
+
+  - Cada evento tiene su propio chat grupal, creado
+    automáticamente al inscribirse.
+
+  - Los mensajes llegan en tiempo real sin recargar la página.
+
+  - El hook useChat.js gestiona toda la lógica: apertura de
+    chats, suscripción a salas, envío de mensajes.
+  - useWebSocket.js maneja la conexión STOMP con
+    reconexión automática cada 5 segundos."
+
+
+────────────────────────────────────────────────────────────────────────
+  12. GRUPOS — Groups.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"En Grupos se ven los eventos a los que te has unido.
+Cada uno tiene botón 'Chat grupal' que abre el chat del evento,
+y botón 'Salir' para abandonar el evento."
+
+
+────────────────────────────────────────────────────────────────────────
+  13. PERFIL — MiPerfil.jsx + PerfilUsuario.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"Mi Perfil permite editar:
+  - Foto de perfil (subida / eliminación).
+  - Descripción personal.
+
+  PerfilUsuario.jsx es la vista de otro usuario, donde se ven
+  sus datos públicos y se pueden realizar acciones de amistad."
+
+
+────────────────────────────────────────────────────────────────────────
+  14. PREMIUM — Premium.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"Página que muestra los beneficios de Premium:
+  - Crear eventos ilimitados.
+  - Badge exclusivo en el perfil.
+  - Mayor visibilidad de tus eventos.
+
+  Un botón activa Premium al instante (es gratis en el
+  entorno demo)."
+
+────────────────────────────────────────────────────────────────────────
+  15. AJUSTES — Settings.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"En Ajustes puedes:
+  - Cambiar email.
+  - Cambiar contraseña (pide la actual).
+  - Eliminar cuenta (confirmación escribiendo 'ELIMINAR')."
+
+
+────────────────────────────────────────────────────────────────────────
+  16. DASHBOARD — Dashboard.jsx (30s)
+────────────────────────────────────────────────────────────────────────
+
+"Panel de estadísticas personales:
+  - Tarjetas con total de eventos, asistentes, likes y comentarios.
+  - Tabla de eventos con métricas individuales."
+
+
+────────────────────────────────────────────────────────────────────────
+  17. PANEL DE ADMINISTRACIÓN — AdminPanel.jsx (1 min 30s)
+────────────────────────────────────────────────────────────────────────
+
+"El panel de admin está en una ruta separada: /groove-admin.
+
+  - Login de admin independiente.
+  - Pestañas: Usuarios, Eventos, Reportes.
+  - Cada pestaña tiene una tabla paginada con acciones:
+      * Usuarios: ver detalle, editar, eliminar.
+      * Eventos: ver detalle, eliminar.
+      * Reportes: ver detalle, marcar como resuelto/rechazado.
+  - Vista de detalle de usuario, evento y reporte.
+  - Gestión de chats: listado de todos los chats, vista de
+    mensajes de cada chat.
+
+  Arriba: navegación a chats admin, volver al home, cerrar
+  sesión."
+
+
+────────────────────────────────────────────────────────────────────────
+  18. NOTIFICACIONES (30s)
+────────────────────────────────────────────────────────────────────────
+
+"El sistema de notificaciones se basa en polling cada 15
+segundos.
+
+  - El header muestra un contador en la campana.
+  - El panel desplegable (NotificationsPanel.jsx) lista las
+    notificaciones con tipo:
+      * SOLICITUD_AMISTAD
+      * SOLICITUD_ACEPTADA
+      * NUEVO_COMENTARIO
+      * USUARIO_SE_UNIO
+  - Se pueden marcar como leídas individualmente o todas.
+  - Al hacer clic, navega al recurso correspondiente."
+
+
+────────────────────────────────────────────────────────────────────────
+  19. TEMA OSCURO/CLARO — ThemeContext.jsx (15s)
+────────────────────────────────────────────────────────────────────────
+
+"Toggle en el header que cambia entre modo claro y oscuro.
+  - Persiste la preferencia en localStorage.
+  - Si no hay preferencia guardada, usa la del sistema
+    (prefers-color-scheme).
+  - Los colores cambian de tonos crema/marrones a oscuros."
+
+
+────────────────────────────────────────────────────────────────────────
+  20. CIERRE (30s)
+────────────────────────────────────────────────────────────────────────
+
+"En resumen, GrooveLink cubre todo el flujo:
+
+  Registro → Personalización → Descubrir eventos →
+  Unirse → Chatear en tiempo real → Hacer amigos →
+  Asistir a conciertos.
+
+  El frontend está construido con React 19, Vite 7,
+  Tailwind CSS v4, WebSockets con STOMP, y una
+  arquitectura basada en componentes lazy-loaded.
+
+  Todo se comunica con el backend Spring Boot mediante
+  una API REST y WebSockets para lo实时."
+
+
+========================================================================
+  NOTAS PARA EL PRESENTADOR
+========================================================================
+
+- Abrir la app en el navegador antes de empezar.
+- Tener datos demo cargados (ejecutar demo-insert.sql).
+- Tener al menos dos cuentas para mostrar chat y amistades.
+- Mostrar el toggle oscuro/claro en algún momento.
+- Al hablar del chat, mostrar cómo llegan los mensajes en
+  tiempo real (abrir dos navegadores o pestañas).
+- Mostrar el panel admin con datos reales.
+
+========================================================================

@@ -52,22 +52,22 @@ public class Evento {
 	private Integer numeroAsistentes;
 
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PersonaUneEvento> personaUneEventos;
+    private List<PersonaUneEvento> personaUneEventos = new java.util.ArrayList<>();
 
 	@OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PersonaMeGustaEvento> megustas;
+	private List<PersonaMeGustaEvento> megustas = new java.util.ArrayList<>();
     
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<FotoEvento> fotos;
+    private java.util.List<FotoEvento> fotos = new java.util.ArrayList<>();
 
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<EventoAptitud> aptitudes;
+    private java.util.List<EventoAptitud> aptitudes = new java.util.ArrayList<>();
 
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<EventoGenero> generos;
+    private java.util.List<EventoGenero> generos = new java.util.ArrayList<>();
 
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<PersonaComentarioEvento> comentarios;
+    private java.util.List<PersonaComentarioEvento> comentarios = new java.util.ArrayList<>();
 
 	public Long getId() {
 		return id;

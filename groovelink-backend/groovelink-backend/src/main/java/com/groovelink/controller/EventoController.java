@@ -188,13 +188,17 @@ public class EventoController {
 
         // Actualizar aptitudes
         if (request.getAptitudesIds() != null) {
-            evento.getAptitudes().clear();
+            if (evento.getAptitudes() != null) {
+                evento.getAptitudes().clear();
+            }
             evento.setAptitudes(eventoService.crearRelacionesAptitudes(evento, request.getAptitudesIds()));
         }
 
         // Actualizar géneros
         if (request.getGenerosIds() != null) {
-            evento.getGeneros().clear();
+            if (evento.getGeneros() != null) {
+                evento.getGeneros().clear();
+            }
             evento.setGeneros(eventoService.crearRelacionesGeneros(evento, request.getGenerosIds()));
         }
 
